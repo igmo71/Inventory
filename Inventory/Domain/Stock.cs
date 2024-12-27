@@ -5,6 +5,8 @@ namespace Inventory.Domain
 {
     public class Stock
     {
+        public Guid Id { get; set; }
+     
         public Asset? Asset { get; set; }
         public Guid AssetId { get; set; }
 

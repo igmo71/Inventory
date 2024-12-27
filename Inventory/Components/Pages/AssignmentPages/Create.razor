@@ -16,6 +16,16 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
+                <label for="assetid" class="form-label">AssetId:</label> 
+                <InputText id="assetid" @bind-Value="Assignment.AssetIdString" class="form-control" /> 
+                <ValidationMessage For="() => Assignment.AssetId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="assigneeid" class="form-label">AssigneeId:</label> 
+                <InputText id="assigneeid" @bind-Value="Assignment.AssigneeId" class="form-control" /> 
+                <ValidationMessage For="() => Assignment.AssigneeId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
                 <label for="balance" class="form-label">Balance:</label> 
                 <InputNumber id="balance" @bind-Value="Assignment.Balance" class="form-control" /> 
                 <ValidationMessage For="() => Assignment.Balance" class="text-danger" /> 

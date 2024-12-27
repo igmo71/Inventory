@@ -21,7 +21,17 @@ else
             <EditForm method="post" Model="Stock" OnValidSubmit="UpdateStock" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
                 <ValidationSummary role="alert"/>
-                <input type="hidden" name="Stock.AssetId" value="@Stock.AssetId" />
+                <input type="hidden" name="Stock.Id" value="@Stock.Id" />
+                <div class="mb-3">
+                    <label for="assetid" class="form-label">AssetId:</label>
+                    <InputText id="assetid" @bind-Value="Stock.AssetIdString" class="form-control" />
+                    <ValidationMessage For="() => Stock.AssetId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="locationid" class="form-label">LocationId:</label>
+                    <InputText id="locationid" @bind-Value="Stock.LocationIdString" class="form-control" />
+                    <ValidationMessage For="() => Stock.LocationId" class="text-danger" />
+                </div>
                 <div class="mb-3">
                     <label for="balance" class="form-label">Balance:</label>
                     <InputNumber id="balance" @bind-Value="Stock.Balance" class="form-control" />
@@ -39,7 +49,7 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    private Guid AssetId { get; set; }
+    private Guid Id { get; set; }
 
     [SupplyParameterFromForm]
     private Stock? Stock { get; set; }
@@ -47,7 +57,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        Stock ??= await context.Stocks.FirstOrDefaultAsync(m => m.AssetId == AssetId);
+        Stock ??= await context.Stocks.FirstOrDefaultAsync(m => m.Id == Id);
 
         if (Stock is null)
         {
@@ -68,7 +78,7 @@ else
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!StockExists(Stock!.AssetId))
+            if (!StockExists(Stock!.Id))
             {
                 NavigationManager.NavigateTo("notfound");
             }
@@ -81,9 +91,9 @@ else
         NavigationManager.NavigateTo("/stocks");
     }
 
-    private bool StockExists(Guid assetid)
+    private bool StockExists(Guid id)
     {
         using var context = DbFactory.CreateDbContext();
-        return context.Stocks.Any(e => e.AssetId == assetid);
+        return context.Stocks.Any(e => e.Id == id);
     }
 }

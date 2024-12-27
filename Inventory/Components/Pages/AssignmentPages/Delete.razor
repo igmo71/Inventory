@@ -18,6 +18,14 @@
     }
     else {
         <dl class="row">
+            <dt class="col-sm-2">AssetId</dt>
+            <dd class="col-sm-10">@assignment.AssetId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">AssigneeId</dt>
+            <dd class="col-sm-10">@assignment.AssigneeId</dd>
+        </dl>
+        <dl class="row">
             <dt class="col-sm-2">Balance</dt>
             <dd class="col-sm-10">@assignment.Balance</dd>
         </dl>
@@ -32,12 +40,12 @@
     private Assignment? assignment;
 
     [SupplyParameterFromQuery]
-    private Guid AssetId { get; set; }
+    private Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        assignment = await context.Assignments.FirstOrDefaultAsync(m => m.AssetId == AssetId);
+        assignment = await context.Assignments.FirstOrDefaultAsync(m => m.Id == Id);
 
         if (assignment is null)
         {

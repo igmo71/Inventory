@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241227162429_Initialize")]
+    [Migration("20241227170915_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -155,6 +155,10 @@ namespace Inventory.Migrations
 
             modelBuilder.Entity("Inventory.Domain.Assignment", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("AssetId")
                         .HasColumnType("uniqueidentifier");
 
@@ -164,7 +168,9 @@ namespace Inventory.Migrations
                     b.Property<double>("Balance")
                         .HasColumnType("float");
 
-                    b.HasKey("AssetId", "AssigneeId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
 
                     b.HasIndex("AssigneeId");
 
@@ -294,16 +300,22 @@ namespace Inventory.Migrations
 
             modelBuilder.Entity("Inventory.Domain.Stock", b =>
                 {
-                    b.Property<Guid>("AssetId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("LocationId")
+                    b.Property<Guid>("AssetId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("Balance")
                         .HasColumnType("float");
 
-                    b.HasKey("AssetId", "LocationId");
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
 
                     b.HasIndex("LocationId");
 
@@ -530,8 +542,7 @@ namespace Inventory.Migrations
                     b.HasOne("Inventory.Data.ApplicationUser", "Assignee")
                         .WithMany()
                         .HasForeignKey("AssigneeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Asset");
 

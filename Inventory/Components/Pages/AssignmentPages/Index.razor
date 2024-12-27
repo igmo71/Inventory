@@ -15,12 +15,14 @@
 </p>
 
 <QuickGrid Class="table" Items="context.Assignments">
+    <PropertyColumn Property="assignment => assignment.AssetId" />
+    <PropertyColumn Property="assignment => assignment.AssigneeId" />
     <PropertyColumn Property="assignment => assignment.Balance" />
 
     <TemplateColumn Context="assignment">
-        <a href="@($"assignments/edit?assetid={assignment.AssetId}")">Edit</a> |
-        <a href="@($"assignments/details?assetid={assignment.AssetId}")">Details</a> |
-        <a href="@($"assignments/delete?assetid={assignment.AssetId}")">Delete</a>
+        <a href="@($"assignments/edit?id={assignment.Id}")">Edit</a> |
+        <a href="@($"assignments/details?id={assignment.Id}")">Details</a> |
+        <a href="@($"assignments/delete?id={assignment.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
 

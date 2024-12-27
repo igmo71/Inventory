@@ -18,6 +18,14 @@
     }
     else {
         <dl class="row">
+            <dt class="col-sm-2">AssetId</dt>
+            <dd class="col-sm-10">@stock.AssetId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">LocationId</dt>
+            <dd class="col-sm-10">@stock.LocationId</dd>
+        </dl>
+        <dl class="row">
             <dt class="col-sm-2">Balance</dt>
             <dd class="col-sm-10">@stock.Balance</dd>
         </dl>
@@ -32,12 +40,12 @@
     private Stock? stock;
 
     [SupplyParameterFromQuery]
-    private Guid AssetId { get; set; }
+    private Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        stock = await context.Stocks.FirstOrDefaultAsync(m => m.AssetId == AssetId);
+        stock = await context.Stocks.FirstOrDefaultAsync(m => m.Id == Id);
 
         if (stock is null)
         {

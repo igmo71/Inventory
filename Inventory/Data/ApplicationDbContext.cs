@@ -48,7 +48,7 @@ namespace Inventory.Data
             builder.Entity<OrderItem>().HasOne(e => e.Order).WithMany(e => e.Items).HasForeignKey(e => e.OrderId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
             builder.Entity<OrderItem>().HasOne(e => e.Asset).WithMany().HasForeignKey(e => e.AssetId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Assignment>().HasKey(e => new { e.AssetId, e.AssigneeId });
+            builder.Entity<Assignment>().HasKey(e => e.Id);
             builder.Entity<Assignment>().HasOne(e => e.Asset).WithMany().HasForeignKey(e => e.AssetId).OnDelete(DeleteBehavior.Cascade);
             builder.Entity<Assignment>().HasOne(e => e.Assignee).WithMany().HasForeignKey(e => e.AssigneeId).OnDelete(DeleteBehavior.Cascade);
 
@@ -57,7 +57,7 @@ namespace Inventory.Data
             builder.Entity<AssignTurnover>().HasOne(e => e.Asset).WithMany().HasForeignKey(e => e.AssetId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
             builder.Entity<AssignTurnover>().HasOne(e => e.Assignee).WithMany().HasForeignKey(e => e.AssigneeId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Stock>().HasKey(e => new { e.AssetId, e.LocationId });
+            builder.Entity<Stock>().HasKey(e => e.Id);
             builder.Entity<Stock>().HasOne(e => e.Asset).WithMany().HasForeignKey(e => e.AssetId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
             builder.Entity<Stock>().HasOne(e => e.Location).WithMany().HasForeignKey(e => e.LocationId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
 

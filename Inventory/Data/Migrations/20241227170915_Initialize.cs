@@ -77,13 +77,14 @@ namespace Inventory.Migrations
                 name: "Assignments",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AssetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AssigneeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AssigneeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Balance = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Assignments", x => new { x.AssetId, x.AssigneeId });
+                    table.PrimaryKey("PK_Assignments", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Assignments_AspNetUsers_AssigneeId",
                         column: x => x.AssigneeId,
@@ -102,13 +103,14 @@ namespace Inventory.Migrations
                 name: "Stocks",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AssetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Balance = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Stocks", x => new { x.AssetId, x.LocationId });
+                    table.PrimaryKey("PK_Stocks", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Stocks_Assets_AssetId",
                         column: x => x.AssetId,
@@ -280,6 +282,11 @@ namespace Inventory.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Assignments_AssetId",
+                table: "Assignments",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Assignments_AssigneeId",
                 table: "Assignments",
                 column: "AssigneeId");
@@ -343,6 +350,11 @@ namespace Inventory.Migrations
                 name: "IX_Orders_StatusId",
                 table: "Orders",
                 column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stocks_AssetId",
+                table: "Stocks",
+                column: "AssetId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stocks_LocationId",

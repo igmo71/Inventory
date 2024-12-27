@@ -1,6 +1,4 @@
-﻿using Inventory.Data;
-
-namespace Inventory.Domain
+﻿namespace Inventory.Domain
 {
     public class StockTurnover
     {

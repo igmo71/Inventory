@@ -1,4 +1,6 @@
-﻿namespace Inventory.Domain
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Inventory.Domain
 {
     public class Asset
     {
@@ -16,7 +18,7 @@
 
         public List<Location>? Locations { get; set; }
 
-        //[NotMapped]
+        [NotMapped]
         public string? ParentIdString
         {
             get

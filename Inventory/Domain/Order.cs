@@ -17,10 +17,10 @@ namespace Inventory.Domain
         public Guid DirectionId { get; set; }
 
         public ApplicationUser? Author { get; set; }
-        public Guid AuthorId { get; set; }
+        public string? AuthorId { get; set; }
 
         public ApplicationUser? Assignee { get; set; }
-        public Guid AssigneeId { get; set; }
+        public string? AssigneeId { get; set; }
 
         public Location? LocationFrom { get; set; }
         public Guid? LocationFromId { get; set; }

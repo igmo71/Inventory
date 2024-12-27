@@ -1,4 +1,5 @@
 ﻿using Inventory.Data;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Inventory.Domain
 {
@@ -12,7 +13,7 @@ namespace Inventory.Domain
 
         public double Balance { get; set; }
 
-        //[NotMapped]
+        [NotMapped]
         public string? AssetIdString
         {
             get
@@ -26,7 +27,7 @@ namespace Inventory.Domain
             }
         }
 
-        //[NotMapped]
+        [NotMapped]
         public string? LocationIdString
         {
             get

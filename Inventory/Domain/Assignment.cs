@@ -8,7 +8,7 @@ namespace Inventory.Domain
         public Guid AssetId { get; set; }
 
         public ApplicationUser? Assignee { get; set; }
-        public Guid AssigneeId { get; set; }
+        public string? AssigneeId { get; set; }
 
         public double Balance { get; set; }
     }

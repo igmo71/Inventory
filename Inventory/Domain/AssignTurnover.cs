@@ -15,7 +15,7 @@ namespace Inventory.Domain
         public Guid AssetId { get; set; }
 
         public ApplicationUser? Assignee { get; set; }
-        public Guid AssigneeId { get; set; }
+        public string? AssigneeId { get; set; }
 
         public double OpeningBalance { get; set; }
         public double Receipt { get; set; }

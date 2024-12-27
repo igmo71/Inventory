@@ -1,4 +1,6 @@
-﻿namespace Inventory.Domain
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Inventory.Domain
 {
     public class StockTurnover
     {
@@ -21,7 +23,7 @@
         public double ClosingBalance { get; set; }
         public double Turnover => Receipt - Expense;
 
-        //[NotMapped]
+        [NotMapped]
         public string? OrderIdString
         {
             get
@@ -35,7 +37,7 @@
             }
         }
 
-        //[NotMapped]
+        [NotMapped]
         public string? AssetIdString
         {
             get
@@ -49,7 +51,7 @@
             }
         }
 
-        //[NotMapped]
+        [NotMapped]
         public string? LocationIdString
         {
             get

@@ -1,0 +1,89 @@
+﻿@page "/orderstatuses/edit"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>OrderStatus</h2>
+<hr />
+@if (OrderStatus is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="OrderStatus" OnValidSubmit="UpdateOrderStatus" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="OrderStatus.Id" value="@OrderStatus.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="OrderStatus.Name" class="form-control" />
+                    <ValidationMessage For="() => OrderStatus.Name" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/orderstatuses">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private Guid Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private OrderStatus? OrderStatus { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        OrderStatus ??= await context.OrderStatuses.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (OrderStatus is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateOrderStatus()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(OrderStatus!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!OrderStatusExists(OrderStatus!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/orderstatuses");
+    }
+
+    private bool OrderStatusExists(Guid id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.OrderStatuses.Any(e => e.Id == id);
+    }
+}

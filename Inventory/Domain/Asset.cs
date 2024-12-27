@@ -29,8 +29,6 @@ namespace Inventory.Domain
             {
                 if (value != null)
                     ParentId = Guid.Parse(value);
-                else
-                    ParentId = null;
             }
         }
     }

@@ -1,0 +1,124 @@
+﻿@page "/stockturnovers/edit"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>StockTurnover</h2>
+<hr />
+@if (StockTurnover is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="StockTurnover" OnValidSubmit="UpdateStockTurnover" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="StockTurnover.Id" value="@StockTurnover.Id" />
+                <div class="mb-3">
+                    <label for="datetime" class="form-label">DateTime:</label>
+                    <InputDate id="datetime" @bind-Value="StockTurnover.DateTime" class="form-control" />
+                    <ValidationMessage For="() => StockTurnover.DateTime" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="orderid" class="form-label">OrderId:</label>
+                    <InputText id="orderid" @bind-Value="StockTurnover.OrderIdString" class="form-control" />
+                    <ValidationMessage For="() => StockTurnover.OrderId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="assetid" class="form-label">AssetId:</label>
+                    <InputText id="assetid" @bind-Value="StockTurnover.AssetIdString" class="form-control" />
+                    <ValidationMessage For="() => StockTurnover.AssetId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="locationid" class="form-label">LocationId:</label>
+                    <InputText id="locationid" @bind-Value="StockTurnover.LocationIdString" class="form-control" />
+                    <ValidationMessage For="() => StockTurnover.LocationId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="openingbalance" class="form-label">OpeningBalance:</label>
+                    <InputNumber id="openingbalance" @bind-Value="StockTurnover.OpeningBalance" class="form-control" />
+                    <ValidationMessage For="() => StockTurnover.OpeningBalance" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="receipt" class="form-label">Receipt:</label>
+                    <InputNumber id="receipt" @bind-Value="StockTurnover.Receipt" class="form-control" />
+                    <ValidationMessage For="() => StockTurnover.Receipt" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="expense" class="form-label">Expense:</label>
+                    <InputNumber id="expense" @bind-Value="StockTurnover.Expense" class="form-control" />
+                    <ValidationMessage For="() => StockTurnover.Expense" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="closingbalance" class="form-label">ClosingBalance:</label>
+                    <InputNumber id="closingbalance" @bind-Value="StockTurnover.ClosingBalance" class="form-control" />
+                    <ValidationMessage For="() => StockTurnover.ClosingBalance" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/stockturnovers">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private Guid Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private StockTurnover? StockTurnover { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        StockTurnover ??= await context.StockTurnovers.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (StockTurnover is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateStockTurnover()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(StockTurnover!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!StockTurnoverExists(StockTurnover!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/stockturnovers");
+    }
+
+    private bool StockTurnoverExists(Guid id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.StockTurnovers.Any(e => e.Id == id);
+    }
+}

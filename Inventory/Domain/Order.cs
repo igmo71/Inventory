@@ -1,4 +1,5 @@
 ﻿using Inventory.Data;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Inventory.Domain
 {
@@ -29,5 +30,61 @@ namespace Inventory.Domain
         public Guid? LocationToId { get; set; }
 
         public List<OrderItem>? Items { get; set; }
+
+        [NotMapped]
+        public string? StatusIdString
+        {
+            get
+            {
+                return StatusId.ToString();
+            }
+            set
+            {
+                if (value != null)
+                    StatusId = Guid.Parse(value);
+            }
+        }
+
+        [NotMapped]
+        public string? DirectionIdString
+        {
+            get
+            {
+                return DirectionId.ToString();
+            }
+            set
+            {
+                if (value != null)
+                    DirectionId = Guid.Parse(value);
+            }
+        }
+
+        [NotMapped]
+        public string? LocationFromIdString
+        {
+            get
+            {
+                return LocationFromId.ToString();
+            }
+            set
+            {
+                if (value != null)
+                    LocationFromId = Guid.Parse(value);
+            }
+        }
+
+        [NotMapped]
+        public string? LocationToIdString
+        {
+            get
+            {
+                return LocationToId.ToString();
+            }
+            set
+            {
+                if (value != null)
+                    LocationToId = Guid.Parse(value);
+            }
+        }
     }
 }

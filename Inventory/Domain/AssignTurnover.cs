@@ -1,4 +1,5 @@
 ﻿using Inventory.Data;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Inventory.Domain
 {
@@ -22,5 +23,33 @@ namespace Inventory.Domain
         public double Expense { get; set; }
         public double ClosingBalance { get; set; }
         public double Turnover => Receipt - Expense;
+
+        [NotMapped]
+        public string? AssetIdString
+        {
+            get
+            {
+                return AssetId.ToString();
+            }
+            set
+            {
+                if (value != null)
+                    AssetId = Guid.Parse(value);
+            }
+        }
+
+        [NotMapped]
+        public string? OrderIdString
+        {
+            get
+            {
+                return OrderId.ToString();
+            }
+            set
+            {
+                if (value != null)
+                    OrderId = Guid.Parse(value);
+            }
+        }
     }
 }

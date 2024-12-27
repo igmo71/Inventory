@@ -1,0 +1,89 @@
+﻿@page "/stocks/edit"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Stock</h2>
+<hr />
+@if (Stock is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Stock" OnValidSubmit="UpdateStock" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Stock.AssetId" value="@Stock.AssetId" />
+                <div class="mb-3">
+                    <label for="balance" class="form-label">Balance:</label>
+                    <InputNumber id="balance" @bind-Value="Stock.Balance" class="form-control" />
+                    <ValidationMessage For="() => Stock.Balance" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/stocks">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private Guid AssetId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Stock? Stock { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Stock ??= await context.Stocks.FirstOrDefaultAsync(m => m.AssetId == AssetId);
+
+        if (Stock is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateStock()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Stock!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!StockExists(Stock!.AssetId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/stocks");
+    }
+
+    private bool StockExists(Guid assetid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Stocks.Any(e => e.AssetId == assetid);
+    }
+}

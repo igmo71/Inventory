@@ -1,0 +1,44 @@
+﻿@page "/orderdirections/create"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>OrderDirection</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="OrderDirection" OnValidSubmit="AddOrderDirection" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="OrderDirection.Name" class="form-control" /> 
+                <ValidationMessage For="() => OrderDirection.Name" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/orderdirections">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private OrderDirection OrderDirection { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddOrderDirection()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.OrderDirections.Add(OrderDirection);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/orderdirections");
+    }
+}

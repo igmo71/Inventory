@@ -1,0 +1,55 @@
+﻿@page "/stocks/delete"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Stock</h2>
+    <hr />
+    @if (stock is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Balance</dt>
+            <dd class="col-sm-10">@stock.Balance</dd>
+        </dl>
+        <EditForm method="post" Model="stock" OnValidSubmit="DeleteStock" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(stock is null)">Delete</button> |
+            <a href="/stocks">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Stock? stock;
+
+    [SupplyParameterFromQuery]
+    private Guid AssetId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        stock = await context.Stocks.FirstOrDefaultAsync(m => m.AssetId == AssetId);
+
+        if (stock is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteStock()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Stocks.Remove(stock!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/stocks");
+    }
+}

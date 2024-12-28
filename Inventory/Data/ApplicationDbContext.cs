@@ -9,7 +9,6 @@ namespace Inventory.Data
         public DbSet<Asset> Assets { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderDirection> OrderDirections { get; set; }
         public DbSet<OrderStatus> OrderStatuses { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
@@ -36,7 +35,7 @@ namespace Inventory.Data
             );
 
             builder.Entity<Order>().HasKey(x => x.Id);
-            builder.Entity<Order>().HasOne(e => e.Direction).WithMany().HasForeignKey(e => e.DirectionId).HasPrincipalKey(e => e.Id);
+            //builder.Entity<Order>().HasOne(e => e.Direction).WithMany().HasForeignKey(e => e.DirectionId).HasPrincipalKey(e => e.Id);
             builder.Entity<Order>().HasOne(e => e.Status).WithMany().HasForeignKey(e => e.StatusId).HasPrincipalKey(e => e.Id);
             builder.Entity<Order>().HasOne(e => e.Author).WithMany().HasForeignKey(e => e.AuthorId).HasPrincipalKey(e => e.Id);
             builder.Entity<Order>().HasOne(e => e.Assignee).WithMany().HasForeignKey(e => e.AssigneeId).HasPrincipalKey(e => e.Id);

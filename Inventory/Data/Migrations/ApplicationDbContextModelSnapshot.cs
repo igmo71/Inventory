@@ -211,8 +211,8 @@ namespace Inventory.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("DirectionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("DirectionId")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("LocationFromId")
                         .HasColumnType("uniqueidentifier");
@@ -232,8 +232,6 @@ namespace Inventory.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.HasIndex("DirectionId");
-
                     b.HasIndex("LocationFromId");
 
                     b.HasIndex("LocationToId");
@@ -241,20 +239,6 @@ namespace Inventory.Migrations
                     b.HasIndex("StatusId");
 
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("Inventory.Domain.OrderDirection", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OrderDirections");
                 });
 
             modelBuilder.Entity("Inventory.Domain.OrderItem", b =>
@@ -565,12 +549,6 @@ namespace Inventory.Migrations
                         .WithMany()
                         .HasForeignKey("AuthorId");
 
-                    b.HasOne("Inventory.Domain.OrderDirection", "Direction")
-                        .WithMany()
-                        .HasForeignKey("DirectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Inventory.Domain.Location", "LocationFrom")
                         .WithMany()
                         .HasForeignKey("LocationFromId");
@@ -588,8 +566,6 @@ namespace Inventory.Migrations
                     b.Navigation("Assignee");
 
                     b.Navigation("Author");
-
-                    b.Navigation("Direction");
 
                     b.Navigation("LocationFrom");
 

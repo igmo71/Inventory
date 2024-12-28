@@ -14,8 +14,8 @@ namespace Inventory.Domain
         public OrderStatus? Status { get; set; }
         public Guid StatusId { get; set; }
 
-        public OrderDirection? Direction { get; set; }
-        public Guid DirectionId { get; set; }
+        //public OrderDirection? Direction { get; set; }
+        public int DirectionId { get; set; }
 
         public ApplicationUser? Author { get; set; }
         public string? AuthorId { get; set; }
@@ -45,19 +45,19 @@ namespace Inventory.Domain
             }
         }
 
-        [NotMapped]
-        public string? DirectionIdString
-        {
-            get
-            {
-                return DirectionId.ToString();
-            }
-            set
-            {
-                if (value != null)
-                    DirectionId = Guid.Parse(value);
-            }
-        }
+        //[NotMapped]
+        //public string? DirectionIdString
+        //{
+        //    get
+        //    {
+        //        return DirectionId.ToString();
+        //    }
+        //    set
+        //    {
+        //        if (value != null)
+        //            DirectionId = Guid.Parse(value);
+        //    }
+        //}
 
         [NotMapped]
         public string? LocationFromIdString

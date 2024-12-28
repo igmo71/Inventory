@@ -50,18 +50,6 @@ namespace Inventory.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderDirections",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderDirections", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OrderStatuses",
                 columns: table => new
                 {
@@ -133,7 +121,7 @@ namespace Inventory.Migrations
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DirectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DirectionId = table.Column<int>(type: "int", nullable: false),
                     AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     AssigneeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     LocationFromId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -162,12 +150,6 @@ namespace Inventory.Migrations
                         column: x => x.LocationToId,
                         principalTable: "Locations",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Orders_OrderDirections_DirectionId",
-                        column: x => x.DirectionId,
-                        principalTable: "OrderDirections",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Orders_OrderStatuses_StatusId",
                         column: x => x.StatusId,
@@ -332,11 +314,6 @@ namespace Inventory.Migrations
                 column: "AuthorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_DirectionId",
-                table: "Orders",
-                column: "DirectionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Orders_LocationFromId",
                 table: "Orders",
                 column: "LocationFromId");
@@ -403,9 +380,6 @@ namespace Inventory.Migrations
 
             migrationBuilder.DropTable(
                 name: "Locations");
-
-            migrationBuilder.DropTable(
-                name: "OrderDirections");
 
             migrationBuilder.DropTable(
                 name: "OrderStatuses");

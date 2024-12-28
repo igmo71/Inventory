@@ -10,8 +10,6 @@
 
         public bool IsEquipment { get; set; }
 
-        public string? SerialNumber { get; set; }
-
         public string? ParentId { get; set; }
         public Asset? Parent { get; set; }
 

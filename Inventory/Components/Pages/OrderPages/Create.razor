@@ -72,7 +72,6 @@
     private async Task AddOrder()
     {
         using var context = DbFactory.CreateDbContext();
-        Order.Id = Guid.CreateVersion7().ToString();
         context.Orders.Add(Order);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/orders");

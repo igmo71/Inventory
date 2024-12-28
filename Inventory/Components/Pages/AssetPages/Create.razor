@@ -30,12 +30,7 @@
                 <label for="isequipment" class="form-label">IsEquipment:</label> 
                 <InputCheckbox id="isequipment" @bind-Value="Asset.IsEquipment" class="form-check-input" /> 
                 <ValidationMessage For="() => Asset.IsEquipment" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="serialnumber" class="form-label">SerialNumber:</label> 
-                <InputText id="serialnumber" @bind-Value="Asset.SerialNumber" class="form-control" /> 
-                <ValidationMessage For="() => Asset.SerialNumber" class="text-danger" /> 
-            </div>        
+            </div>                        
             <div class="mb-3">
                 <label for="parentid" class="form-label">ParentId:</label> 
                 <InputText id="parentid" @bind-Value="Asset.ParentId" class="form-control" /> 

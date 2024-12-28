@@ -38,6 +38,11 @@ else
                     <ValidationMessage For="() => StockTurnover.AssetId" class="text-danger" />
                 </div>
                 <div class="mb-3">
+                    <label for="serialnumberid" class="form-label">SerialNumberId:</label>
+                    <InputText id="serialnumberid" @bind-Value="StockTurnover.SerialNumberId" class="form-control" />
+                    <ValidationMessage For="() => StockTurnover.SerialNumberId" class="text-danger" />
+                </div>
+                <div class="mb-3">
                     <label for="locationid" class="form-label">LocationId:</label>
                     <InputText id="locationid" @bind-Value="StockTurnover.LocationId" class="form-control" />
                     <ValidationMessage For="() => StockTurnover.LocationId" class="text-danger" />

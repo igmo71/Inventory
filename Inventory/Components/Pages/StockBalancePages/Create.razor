@@ -21,6 +21,11 @@
                 <ValidationMessage For="() => StockBalance.AssetId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
+                <label for="serialnumberid" class="form-label">SerialNumberId:</label> 
+                <InputText id="serialnumberid" @bind-Value="StockBalance.SerialNumberId" class="form-control" /> 
+                <ValidationMessage For="() => StockBalance.SerialNumberId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
                 <label for="locationid" class="form-label">LocationId:</label> 
                 <InputText id="locationid" @bind-Value="StockBalance.LocationId" class="form-control" /> 
                 <ValidationMessage For="() => StockBalance.LocationId" class="text-danger" /> 

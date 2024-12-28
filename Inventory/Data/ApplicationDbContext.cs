@@ -14,6 +14,8 @@ namespace Inventory.Data
         public DbSet<StockBalance> StockBalances { get; set; }
         public DbSet<StockTurnover> StockTurnovers { get; set; }
 
+        public DbSet<SerialNumber> SerialNumbers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -23,7 +25,6 @@ namespace Inventory.Data
             builder.Entity<Asset>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<Asset>().Property(e => e.ParentId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<Asset>().Property(e => e.Name).HasMaxLength(AppSettings.NAME_LENGTH);
-            builder.Entity<Asset>().Property(e => e.SerialNumber).HasMaxLength(AppSettings.NAME_LENGTH);
 
             builder.Entity<Location>().HasKey(e => e.Id);
             builder.Entity<Location>().HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).HasPrincipalKey(e => e.Id);
@@ -72,6 +73,12 @@ namespace Inventory.Data
             builder.Entity<StockTurnover>().Property(e => e.AssetId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<StockTurnover>().Property(e => e.LocationId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<StockTurnover>().Property(e => e.AssigneeId).HasMaxLength(AppSettings.USER_ID_LENGTH);
+
+            builder.Entity<SerialNumber>().HasKey(e => e.Id);
+            builder.Entity<SerialNumber>().HasOne(e => e.Asset).WithMany().HasForeignKey(e => e.AssetId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<SerialNumber>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<SerialNumber>().Property(e => e.AssetId).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<SerialNumber>().Property(e => e.Number).HasMaxLength(AppSettings.NAME_LENGTH);
         }
     }
 }

@@ -16,8 +16,6 @@ namespace Inventory.Domain
 
         public List<Asset>? Children { get; set; }
 
-        public List<Location>? Locations { get; set; }
-
         [NotMapped]
         public string? ParentIdString
         {

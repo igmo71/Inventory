@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Inventory.Data;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Inventory.Domain
 {
@@ -16,6 +17,9 @@ namespace Inventory.Domain
 
         public Location? Location { get; set; }
         public Guid LocationId { get; set; }
+
+        public ApplicationUser? Assignee { get; set; }
+        public string? AssigneeId { get; set; }
 
         public double OpeningBalance { get; set; }
         public double Receipt { get; set; }

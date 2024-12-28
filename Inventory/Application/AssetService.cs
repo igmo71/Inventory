@@ -1,11 +1,11 @@
-﻿using Inventory.Common;
+﻿using Inventory.Common.Results;
 using Inventory.Data;
 using Microsoft.EntityFrameworkCore;
 using Asset = Inventory.Domain.Asset;
 
 namespace Inventory.Application
 {
-    public interface IAssetService
+    interface IAssetService
     {
         Task<ListResult<Asset>> GetList(int skip, int? take);
         Task<Asset?> Get(string id);
@@ -15,7 +15,7 @@ namespace Inventory.Application
         bool Exists(string id);
     }
 
-    public class AssetService(IDbContextFactory<ApplicationDbContext> dbFactory) : IAssetService
+    class AssetService(IDbContextFactory<ApplicationDbContext> dbFactory) : IAssetService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Inventory.Common
+namespace Inventory.Common.Results
 {
     public class ListResult<T>
     {

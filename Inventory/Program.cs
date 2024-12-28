@@ -45,6 +45,7 @@ namespace Inventory
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
             builder.Services.AddScoped<IAssetService, AssetService>();
+            builder.Services.AddScoped<ILocationService, LocationService>();
 
             var app = builder.Build();
 

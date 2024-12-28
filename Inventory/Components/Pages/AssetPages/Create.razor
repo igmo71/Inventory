@@ -2,7 +2,6 @@
 @using Inventory.Application
 @using Microsoft.EntityFrameworkCore
 @using Inventory.Domain
-@* @inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory *@
 @inject NavigationManager NavigationManager
 @inject IAssetService Service
 
@@ -55,14 +54,8 @@
     [SupplyParameterFromForm]
     private Asset Asset { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddAsset()
     {
-        // using var context = DbFactory.CreateDbContext();
-        // Asset.Id = Guid.CreateVersion7().ToString();
-        // context.Assets.Add(Asset);
-        // await context.SaveChangesAsync();
-
         string id = await Service.Create(Asset);
         NavigationManager.NavigateTo("/assets");
     }

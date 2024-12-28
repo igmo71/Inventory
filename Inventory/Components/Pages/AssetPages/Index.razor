@@ -5,8 +5,6 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Inventory.Domain
 @using Inventory.Data
-@* @implements IAsyncDisposable
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory *@
 @inject IAssetService Service
 
 @attribute [Authorize]
@@ -35,12 +33,10 @@
 </QuickGrid>
 
 @code {
-    // private ApplicationDbContext context = default!;
     GridItemsProvider<Asset>? itemsProvider;
 
     protected override void OnInitialized()
     {
-        //context = DbFactory.CreateDbContext();
         itemsProvider = async request =>
         {
             var result = await Service.GetList(request.StartIndex, request.Count);
@@ -56,6 +52,4 @@
             return response;
         };
     }
-
-    //public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

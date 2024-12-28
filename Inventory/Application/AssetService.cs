@@ -8,10 +8,10 @@ namespace Inventory.Application
     public interface IAssetService
     {
         Task<ListResult<Asset>> GetList(int skip, int? take);
-        Task<string> Create(Asset asset);
         Task<Asset?> Get(string id);
-        Task Delete(Asset asset);
+        Task<string> Create(Asset asset);
         Task Update(Asset asset);
+        Task Delete(Asset asset);
         bool Exists(string id);
     }
 
@@ -49,13 +49,6 @@ namespace Inventory.Application
             return asset.Id;
         }
 
-        public async Task Delete(Asset asset)
-        {
-            using var context = _dbFactory.CreateDbContext();
-            context.Assets.Remove(asset);
-            await context.SaveChangesAsync();
-        }
-
         public async Task Update(Asset asset)
         {
             using var context = _dbFactory.CreateDbContext();
@@ -76,6 +69,13 @@ namespace Inventory.Application
                     throw;
                 }
             }
+        }
+
+        public async Task Delete(Asset asset)
+        {
+            using var context = _dbFactory.CreateDbContext();
+            context.Assets.Remove(asset);
+            await context.SaveChangesAsync();
         }
 
         public bool Exists(string id)

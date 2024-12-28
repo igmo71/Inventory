@@ -2,7 +2,6 @@
 @using Inventory.Application
 @using Microsoft.EntityFrameworkCore
 @using Inventory.Domain
-@* @inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory *@
 @inject NavigationManager NavigationManager
 @inject IAssetService Service
 
@@ -46,9 +45,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // using var context = DbFactory.CreateDbContext();
-        // asset = await context.Assets.FirstOrDefaultAsync(m => m.Id == Id);
-
         if (Id is not null)
             asset = await Service.Get(Id);
 

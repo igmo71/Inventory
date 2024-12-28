@@ -1,0 +1,65 @@
+﻿@page "/assets/create"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Asset</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Asset" OnValidSubmit="AddAsset" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Asset.Name" class="form-control" /> 
+                <ValidationMessage For="() => Asset.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isfolder" class="form-label">IsFolder:</label> 
+                <InputCheckbox id="isfolder" @bind-Value="Asset.IsFolder" class="form-check-input" /> 
+                <ValidationMessage For="() => Asset.IsFolder" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isequipment" class="form-label">IsEquipment:</label> 
+                <InputCheckbox id="isequipment" @bind-Value="Asset.IsEquipment" class="form-check-input" /> 
+                <ValidationMessage For="() => Asset.IsEquipment" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="serialnumber" class="form-label">SerialNumber:</label> 
+                <InputText id="serialnumber" @bind-Value="Asset.SerialNumber" class="form-control" /> 
+                <ValidationMessage For="() => Asset.SerialNumber" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="parentid" class="form-label">ParentId:</label> 
+                <InputText id="parentid" @bind-Value="Asset.ParentId" class="form-control" /> 
+                <ValidationMessage For="() => Asset.ParentId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/assets">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Asset Asset { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddAsset()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Asset.Id = Guid.CreateVersion7().ToString();
+        context.Assets.Add(Asset);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/assets");
+    }
+}

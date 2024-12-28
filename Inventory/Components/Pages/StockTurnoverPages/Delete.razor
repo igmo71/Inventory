@@ -1,0 +1,87 @@
+﻿@page "/stockturnovers/delete"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>StockTurnover</h2>
+    <hr />
+    @if (stockturnover is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">DateTime</dt>
+            <dd class="col-sm-10">@stockturnover.DateTime</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">OrderId</dt>
+            <dd class="col-sm-10">@stockturnover.OrderId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">AssetId</dt>
+            <dd class="col-sm-10">@stockturnover.AssetId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">LocationId</dt>
+            <dd class="col-sm-10">@stockturnover.LocationId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">AssigneeId</dt>
+            <dd class="col-sm-10">@stockturnover.AssigneeId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">OpeningBalance</dt>
+            <dd class="col-sm-10">@stockturnover.OpeningBalance</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Receipt</dt>
+            <dd class="col-sm-10">@stockturnover.Receipt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Expense</dt>
+            <dd class="col-sm-10">@stockturnover.Expense</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ClosingBalance</dt>
+            <dd class="col-sm-10">@stockturnover.ClosingBalance</dd>
+        </dl>
+        <EditForm method="post" Model="stockturnover" OnValidSubmit="DeleteStockTurnover" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(stockturnover is null)">Delete</button> |
+            <a href="/stockturnovers">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private StockTurnover? stockturnover;
+
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        stockturnover = await context.StockTurnovers.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (stockturnover is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteStockTurnover()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.StockTurnovers.Remove(stockturnover!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/stockturnovers");
+    }
+}

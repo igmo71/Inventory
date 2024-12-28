@@ -1,0 +1,104 @@
+﻿@page "/stockbalances/edit"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>StockBalance</h2>
+<hr />
+@if (StockBalance is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="StockBalance" OnValidSubmit="UpdateStockBalance" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="StockBalance.Id" value="@StockBalance.Id" />
+                <div class="mb-3">
+                    <label for="assetid" class="form-label">AssetId:</label>
+                    <InputText id="assetid" @bind-Value="StockBalance.AssetId" class="form-control" />
+                    <ValidationMessage For="() => StockBalance.AssetId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="locationid" class="form-label">LocationId:</label>
+                    <InputText id="locationid" @bind-Value="StockBalance.LocationId" class="form-control" />
+                    <ValidationMessage For="() => StockBalance.LocationId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="assigneeid" class="form-label">AssigneeId:</label>
+                    <InputText id="assigneeid" @bind-Value="StockBalance.AssigneeId" class="form-control" />
+                    <ValidationMessage For="() => StockBalance.AssigneeId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="balance" class="form-label">Balance:</label>
+                    <InputNumber id="balance" @bind-Value="StockBalance.Balance" class="form-control" />
+                    <ValidationMessage For="() => StockBalance.Balance" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/stockbalances">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private StockBalance? StockBalance { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        StockBalance ??= await context.StockBalances.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (StockBalance is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateStockBalance()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(StockBalance!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!StockBalanceExists(StockBalance!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/stockbalances");
+    }
+
+    private bool StockBalanceExists(string id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.StockBalances.Any(e => e.Id == id);
+    }
+}

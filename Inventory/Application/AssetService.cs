@@ -1,5 +1,5 @@
-﻿using Inventory.Data;
-using Microsoft.AspNetCore.Components;
+﻿using Inventory.Common;
+using Inventory.Data;
 using Microsoft.EntityFrameworkCore;
 using Asset = Inventory.Domain.Asset;
 
@@ -7,6 +7,7 @@ namespace Inventory.Application
 {
     public interface IAssetService
     {
+        Task<ListResult<Asset>> GetList(int skip, int? take);
         Task<string> Create(Asset asset);
         Task<Asset?> Get(string id);
         Task Delete(Asset asset);
@@ -18,13 +19,18 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<string> Create(Asset asset)
+        public async Task<ListResult<Asset>> GetList(int skip, int? take)
         {
             using var context = _dbFactory.CreateDbContext();
-            asset.Id = Guid.CreateVersion7().ToString();
-            context.Assets.Add(asset);
-            await context.SaveChangesAsync();
-            return asset.Id;
+            var query = context.Assets.Skip(skip);
+
+            if (take is not null)
+                query = query.Take((int)take);
+
+            var result = await query.AsNoTracking().ToListAsync();
+            var total = context.Assets.Count();
+
+            return ListResult<Asset>.Success(result, total);
         }
 
         public async Task<Asset?> Get(string id)
@@ -32,6 +38,15 @@ namespace Inventory.Application
             using var context = _dbFactory.CreateDbContext();
             var asset = await context.Assets.FirstOrDefaultAsync(m => m.Id == id);
             return asset;
+        }
+
+        public async Task<string> Create(Asset asset)
+        {
+            using var context = _dbFactory.CreateDbContext();
+            asset.Id = Guid.CreateVersion7().ToString();
+            context.Assets.Add(asset);
+            await context.SaveChangesAsync();
+            return asset.Id;
         }
 
         public async Task Delete(Asset asset)

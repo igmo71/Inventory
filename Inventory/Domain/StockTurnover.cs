@@ -4,21 +4,21 @@ namespace Inventory.Domain
 {
     public class StockTurnover
     {
-        public required string Id { get; set; }
+        public string? Id { get; set; }
 
         public DateTime DateTime { get; set; }
 
         public Order? Order { get; set; }
-        public required string OrderId { get; set; }
+        public string? OrderId { get; set; }
 
         public Asset? Asset { get; set; }
-        public required string AssetId { get; set; }
+        public string? AssetId { get; set; }
 
         public Location? Location { get; set; }
-        public required string LocationId { get; set; }
+        public string? LocationId { get; set; }
 
         public ApplicationUser? Assignee { get; set; }
-        public required string AssigneeId { get; set; }
+        public string? AssigneeId { get; set; }
 
         public double OpeningBalance { get; set; }
         public double Receipt { get; set; }

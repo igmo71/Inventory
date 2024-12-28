@@ -2,7 +2,7 @@
 {
     public class Location
     {
-        public required string Id { get; set; }
+        public string? Id { get; set; }
 
         public string? Name { get; set; }
 

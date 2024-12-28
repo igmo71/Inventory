@@ -39,9 +39,9 @@ namespace Inventory.Data
             builder.Entity<Order>().HasOne(e => e.LocationTo).WithMany().HasForeignKey(e => e.LocationToId).HasPrincipalKey(e => e.Id);
             builder.Entity<Order>().HasMany(e => e.Items).WithOne(e => e.Order).HasForeignKey(e => e.OrderId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
             builder.Entity<Order>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<Order>().Property(e => e.AuthorId).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<Order>().Property(e => e.AssigneeFromId).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<Order>().Property(e => e.AssigneeToId).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<Order>().Property(e => e.AuthorId).HasMaxLength(AppSettings.USER_ID_LENGTH);
+            builder.Entity<Order>().Property(e => e.AssigneeFromId).HasMaxLength(AppSettings.USER_ID_LENGTH);
+            builder.Entity<Order>().Property(e => e.AssigneeToId).HasMaxLength(AppSettings.USER_ID_LENGTH);
             builder.Entity<Order>().Property(e => e.LocationFromId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<Order>().Property(e => e.LocationToId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<Order>().Property(e => e.Number).HasMaxLength(AppSettings.GUID_LENGTH);
@@ -60,7 +60,7 @@ namespace Inventory.Data
             builder.Entity<StockBalance>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<StockBalance>().Property(e => e.AssetId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<StockBalance>().Property(e => e.LocationId).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<StockBalance>().Property(e => e.AssigneeId).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<StockBalance>().Property(e => e.AssigneeId).HasMaxLength(AppSettings.USER_ID_LENGTH);
 
             builder.Entity<StockTurnover>().HasKey(e => e.Id);
             builder.Entity<StockTurnover>().HasOne(e => e.Order).WithMany().HasForeignKey(e => e.OrderId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
@@ -71,7 +71,7 @@ namespace Inventory.Data
             builder.Entity<StockTurnover>().Property(e => e.OrderId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<StockTurnover>().Property(e => e.AssetId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<StockTurnover>().Property(e => e.LocationId).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<StockTurnover>().Property(e => e.AssigneeId).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<StockTurnover>().Property(e => e.AssigneeId).HasMaxLength(AppSettings.USER_ID_LENGTH);
         }
     }
 }

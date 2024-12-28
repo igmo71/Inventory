@@ -1,8 +1,10 @@
 ﻿@page "/assets/delete"
+@using Inventory.Application
 @using Microsoft.EntityFrameworkCore
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@* @inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory *@
 @inject NavigationManager NavigationManager
+@inject IAssetService Service
 
 <PageTitle>Delete</PageTitle>
 
@@ -16,7 +18,8 @@
     {
         <p><em>Loading...</em></p>
     }
-    else {
+    else
+    {
         <dl class="row">
             <dt class="col-sm-2">Name</dt>
             <dd class="col-sm-10">@asset.Name</dd>
@@ -48,24 +51,28 @@
     private Asset? asset;
 
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        asset = await context.Assets.FirstOrDefaultAsync(m => m.Id == Id);
+        // using var context = DbFactory.CreateDbContext();
+        // asset = await context.Assets.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Id is not null)
+            asset = await Service.Get(Id);
 
         if (asset is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
     private async Task DeleteAsset()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Assets.Remove(asset!);
-        await context.SaveChangesAsync();
+        // using var context = DbFactory.CreateDbContext();
+        // context.Assets.Remove(asset!);
+        // await context.SaveChangesAsync();
+
+        await Service.Delete(asset!);
+
         NavigationManager.NavigateTo("/assets");
     }
 }

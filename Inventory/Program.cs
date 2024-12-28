@@ -1,4 +1,5 @@
-﻿using Inventory.Components;
+﻿using Inventory.Application;
+using Inventory.Components;
 using Inventory.Components.Account;
 using Inventory.Data;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -42,6 +43,8 @@ namespace Inventory
                 .AddDefaultTokenProviders();
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+            builder.Services.AddScoped<IAssetService, AssetService>();
 
             var app = builder.Build();
 

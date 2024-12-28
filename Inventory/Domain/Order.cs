@@ -1,11 +1,10 @@
 ﻿using Inventory.Data;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Inventory.Domain
 {
     public class Order
     {
-        public Guid Id { get; set; }
+        public required string Id { get; set; }
 
         public DateTime DateTime { get; set; }
 
@@ -23,39 +22,11 @@ namespace Inventory.Domain
         public string? AssigneeToId { get; set; }
 
         public Location? LocationFrom { get; set; }
-        public Guid? LocationFromId { get; set; }
+        public string? LocationFromId { get; set; }
 
         public Location? LocationTo { get; set; }
-        public Guid? LocationToId { get; set; }
+        public string? LocationToId { get; set; }
 
         public List<OrderItem>? Items { get; set; }
-        
-        [NotMapped]
-        public string? LocationFromIdString
-        {
-            get
-            {
-                return LocationFromId.ToString();
-            }
-            set
-            {
-                if (value != null)
-                    LocationFromId = Guid.Parse(value);
-            }
-        }
-
-        [NotMapped]
-        public string? LocationToIdString
-        {
-            get
-            {
-                return LocationToId.ToString();
-            }
-            set
-            {
-                if (value != null)
-                    LocationToId = Guid.Parse(value);
-            }
-        }
     }
 }

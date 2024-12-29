@@ -1,21 +1,22 @@
-﻿using Inventory.Common.Results;
+﻿using Inventory.Common;
+using Inventory.Common.Results;
 using Inventory.Data;
 using Microsoft.EntityFrameworkCore;
 using Asset = Inventory.Domain.Asset;
 
 namespace Inventory.Application
 {
-    interface IAssetService
+    public interface IAssetService
     {
         Task<ListResult<Asset>> GetList(int skip, int? take);
         Task<Asset?> Get(string id);
         Task<string> Create(Asset asset);
-        Task Update(Asset asset);
+        Task<Result> Update(Asset asset);
         Task Delete(Asset asset);
         bool Exists(string id);
     }
 
-    class AssetService(IDbContextFactory<ApplicationDbContext> dbFactory) : IAssetService
+    public class AssetService(IDbContextFactory<ApplicationDbContext> dbFactory) : IAssetService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
@@ -49,7 +50,7 @@ namespace Inventory.Application
             return asset.Id;
         }
 
-        public async Task Update(Asset asset)
+        public async Task<Result> Update(Asset asset)
         {
             using var context = _dbFactory.CreateDbContext();
             context.Attach(asset).State = EntityState.Modified;
@@ -57,12 +58,14 @@ namespace Inventory.Application
             try
             {
                 await context.SaveChangesAsync();
+
+                return Result.Success();
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!Exists(asset.Id!))
                 {
-                    throw; // TODO: Handle DbUpdateConcurrencyException
+                    return Result.Fail(new NotFoundException(nameof(Asset), asset.Id));
                 }
                 else
                 {

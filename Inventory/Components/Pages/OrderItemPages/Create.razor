@@ -1,8 +1,11 @@
 ﻿@page "/orderitems/create"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IOrderItemService Service
+
+@attribute [Authorize]
 
 <PageTitle>Create</PageTitle>
 
@@ -48,13 +51,10 @@
     [SupplyParameterFromForm]
     private OrderItem OrderItem { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddOrderItem()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.OrderItems.Add(OrderItem);
-        OrderItem.Id = Guid.CreateVersion7().ToString();
-        await context.SaveChangesAsync();
+        string id = await Service.Create(OrderItem);
+
         NavigationManager.NavigateTo("/orderitems");
     }
 }

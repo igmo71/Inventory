@@ -6,9 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Application
 {
-    interface ILocationService
+    public interface ILocationService
     {
-
         Task<ListResult<Location>> GetList(int skip, int? take);
         Task<Location?> Get(string id);
         Task<string> Create(Location location);
@@ -17,7 +16,7 @@ namespace Inventory.Application
         bool Exists(string id);
     }
 
-    class LocationService(IDbContextFactory<ApplicationDbContext> dbFactory) : ILocationService
+    public class LocationService(IDbContextFactory<ApplicationDbContext> dbFactory) : ILocationService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 

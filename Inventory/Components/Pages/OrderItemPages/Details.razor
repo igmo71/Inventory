@@ -1,9 +1,11 @@
 ﻿@page "/orderitems/details"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IOrderItemService Service
 
+@attribute [Authorize]
 <PageTitle>Details</PageTitle>
 
 <h1>Details</h1>
@@ -41,12 +43,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        orderitem = await context.OrderItems.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            orderitem = await Service.Get(Id);
 
         if (orderitem is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 }

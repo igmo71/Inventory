@@ -1,8 +1,11 @@
 ﻿@page "/orderitems/delete"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IOrderItemService Service
+
+@attribute [Authorize]
 
 <PageTitle>Delete</PageTitle>
 
@@ -44,24 +47,21 @@
     private OrderItem? orderitem;
 
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        orderitem = await context.OrderItems.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            orderitem = await Service.Get(Id);
 
         if (orderitem is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
     private async Task DeleteOrderItem()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.OrderItems.Remove(orderitem!);
-        await context.SaveChangesAsync();
+        await Service.Delete(orderitem!);
+
         NavigationManager.NavigateTo("/orderitems");
     }
 }

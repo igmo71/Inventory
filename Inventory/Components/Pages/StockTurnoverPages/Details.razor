@@ -1,8 +1,11 @@
 ﻿@page "/stockturnovers/details"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IStockTurnoverService Service
+
+@attribute [Authorize]
 
 <PageTitle>Details</PageTitle>
 
@@ -15,7 +18,8 @@
     {
         <p><em>Loading...</em></p>
     }
-    else {
+    else
+    {
         <dl class="row">
             <dt class="col-sm-2">DateTime</dt>
             <dd class="col-sm-10">@stockturnover.DateTime</dd>
@@ -49,16 +53,14 @@
     private StockTurnover? stockturnover;
 
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        stockturnover = await context.StockTurnovers.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            stockturnover = await Service.Get(Id);
 
         if (stockturnover is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 }

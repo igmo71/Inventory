@@ -1,8 +1,11 @@
 ﻿@page "/stockturnovers/create"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IStockTurnoverService Service
+
+@attribute [Authorize]
 
 <PageTitle>Create</PageTitle>
 
@@ -78,13 +81,10 @@
     [SupplyParameterFromForm]
     private StockTurnover StockTurnover { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddStockTurnover()
     {
-        using var context = DbFactory.CreateDbContext();
-        StockTurnover.Id = Guid.CreateVersion7().ToString();
-        context.StockTurnovers.Add(StockTurnover);
-        await context.SaveChangesAsync();
+        string id = await Service.Create(StockTurnover);
+
         NavigationManager.NavigateTo("/stockturnovers");
     }
 }

@@ -1,8 +1,11 @@
 ﻿@page "/stockturnovers/edit"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IStockTurnoverService Service
+
+@attribute [Authorize]
 
 <PageTitle>Edit</PageTitle>
 
@@ -84,51 +87,24 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     [SupplyParameterFromForm]
     private StockTurnover? StockTurnover { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        StockTurnover ??= await context.StockTurnovers.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            StockTurnover ??= await Service.Get(Id);
 
         if (StockTurnover is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateStockTurnover()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(StockTurnover!).State = EntityState.Modified;
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!StockTurnoverExists(StockTurnover!.Id))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
-        }
+        await Service.Update(StockTurnover!);
 
         NavigationManager.NavigateTo("/stockturnovers");
-    }
-
-    private bool StockTurnoverExists(string id)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.StockTurnovers.Any(e => e.Id == id);
     }
 }

@@ -50,6 +50,7 @@ namespace Inventory
             builder.Services.AddScoped<IOrderItemService, OrderItemService>();
             builder.Services.AddScoped<ISerialNumberService, SerialNumberService>();
             builder.Services.AddScoped<IStockBalanceService, StockBalanceService>();
+            builder.Services.AddScoped<IStockTurnoverService, StockTurnoverService>();
 
             var app = builder.Build();
 

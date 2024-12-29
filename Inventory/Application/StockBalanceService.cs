@@ -37,8 +37,8 @@ namespace Inventory.Application
         public async Task<StockBalance?> Get(string id)
         {
             using var context = _dbFactory.CreateDbContext();
-            var order = await context.StockBalances.FirstOrDefaultAsync(m => m.Id == id);
-            return order;
+            var stockBalance = await context.StockBalances.FirstOrDefaultAsync(m => m.Id == id);
+            return stockBalance;
         }
 
         public async Task<string> Create(StockBalance stockBalance)

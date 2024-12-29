@@ -1,9 +1,11 @@
 ﻿@page "/assets/delete"
 @using Inventory.Application
-@using Microsoft.EntityFrameworkCore
 @using Inventory.Domain
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
 @inject IAssetService Service
+
+@attribute [Authorize]
 
 <PageTitle>Delete</PageTitle>
 

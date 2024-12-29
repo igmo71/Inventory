@@ -1,11 +1,9 @@
 ﻿@page "/assets"
 @using Inventory.Application
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using Inventory.Domain
-@using Inventory.Data
-@inject ILocationService Service
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject IAssetService Service
 
 @attribute [Authorize]
 

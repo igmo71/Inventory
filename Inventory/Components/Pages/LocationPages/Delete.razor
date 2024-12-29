@@ -1,8 +1,11 @@
 ﻿@page "/locations/delete"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject ILocationService Service
+
+@attribute [Authorize]
 
 <PageTitle>Delete</PageTitle>
 
@@ -16,7 +19,8 @@
     {
         <p><em>Loading...</em></p>
     }
-    else {
+    else
+    {
         <dl class="row">
             <dt class="col-sm-2">Name</dt>
             <dd class="col-sm-10">@location.Name</dd>
@@ -40,24 +44,21 @@
     private Location? location;
 
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        location = await context.Locations.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            location = await Service.Get(Id);
 
         if (location is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
     private async Task DeleteLocation()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Locations.Remove(location!);
-        await context.SaveChangesAsync();
+        await Service.Delete(location!);
+
         NavigationManager.NavigateTo("/locations");
     }
 }

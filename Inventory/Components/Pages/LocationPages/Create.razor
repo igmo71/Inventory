@@ -1,8 +1,11 @@
 ﻿@page "/locations/create"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject ILocationService Service
+
+@attribute [Authorize]
 
 <PageTitle>Create</PageTitle>
 
@@ -43,13 +46,10 @@
     [SupplyParameterFromForm]
     private Location Location { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddLocation()
     {
-        using var context = DbFactory.CreateDbContext();
-        Location.Id = Guid.CreateVersion7().ToString();
-        context.Locations.Add(Location);
-        await context.SaveChangesAsync();
+        string id = await Service.Create(Location);
+
         NavigationManager.NavigateTo("/locations");
     }
 }

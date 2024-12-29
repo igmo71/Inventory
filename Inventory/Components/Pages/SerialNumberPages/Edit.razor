@@ -1,8 +1,11 @@
 ﻿@page "/serialnumbers/edit"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject ISerialNumberService Service
+
+@attribute [Authorize]
 
 <PageTitle>Edit</PageTitle>
 
@@ -20,7 +23,7 @@ else
         <div class="col-md-4">
             <EditForm method="post" Model="SerialNumber" OnValidSubmit="UpdateSerialNumber" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary role="alert"/>
+                <ValidationSummary role="alert" />
                 <input type="hidden" name="SerialNumber.Id" value="@SerialNumber.Id" />
                 <div class="mb-3">
                     <label for="assetid" class="form-label">AssetId:</label>
@@ -44,51 +47,24 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     [SupplyParameterFromForm]
     private SerialNumber? SerialNumber { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        SerialNumber ??= await context.SerialNumbers.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            SerialNumber ??= await Service.Get(Id);
 
         if (SerialNumber is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateSerialNumber()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(SerialNumber!).State = EntityState.Modified;
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!SerialNumberExists(SerialNumber!.Id))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
-        }
+        await Service.Update(SerialNumber!);
 
         NavigationManager.NavigateTo("/serialnumbers");
-    }
-
-    private bool SerialNumberExists(string id)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.SerialNumbers.Any(e => e.Id == id);
     }
 }

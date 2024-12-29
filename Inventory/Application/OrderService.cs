@@ -3,7 +3,6 @@ using Inventory.Common.Results;
 using Inventory.Data;
 using Inventory.Domain;
 using Microsoft.EntityFrameworkCore;
-using NuGet.ContentModel;
 
 namespace Inventory.Application
 {

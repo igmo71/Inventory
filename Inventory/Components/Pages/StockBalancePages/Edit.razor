@@ -1,9 +1,11 @@
 ﻿@page "/stockbalances/edit"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IStockBalanceService Service
 
+@attribute [Authorize]
 <PageTitle>Edit</PageTitle>
 
 <h1>Edit</h1>
@@ -20,7 +22,7 @@ else
         <div class="col-md-4">
             <EditForm method="post" Model="StockBalance" OnValidSubmit="UpdateStockBalance" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary role="alert"/>
+                <ValidationSummary role="alert" />
                 <input type="hidden" name="StockBalance.Id" value="@StockBalance.Id" />
                 <div class="mb-3">
                     <label for="assetid" class="form-label">AssetId:</label>
@@ -59,51 +61,24 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     [SupplyParameterFromForm]
     private StockBalance? StockBalance { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        StockBalance ??= await context.StockBalances.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            StockBalance ??= await Service.Get(Id);
 
         if (StockBalance is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateStockBalance()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(StockBalance!).State = EntityState.Modified;
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!StockBalanceExists(StockBalance!.Id))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
-        }
+        await Service.Update(StockBalance!);
 
         NavigationManager.NavigateTo("/stockbalances");
-    }
-
-    private bool StockBalanceExists(string id)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.StockBalances.Any(e => e.Id == id);
     }
 }

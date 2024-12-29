@@ -1,8 +1,11 @@
 ﻿@page "/stockbalances/create"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IStockBalanceService Service
+
+@attribute [Authorize]
 
 <PageTitle>Create</PageTitle>
 
@@ -53,13 +56,10 @@
     [SupplyParameterFromForm]
     private StockBalance StockBalance { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddStockBalance()
     {
-        using var context = DbFactory.CreateDbContext();
-        StockBalance.Id = Guid.CreateVersion7().ToString();
-        context.StockBalances.Add(StockBalance);
-        await context.SaveChangesAsync();
+        string id = await Service.Create(StockBalance);
+
         NavigationManager.NavigateTo("/stockbalances");
     }
 }

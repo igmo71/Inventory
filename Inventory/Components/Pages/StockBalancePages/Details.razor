@@ -1,8 +1,9 @@
 ﻿@page "/stockbalances/details"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IStockBalanceService Service
 
 <PageTitle>Details</PageTitle>
 
@@ -15,7 +16,8 @@
     {
         <p><em>Loading...</em></p>
     }
-    else {
+    else
+    {
         <dl class="row">
             <dt class="col-sm-2">AssetId</dt>
             <dd class="col-sm-10">@stockbalance.AssetId</dd>
@@ -39,16 +41,14 @@
     private StockBalance? stockbalance;
 
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        stockbalance = await context.StockBalances.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            stockbalance = await Service.Get(Id);
 
         if (stockbalance is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 }

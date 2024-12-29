@@ -1,8 +1,11 @@
 ﻿@page "/stockbalances/delete"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IStockBalanceService Service
+
+@attribute [Authorize]
 
 <PageTitle>Delete</PageTitle>
 
@@ -16,7 +19,8 @@
     {
         <p><em>Loading...</em></p>
     }
-    else {
+    else
+    {
         <dl class="row">
             <dt class="col-sm-2">AssetId</dt>
             <dd class="col-sm-10">@stockbalance.AssetId</dd>
@@ -48,24 +52,21 @@
     private StockBalance? stockbalance;
 
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        stockbalance = await context.StockBalances.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            stockbalance = await Service.Get(Id);
 
         if (stockbalance is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
     private async Task DeleteStockBalance()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.StockBalances.Remove(stockbalance!);
-        await context.SaveChangesAsync();
+        await Service.Delete(stockbalance!);
+
         NavigationManager.NavigateTo("/stockbalances");
     }
 }

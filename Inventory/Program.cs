@@ -49,6 +49,7 @@ namespace Inventory
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderItemService, OrderItemService>();
             builder.Services.AddScoped<ISerialNumberService, SerialNumberService>();
+            builder.Services.AddScoped<IStockBalanceService, StockBalanceService>();
 
             var app = builder.Build();
 

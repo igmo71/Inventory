@@ -46,6 +46,8 @@ namespace Inventory
 
             builder.Services.AddScoped<IAssetService, AssetService>();
             builder.Services.AddScoped<ILocationService, LocationService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderItemService, OrderItemService>();
 
             var app = builder.Build();
 

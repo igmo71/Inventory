@@ -1,8 +1,11 @@
 ﻿@page "/orders/details"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IOrderService Service
+
+@attribute [Authorize]
 
 <PageTitle>Details</PageTitle>
 
@@ -45,16 +48,14 @@
     private Order? order;
 
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        order = await context.Orders.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            order = await Service.Get(Id);
 
         if (order is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 }

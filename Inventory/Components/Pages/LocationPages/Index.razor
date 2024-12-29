@@ -16,10 +16,10 @@
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
+    <PropertyColumn Property="location => location.Id" />
     <PropertyColumn Property="location => location.Name" />
     <PropertyColumn Property="location => location.IsFolder" />
     <PropertyColumn Property="location => location.ParentId" />
-    <PropertyColumn Property="location => location.Id" />
 
     <TemplateColumn Context="location">
         <a href="@($"locations/edit?id={location.Id}")">Edit</a> |

@@ -20,6 +20,9 @@
     <PropertyColumn Property="location => location.Name" />
     <PropertyColumn Property="location => location.IsFolder" />
     <PropertyColumn Property="location => location.ParentId" />
+    <TemplateColumn Context="location">
+        <span>@location.Parent?.Name</span>
+    </TemplateColumn>
 
     <TemplateColumn Context="location">
         <a href="@($"locations/edit?id={location.Id}")">Edit</a> |

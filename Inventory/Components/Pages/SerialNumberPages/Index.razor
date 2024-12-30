@@ -18,6 +18,9 @@
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
     <PropertyColumn Property="serialnumber => serialnumber.Id" />
     <PropertyColumn Property="serialnumber => serialnumber.EquipmentId" />
+    <TemplateColumn Context="serialnumber">
+        <span>@serialnumber.Equipment?.Name</span>
+    </TemplateColumn>
     <PropertyColumn Property="serialnumber => serialnumber.Number" />
 
     <TemplateColumn Context="serialnumber">

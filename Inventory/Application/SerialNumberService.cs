@@ -28,7 +28,7 @@ namespace Inventory.Application
             if (take is not null)
                 query = query.Take((int)take);
 
-            var result = await query.AsNoTracking().ToListAsync();
+            var result = await query.Include(e => e.Equipment).AsNoTracking().ToListAsync();
             var total = context.SerialNumbers.Count();
 
             return ListResult<SerialNumber>.Success(result, total);

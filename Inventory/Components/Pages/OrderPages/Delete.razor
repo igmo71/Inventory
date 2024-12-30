@@ -37,20 +37,12 @@
             <dd class="col-sm-10">@order.IsAssigned</dd>
         </dl>
         <dl class="row">
-            <dt class="col-sm-2">AssigneeFromId</dt>
-            <dd class="col-sm-10">@order.AssigneeFromId</dd>
+            <dt class="col-sm-2">AssigneeId</dt>
+            <dd class="col-sm-10">@order.AssigneeId</dd>
         </dl>
         <dl class="row">
-            <dt class="col-sm-2">AssigneeToId</dt>
-            <dd class="col-sm-10">@order.AssigneeToId</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">LocationFromId</dt>
-            <dd class="col-sm-10">@order.LocationFromId</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">LocationToId</dt>
-            <dd class="col-sm-10">@order.LocationToId</dd>
+            <dt class="col-sm-2">LocationId</dt>
+            <dd class="col-sm-10">@order.LocationId</dd>
         </dl>
         <EditForm method="post" Model="order" OnValidSubmit="DeleteOrder" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(order is null)">Delete</button> |

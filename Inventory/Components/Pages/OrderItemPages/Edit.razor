@@ -36,11 +36,6 @@ else
                     <ValidationMessage For="() => OrderItem.AssetId" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="serialnumberid" class="form-label">SerialNumberId:</label>
-                    <InputText id="serialnumberid" @bind-Value="OrderItem.SerialNumberId" class="form-control" />
-                    <ValidationMessage For="() => OrderItem.SerialNumberId" class="text-danger" />
-                </div>
-                <div class="mb-3">
                     <label for="amount" class="form-label">Amount:</label>
                     <InputNumber id="amount" @bind-Value="OrderItem.Amount" class="form-control" />
                     <ValidationMessage For="() => OrderItem.Amount" class="text-danger" />

@@ -21,10 +21,8 @@
     <PropertyColumn Property="order => order.Number" />
     <PropertyColumn Property="order => order.AuthorId" />
     <PropertyColumn Property="order => order.IsAssigned" />
-    <PropertyColumn Property="order => order.AssigneeFromId" />
-    <PropertyColumn Property="order => order.AssigneeToId" />
-    <PropertyColumn Property="order => order.LocationFromId" />
-    <PropertyColumn Property="order => order.LocationToId" />
+    <PropertyColumn Property="order => order.AssigneeId" />
+    <PropertyColumn Property="order => order.LocationId" />
 
     <TemplateColumn Context="order">
         <a href="@($"orders/edit?id={order.Id}")">Edit</a> |

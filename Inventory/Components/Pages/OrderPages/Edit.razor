@@ -46,24 +46,14 @@ else
                     <ValidationMessage For="() => Order.IsAssigned" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="assigneefromid" class="form-label">AssigneeFromId:</label>
-                    <InputText id="assigneefromid" @bind-Value="Order.AssigneeFromId" class="form-control" />
-                    <ValidationMessage For="() => Order.AssigneeFromId" class="text-danger" />
+                    <label for="assigneefromid" class="form-label">AssigneeId:</label>
+                    <InputText id="assigneefromid" @bind-Value="Order.AssigneeId" class="form-control" />
+                    <ValidationMessage For="() => Order.AssigneeId" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="assigneetoid" class="form-label">AssigneeToId:</label>
-                    <InputText id="assigneetoid" @bind-Value="Order.AssigneeToId" class="form-control" />
-                    <ValidationMessage For="() => Order.AssigneeToId" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="locationfromid" class="form-label">LocationFromId:</label>
-                    <InputText id="locationfromid" @bind-Value="Order.LocationFromId" class="form-control" />
-                    <ValidationMessage For="() => Order.LocationFromId" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="locationtoid" class="form-label">LocationToId:</label>
-                    <InputText id="locationtoid" @bind-Value="Order.LocationToId" class="form-control" />
-                    <ValidationMessage For="() => Order.LocationToId" class="text-danger" />
+                    <label for="locationfromid" class="form-label">LocationId:</label>
+                    <InputText id="locationfromid" @bind-Value="Order.LocationId" class="form-control" />
+                    <ValidationMessage For="() => Order.LocationId" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>

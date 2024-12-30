@@ -10,6 +10,8 @@ namespace Inventory.Data
         public DbSet<Asset> Assets { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<EquipmentOrder> EquipmentOrders { get; set; }
+        public DbSet<MaterialOrder> MaterialOrders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<StockBalance> StockBalances { get; set; }
         public DbSet<StockTurnover> StockTurnovers { get; set; }
@@ -34,18 +36,17 @@ namespace Inventory.Data
 
             builder.Entity<Order>().HasKey(e => e.Id);
             builder.Entity<Order>().HasOne(e => e.Author).WithMany().HasForeignKey(e => e.AuthorId).HasPrincipalKey(e => e.Id);
-            builder.Entity<Order>().HasOne(e => e.AssigneeFrom).WithMany().HasForeignKey(e => e.AssigneeFromId).HasPrincipalKey(e => e.Id);
-            builder.Entity<Order>().HasOne(e => e.AssigneeTo).WithMany().HasForeignKey(e => e.AssigneeToId).HasPrincipalKey(e => e.Id);
-            builder.Entity<Order>().HasOne(e => e.LocationFrom).WithMany().HasForeignKey(e => e.LocationFromId).HasPrincipalKey(e => e.Id);
-            builder.Entity<Order>().HasOne(e => e.LocationTo).WithMany().HasForeignKey(e => e.LocationToId).HasPrincipalKey(e => e.Id);
-            builder.Entity<Order>().HasMany(e => e.Items).WithOne(e => e.Order).HasForeignKey(e => e.OrderId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Order>().HasOne(e => e.Assignee).WithMany().HasForeignKey(e => e.AssigneeId).HasPrincipalKey(e => e.Id);
+            builder.Entity<Order>().HasOne(e => e.Location).WithMany().HasForeignKey(e => e.LocationId).HasPrincipalKey(e => e.Id);
+            
             builder.Entity<Order>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<Order>().Property(e => e.AuthorId).HasMaxLength(AppSettings.USER_ID_LENGTH);
-            builder.Entity<Order>().Property(e => e.AssigneeFromId).HasMaxLength(AppSettings.USER_ID_LENGTH);
-            builder.Entity<Order>().Property(e => e.AssigneeToId).HasMaxLength(AppSettings.USER_ID_LENGTH);
-            builder.Entity<Order>().Property(e => e.LocationFromId).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<Order>().Property(e => e.LocationToId).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<Order>().Property(e => e.AssigneeId).HasMaxLength(AppSettings.USER_ID_LENGTH);
+            builder.Entity<Order>().Property(e => e.LocationId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<Order>().Property(e => e.Number).HasMaxLength(AppSettings.GUID_LENGTH);
+
+            builder.Entity<MaterialOrder>().HasMany(e => e.Items).WithOne(e => e.Order).HasForeignKey(e => e.OrderId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
+
 
             builder.Entity<OrderItem>().HasKey(e => e.Id);
             builder.Entity<OrderItem>().HasOne(e => e.Order).WithMany(e => e.Items).HasForeignKey(e => e.OrderId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);

@@ -15,18 +15,10 @@ namespace Inventory.Domain
 
         public bool IsAssigned { get; set; }
 
-        public ApplicationUser? AssigneeFrom { get; set; }
-        public string? AssigneeFromId { get; set; }
+        public ApplicationUser? Assignee { get; set; }
+        public string? AssigneeId { get; set; }
 
-        public ApplicationUser? AssigneeTo { get; set; }
-        public string? AssigneeToId { get; set; }
-
-        public Location? LocationFrom { get; set; }
-        public string? LocationFromId { get; set; }
-
-        public Location? LocationTo { get; set; }
-        public string? LocationToId { get; set; }
-
-        public List<OrderItem>? Items { get; set; }
+        public Location? Location { get; set; }
+        public string? LocationId { get; set; }
     }
 }

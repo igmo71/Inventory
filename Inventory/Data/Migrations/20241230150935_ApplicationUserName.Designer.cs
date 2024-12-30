@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241230115549_UserNameAndLocation")]
-    partial class UserNameAndLocation
+    [Migration("20241230150935_ApplicationUserName")]
+    partial class ApplicationUserName
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,9 +44,6 @@ namespace Inventory.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("LocationId")
-                        .HasColumnType("nvarchar(36)");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -54,7 +51,8 @@ namespace Inventory.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -84,8 +82,6 @@ namespace Inventory.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -545,15 +541,6 @@ namespace Inventory.Migrations
                     b.HasBaseType("Inventory.Domain.Order");
 
                     b.HasDiscriminator().HasValue("MaterialOrder");
-                });
-
-            modelBuilder.Entity("Inventory.Data.ApplicationUser", b =>
-                {
-                    b.HasOne("Inventory.Domain.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId");
-
-                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Inventory.Domain.Equipment", b =>

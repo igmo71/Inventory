@@ -23,6 +23,8 @@ namespace Inventory.Data
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<ApplicationUser>().Property(e => e.Name).HasMaxLength(AppSettings.NAME_LENGTH);
+
             builder.Entity<Equipment>().HasKey(e => e.Id);
             builder.Entity<Equipment>().HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).HasPrincipalKey(e => e.Id);
             builder.Entity<Equipment>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);

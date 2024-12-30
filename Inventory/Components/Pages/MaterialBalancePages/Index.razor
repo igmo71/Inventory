@@ -1,0 +1,39 @@
+﻿@page "/materialbalances"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Inventory.Domain
+@using Inventory.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="materialbalances/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.MaterialBalances">
+    <PropertyColumn Property="materialbalance => materialbalance.AssigneeId" />
+    <PropertyColumn Property="materialbalance => materialbalance.LocationId" />
+    <PropertyColumn Property="materialbalance => materialbalance.MaterialId" />
+    <PropertyColumn Property="materialbalance => materialbalance.Balance" />
+
+    <TemplateColumn Context="materialbalance">
+        <a href="@($"materialbalances/edit?id={materialbalance.Id}")">Edit</a> |
+        <a href="@($"materialbalances/details?id={materialbalance.Id}")">Details</a> |
+        <a href="@($"materialbalances/delete?id={materialbalance.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,99 @@
+﻿@page "/materialorderitems/edit"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>MaterialOrderItem</h2>
+<hr />
+@if (MaterialOrderItem is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="MaterialOrderItem" OnValidSubmit="UpdateMaterialOrderItem" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="MaterialOrderItem.Id" value="@MaterialOrderItem.Id" />
+                <div class="mb-3">
+                    <label for="orderid" class="form-label">OrderId:</label>
+                    <InputText id="orderid" @bind-Value="MaterialOrderItem.OrderId" class="form-control" />
+                    <ValidationMessage For="() => MaterialOrderItem.OrderId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="mayerialid" class="form-label">MayerialId:</label>
+                    <InputText id="mayerialid" @bind-Value="MaterialOrderItem.MayerialId" class="form-control" />
+                    <ValidationMessage For="() => MaterialOrderItem.MayerialId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="count" class="form-label">Count:</label>
+                    <InputNumber id="count" @bind-Value="MaterialOrderItem.Count" class="form-control" />
+                    <ValidationMessage For="() => MaterialOrderItem.Count" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/materialorderitems">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private MaterialOrderItem? MaterialOrderItem { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        MaterialOrderItem ??= await context.MaterialOrderItems.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (MaterialOrderItem is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateMaterialOrderItem()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(MaterialOrderItem!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MaterialOrderItemExists(MaterialOrderItem!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/materialorderitems");
+    }
+
+    private bool MaterialOrderItemExists(string id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.MaterialOrderItems.Any(e => e.Id == id);
+    }
+}

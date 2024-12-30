@@ -1,0 +1,129 @@
+﻿@page "/materialturnovers/edit"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>MaterialTurnover</h2>
+<hr />
+@if (MaterialTurnover is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="MaterialTurnover" OnValidSubmit="UpdateMaterialTurnover" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="MaterialTurnover.Id" value="@MaterialTurnover.Id" />
+                <div class="mb-3">
+                    <label for="assigneeid" class="form-label">AssigneeId:</label>
+                    <InputText id="assigneeid" @bind-Value="MaterialTurnover.AssigneeId" class="form-control" />
+                    <ValidationMessage For="() => MaterialTurnover.AssigneeId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="locationid" class="form-label">LocationId:</label>
+                    <InputText id="locationid" @bind-Value="MaterialTurnover.LocationId" class="form-control" />
+                    <ValidationMessage For="() => MaterialTurnover.LocationId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="materialid" class="form-label">MaterialId:</label>
+                    <InputText id="materialid" @bind-Value="MaterialTurnover.MaterialId" class="form-control" />
+                    <ValidationMessage For="() => MaterialTurnover.MaterialId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="orderid" class="form-label">OrderId:</label>
+                    <InputText id="orderid" @bind-Value="MaterialTurnover.OrderId" class="form-control" />
+                    <ValidationMessage For="() => MaterialTurnover.OrderId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datetime" class="form-label">DateTime:</label>
+                    <InputDate id="datetime" @bind-Value="MaterialTurnover.DateTime" class="form-control" />
+                    <ValidationMessage For="() => MaterialTurnover.DateTime" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="openingbalance" class="form-label">OpeningBalance:</label>
+                    <InputNumber id="openingbalance" @bind-Value="MaterialTurnover.OpeningBalance" class="form-control" />
+                    <ValidationMessage For="() => MaterialTurnover.OpeningBalance" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="receipt" class="form-label">Receipt:</label>
+                    <InputNumber id="receipt" @bind-Value="MaterialTurnover.Receipt" class="form-control" />
+                    <ValidationMessage For="() => MaterialTurnover.Receipt" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="expense" class="form-label">Expense:</label>
+                    <InputNumber id="expense" @bind-Value="MaterialTurnover.Expense" class="form-control" />
+                    <ValidationMessage For="() => MaterialTurnover.Expense" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="closingbalance" class="form-label">ClosingBalance:</label>
+                    <InputNumber id="closingbalance" @bind-Value="MaterialTurnover.ClosingBalance" class="form-control" />
+                    <ValidationMessage For="() => MaterialTurnover.ClosingBalance" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/materialturnovers">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private MaterialTurnover? MaterialTurnover { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        MaterialTurnover ??= await context.MaterialTurnovers.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (MaterialTurnover is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateMaterialTurnover()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(MaterialTurnover!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MaterialTurnoverExists(MaterialTurnover!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/materialturnovers");
+    }
+
+    private bool MaterialTurnoverExists(string id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.MaterialTurnovers.Any(e => e.Id == id);
+    }
+}

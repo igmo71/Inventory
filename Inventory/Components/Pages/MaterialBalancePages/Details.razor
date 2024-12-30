@@ -1,0 +1,52 @@
+﻿@page "/materialbalances/details"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>MaterialBalance</h2>
+    <hr />
+    @if (materialbalance is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">AssigneeId</dt>
+            <dd class="col-sm-10">@materialbalance.AssigneeId</dd>
+            <dt class="col-sm-2">LocationId</dt>
+            <dd class="col-sm-10">@materialbalance.LocationId</dd>
+            <dt class="col-sm-2">MaterialId</dt>
+            <dd class="col-sm-10">@materialbalance.MaterialId</dd>
+            <dt class="col-sm-2">Balance</dt>
+            <dd class="col-sm-10">@materialbalance.Balance</dd>
+        </dl>
+        <div>
+            <a href="@($"/materialbalances/edit?id={materialbalance.Id}")">Edit</a> |
+            <a href="@($"/materialbalances")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private MaterialBalance? materialbalance;
+
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        materialbalance = await context.MaterialBalances.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (materialbalance is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

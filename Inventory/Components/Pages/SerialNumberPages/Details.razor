@@ -1,0 +1,48 @@
+﻿@page "/serialnumbers/details"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>SerialNumber</h2>
+    <hr />
+    @if (serialnumber is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">EquipmentId</dt>
+            <dd class="col-sm-10">@serialnumber.EquipmentId</dd>
+            <dt class="col-sm-2">Number</dt>
+            <dd class="col-sm-10">@serialnumber.Number</dd>
+        </dl>
+        <div>
+            <a href="@($"/serialnumbers/edit?id={serialnumber.Id}")">Edit</a> |
+            <a href="@($"/serialnumbers")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private SerialNumber? serialnumber;
+
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        serialnumber = await context.SerialNumbers.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (serialnumber is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

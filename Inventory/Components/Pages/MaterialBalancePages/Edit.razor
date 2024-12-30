@@ -1,0 +1,104 @@
+﻿@page "/materialbalances/edit"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>MaterialBalance</h2>
+<hr />
+@if (MaterialBalance is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="MaterialBalance" OnValidSubmit="UpdateMaterialBalance" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="MaterialBalance.Id" value="@MaterialBalance.Id" />
+                <div class="mb-3">
+                    <label for="assigneeid" class="form-label">AssigneeId:</label>
+                    <InputText id="assigneeid" @bind-Value="MaterialBalance.AssigneeId" class="form-control" />
+                    <ValidationMessage For="() => MaterialBalance.AssigneeId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="locationid" class="form-label">LocationId:</label>
+                    <InputText id="locationid" @bind-Value="MaterialBalance.LocationId" class="form-control" />
+                    <ValidationMessage For="() => MaterialBalance.LocationId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="materialid" class="form-label">MaterialId:</label>
+                    <InputText id="materialid" @bind-Value="MaterialBalance.MaterialId" class="form-control" />
+                    <ValidationMessage For="() => MaterialBalance.MaterialId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="balance" class="form-label">Balance:</label>
+                    <InputNumber id="balance" @bind-Value="MaterialBalance.Balance" class="form-control" />
+                    <ValidationMessage For="() => MaterialBalance.Balance" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/materialbalances">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private MaterialBalance? MaterialBalance { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        MaterialBalance ??= await context.MaterialBalances.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (MaterialBalance is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateMaterialBalance()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(MaterialBalance!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MaterialBalanceExists(MaterialBalance!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/materialbalances");
+    }
+
+    private bool MaterialBalanceExists(string id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.MaterialBalances.Any(e => e.Id == id);
+    }
+}

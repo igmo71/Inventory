@@ -1,0 +1,87 @@
+﻿@page "/materialturnovers/delete"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>MaterialTurnover</h2>
+    <hr />
+    @if (materialturnover is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">AssigneeId</dt>
+            <dd class="col-sm-10">@materialturnover.AssigneeId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">LocationId</dt>
+            <dd class="col-sm-10">@materialturnover.LocationId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">MaterialId</dt>
+            <dd class="col-sm-10">@materialturnover.MaterialId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">OrderId</dt>
+            <dd class="col-sm-10">@materialturnover.OrderId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateTime</dt>
+            <dd class="col-sm-10">@materialturnover.DateTime</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">OpeningBalance</dt>
+            <dd class="col-sm-10">@materialturnover.OpeningBalance</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Receipt</dt>
+            <dd class="col-sm-10">@materialturnover.Receipt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Expense</dt>
+            <dd class="col-sm-10">@materialturnover.Expense</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ClosingBalance</dt>
+            <dd class="col-sm-10">@materialturnover.ClosingBalance</dd>
+        </dl>
+        <EditForm method="post" Model="materialturnover" OnValidSubmit="DeleteMaterialTurnover" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(materialturnover is null)">Delete</button> |
+            <a href="/materialturnovers">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private MaterialTurnover? materialturnover;
+
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        materialturnover = await context.MaterialTurnovers.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (materialturnover is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteMaterialTurnover()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.MaterialTurnovers.Remove(materialturnover!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/materialturnovers");
+    }
+}

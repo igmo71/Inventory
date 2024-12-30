@@ -1,0 +1,56 @@
+﻿@page "/equipmenthistories/details"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>EquipmentHistory</h2>
+    <hr />
+    @if (equipmenthistory is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">AssigneeId</dt>
+            <dd class="col-sm-10">@equipmenthistory.AssigneeId</dd>
+            <dt class="col-sm-2">LocationId</dt>
+            <dd class="col-sm-10">@equipmenthistory.LocationId</dd>
+            <dt class="col-sm-2">EquipmentId</dt>
+            <dd class="col-sm-10">@equipmenthistory.EquipmentId</dd>
+            <dt class="col-sm-2">SerialNumberId</dt>
+            <dd class="col-sm-10">@equipmenthistory.SerialNumberId</dd>
+            <dt class="col-sm-2">DateBegin</dt>
+            <dd class="col-sm-10">@equipmenthistory.DateBegin</dd>
+            <dt class="col-sm-2">DateEnd</dt>
+            <dd class="col-sm-10">@equipmenthistory.DateEnd</dd>
+        </dl>
+        <div>
+            <a href="@($"/equipmenthistories/edit?id={equipmenthistory.Id}")">Edit</a> |
+            <a href="@($"/equipmenthistories")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private EquipmentHistory? equipmenthistory;
+
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        equipmenthistory = await context.EquipmentHistories.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (equipmenthistory is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,54 @@
+﻿@page "/materialorderitems/create"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>MaterialOrderItem</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="MaterialOrderItem" OnValidSubmit="AddMaterialOrderItem" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="orderid" class="form-label">OrderId:</label> 
+                <InputText id="orderid" @bind-Value="MaterialOrderItem.OrderId" class="form-control" /> 
+                <ValidationMessage For="() => MaterialOrderItem.OrderId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="mayerialid" class="form-label">MayerialId:</label> 
+                <InputText id="mayerialid" @bind-Value="MaterialOrderItem.MayerialId" class="form-control" /> 
+                <ValidationMessage For="() => MaterialOrderItem.MayerialId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="count" class="form-label">Count:</label> 
+                <InputNumber id="count" @bind-Value="MaterialOrderItem.Count" class="form-control" /> 
+                <ValidationMessage For="() => MaterialOrderItem.Count" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/materialorderitems">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private MaterialOrderItem MaterialOrderItem { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddMaterialOrderItem()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.MaterialOrderItems.Add(MaterialOrderItem);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/materialorderitems");
+    }
+}

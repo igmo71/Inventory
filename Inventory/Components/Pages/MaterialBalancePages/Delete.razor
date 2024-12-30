@@ -1,0 +1,67 @@
+﻿@page "/materialbalances/delete"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>MaterialBalance</h2>
+    <hr />
+    @if (materialbalance is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">AssigneeId</dt>
+            <dd class="col-sm-10">@materialbalance.AssigneeId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">LocationId</dt>
+            <dd class="col-sm-10">@materialbalance.LocationId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">MaterialId</dt>
+            <dd class="col-sm-10">@materialbalance.MaterialId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Balance</dt>
+            <dd class="col-sm-10">@materialbalance.Balance</dd>
+        </dl>
+        <EditForm method="post" Model="materialbalance" OnValidSubmit="DeleteMaterialBalance" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(materialbalance is null)">Delete</button> |
+            <a href="/materialbalances">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private MaterialBalance? materialbalance;
+
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        materialbalance = await context.MaterialBalances.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (materialbalance is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteMaterialBalance()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.MaterialBalances.Remove(materialbalance!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/materialbalances");
+    }
+}

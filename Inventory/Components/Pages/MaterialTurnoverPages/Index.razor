@@ -1,0 +1,44 @@
+﻿@page "/materialturnovers"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Inventory.Domain
+@using Inventory.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="materialturnovers/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.MaterialTurnovers">
+    <PropertyColumn Property="materialturnover => materialturnover.AssigneeId" />
+    <PropertyColumn Property="materialturnover => materialturnover.LocationId" />
+    <PropertyColumn Property="materialturnover => materialturnover.MaterialId" />
+    <PropertyColumn Property="materialturnover => materialturnover.OrderId" />
+    <PropertyColumn Property="materialturnover => materialturnover.DateTime" />
+    <PropertyColumn Property="materialturnover => materialturnover.OpeningBalance" />
+    <PropertyColumn Property="materialturnover => materialturnover.Receipt" />
+    <PropertyColumn Property="materialturnover => materialturnover.Expense" />
+    <PropertyColumn Property="materialturnover => materialturnover.ClosingBalance" />
+
+    <TemplateColumn Context="materialturnover">
+        <a href="@($"materialturnovers/edit?id={materialturnover.Id}")">Edit</a> |
+        <a href="@($"materialturnovers/details?id={materialturnover.Id}")">Details</a> |
+        <a href="@($"materialturnovers/delete?id={materialturnover.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

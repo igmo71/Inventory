@@ -1,0 +1,56 @@
+﻿@page "/materialorders/details"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>MaterialOrder</h2>
+    <hr />
+    @if (materialorder is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">DateTime</dt>
+            <dd class="col-sm-10">@materialorder.DateTime</dd>
+            <dt class="col-sm-2">Number</dt>
+            <dd class="col-sm-10">@materialorder.Number</dd>
+            <dt class="col-sm-2">AuthorId</dt>
+            <dd class="col-sm-10">@materialorder.AuthorId</dd>
+            <dt class="col-sm-2">IsAssigned</dt>
+            <dd class="col-sm-10">@materialorder.IsAssigned</dd>
+            <dt class="col-sm-2">AssigneeId</dt>
+            <dd class="col-sm-10">@materialorder.AssigneeId</dd>
+            <dt class="col-sm-2">LocationId</dt>
+            <dd class="col-sm-10">@materialorder.LocationId</dd>
+        </dl>
+        <div>
+            <a href="@($"/materialorders/edit?id={materialorder.Id}")">Edit</a> |
+            <a href="@($"/materialorders")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private MaterialOrder? materialorder;
+
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        materialorder = await context.MaterialOrders.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (materialorder is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

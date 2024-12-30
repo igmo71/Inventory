@@ -46,7 +46,7 @@ namespace Inventory
 
             builder.Services.AddScoped<IEquipmentService, EquipmentService>();
             builder.Services.AddScoped<ILocationService, LocationService>();
-            builder.Services.AddScoped<IOrderService, OrderService>();
+            //builder.Services.AddScoped<IOrderService, OrderService>();
             //builder.Services.AddScoped<IOrderItemService, OrderItemService>();
             builder.Services.AddScoped<ISerialNumberService, SerialNumberService>();
             //builder.Services.AddScoped<IStockBalanceService, StockBalanceService>();

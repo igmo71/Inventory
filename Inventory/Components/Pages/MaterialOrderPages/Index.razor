@@ -1,0 +1,41 @@
+﻿@page "/materialorders"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Inventory.Domain
+@using Inventory.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="materialorders/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.MaterialOrders">
+    <PropertyColumn Property="materialorder => materialorder.DateTime" />
+    <PropertyColumn Property="materialorder => materialorder.Number" />
+    <PropertyColumn Property="materialorder => materialorder.AuthorId" />
+    <PropertyColumn Property="materialorder => materialorder.IsAssigned" />
+    <PropertyColumn Property="materialorder => materialorder.AssigneeId" />
+    <PropertyColumn Property="materialorder => materialorder.LocationId" />
+
+    <TemplateColumn Context="materialorder">
+        <a href="@($"materialorders/edit?id={materialorder.Id}")">Edit</a> |
+        <a href="@($"materialorders/details?id={materialorder.Id}")">Details</a> |
+        <a href="@($"materialorders/delete?id={materialorder.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

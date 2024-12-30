@@ -1,0 +1,54 @@
+﻿@page "/materials/create"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Material</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Material" OnValidSubmit="AddMaterial" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Material.Name" class="form-control" /> 
+                <ValidationMessage For="() => Material.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isfolder" class="form-label">IsFolder:</label> 
+                <InputCheckbox id="isfolder" @bind-Value="Material.IsFolder" class="form-check-input" /> 
+                <ValidationMessage For="() => Material.IsFolder" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="parentid" class="form-label">ParentId:</label> 
+                <InputText id="parentid" @bind-Value="Material.ParentId" class="form-control" /> 
+                <ValidationMessage For="() => Material.ParentId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/materials">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Material Material { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddMaterial()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Materials.Add(Material);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/materials");
+    }
+}

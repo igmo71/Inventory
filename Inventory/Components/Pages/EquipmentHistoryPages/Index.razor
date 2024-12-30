@@ -1,0 +1,41 @@
+﻿@page "/equipmenthistories"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Inventory.Domain
+@using Inventory.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="equipmenthistories/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.EquipmentHistories">
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.AssigneeId" />
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.LocationId" />
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.EquipmentId" />
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.SerialNumberId" />
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.DateBegin" />
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.DateEnd" />
+
+    <TemplateColumn Context="equipmenthistory">
+        <a href="@($"equipmenthistories/edit?id={equipmenthistory.Id}")">Edit</a> |
+        <a href="@($"equipmenthistories/details?id={equipmenthistory.Id}")">Details</a> |
+        <a href="@($"equipmenthistories/delete?id={equipmenthistory.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

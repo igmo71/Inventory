@@ -1,0 +1,114 @@
+﻿@page "/materialorders/edit"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>MaterialOrder</h2>
+<hr />
+@if (MaterialOrder is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="MaterialOrder" OnValidSubmit="UpdateMaterialOrder" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="MaterialOrder.Id" value="@MaterialOrder.Id" />
+                <div class="mb-3">
+                    <label for="datetime" class="form-label">DateTime:</label>
+                    <InputDate id="datetime" @bind-Value="MaterialOrder.DateTime" class="form-control" />
+                    <ValidationMessage For="() => MaterialOrder.DateTime" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="number" class="form-label">Number:</label>
+                    <InputText id="number" @bind-Value="MaterialOrder.Number" class="form-control" />
+                    <ValidationMessage For="() => MaterialOrder.Number" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="authorid" class="form-label">AuthorId:</label>
+                    <InputText id="authorid" @bind-Value="MaterialOrder.AuthorId" class="form-control" />
+                    <ValidationMessage For="() => MaterialOrder.AuthorId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="isassigned" class="form-label">IsAssigned:</label>
+                    <InputCheckbox id="isassigned" @bind-Value="MaterialOrder.IsAssigned" class="form-check-input" />
+                    <ValidationMessage For="() => MaterialOrder.IsAssigned" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="assigneeid" class="form-label">AssigneeId:</label>
+                    <InputText id="assigneeid" @bind-Value="MaterialOrder.AssigneeId" class="form-control" />
+                    <ValidationMessage For="() => MaterialOrder.AssigneeId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="locationid" class="form-label">LocationId:</label>
+                    <InputText id="locationid" @bind-Value="MaterialOrder.LocationId" class="form-control" />
+                    <ValidationMessage For="() => MaterialOrder.LocationId" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/materialorders">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private MaterialOrder? MaterialOrder { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        MaterialOrder ??= await context.MaterialOrders.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (MaterialOrder is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateMaterialOrder()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(MaterialOrder!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MaterialOrderExists(MaterialOrder!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/materialorders");
+    }
+
+    private bool MaterialOrderExists(string id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.MaterialOrders.Any(e => e.Id == id);
+    }
+}

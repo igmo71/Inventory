@@ -1,0 +1,114 @@
+﻿@page "/equipmenthistories/edit"
+@using Microsoft.EntityFrameworkCore
+@using Inventory.Domain
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>EquipmentHistory</h2>
+<hr />
+@if (EquipmentHistory is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="EquipmentHistory" OnValidSubmit="UpdateEquipmentHistory" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="EquipmentHistory.Id" value="@EquipmentHistory.Id" />
+                <div class="mb-3">
+                    <label for="assigneeid" class="form-label">AssigneeId:</label>
+                    <InputText id="assigneeid" @bind-Value="EquipmentHistory.AssigneeId" class="form-control" />
+                    <ValidationMessage For="() => EquipmentHistory.AssigneeId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="locationid" class="form-label">LocationId:</label>
+                    <InputText id="locationid" @bind-Value="EquipmentHistory.LocationId" class="form-control" />
+                    <ValidationMessage For="() => EquipmentHistory.LocationId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="equipmentid" class="form-label">EquipmentId:</label>
+                    <InputText id="equipmentid" @bind-Value="EquipmentHistory.EquipmentId" class="form-control" />
+                    <ValidationMessage For="() => EquipmentHistory.EquipmentId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="serialnumberid" class="form-label">SerialNumberId:</label>
+                    <InputText id="serialnumberid" @bind-Value="EquipmentHistory.SerialNumberId" class="form-control" />
+                    <ValidationMessage For="() => EquipmentHistory.SerialNumberId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datebegin" class="form-label">DateBegin:</label>
+                    <InputDate id="datebegin" @bind-Value="EquipmentHistory.DateBegin" class="form-control" />
+                    <ValidationMessage For="() => EquipmentHistory.DateBegin" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateend" class="form-label">DateEnd:</label>
+                    <InputDate id="dateend" @bind-Value="EquipmentHistory.DateEnd" class="form-control" />
+                    <ValidationMessage For="() => EquipmentHistory.DateEnd" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/equipmenthistories">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private EquipmentHistory? EquipmentHistory { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        EquipmentHistory ??= await context.EquipmentHistories.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (EquipmentHistory is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateEquipmentHistory()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(EquipmentHistory!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EquipmentHistoryExists(EquipmentHistory!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/equipmenthistories");
+    }
+
+    private bool EquipmentHistoryExists(string id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.EquipmentHistories.Any(e => e.Id == id);
+    }
+}

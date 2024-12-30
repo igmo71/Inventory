@@ -1,8 +1,11 @@
 ﻿@page "/equipmentorders/edit"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IEquipmentOrderService Service
+
+@attribute [Authorize]
 
 <PageTitle>Edit</PageTitle>
 
@@ -74,51 +77,24 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     [SupplyParameterFromForm]
     private EquipmentOrder? EquipmentOrder { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        EquipmentOrder ??= await context.EquipmentOrders.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            EquipmentOrder ??= await Service.Get(Id);
 
         if (EquipmentOrder is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateEquipmentOrder()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(EquipmentOrder!).State = EntityState.Modified;
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!EquipmentOrderExists(EquipmentOrder!.Id))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
-        }
+        await Service.Update(EquipmentOrder!);
 
         NavigationManager.NavigateTo("/equipmentorders");
-    }
-
-    private bool EquipmentOrderExists(string id)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.EquipmentOrders.Any(e => e.Id == id);
     }
 }

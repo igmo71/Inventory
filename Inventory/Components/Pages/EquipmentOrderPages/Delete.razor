@@ -1,8 +1,11 @@
 ﻿@page "/equipmentorders/delete"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IEquipmentOrderService Service
+
+@attribute [Authorize]
 
 <PageTitle>Delete</PageTitle>
 
@@ -16,7 +19,8 @@
     {
         <p><em>Loading...</em></p>
     }
-    else {
+    else
+    {
         <dl class="row">
             <dt class="col-sm-2">EquipmentId</dt>
             <dd class="col-sm-10">@equipmentorder.EquipmentId</dd>
@@ -60,24 +64,21 @@
     private EquipmentOrder? equipmentorder;
 
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        equipmentorder = await context.EquipmentOrders.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            equipmentorder = await Service.Get(Id);
 
         if (equipmentorder is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
     private async Task DeleteEquipmentOrder()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.EquipmentOrders.Remove(equipmentorder!);
-        await context.SaveChangesAsync();
+        await Service.Delete(equipmentorder!);
+
         NavigationManager.NavigateTo("/equipmentorders");
     }
 }

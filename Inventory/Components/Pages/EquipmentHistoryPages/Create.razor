@@ -1,8 +1,11 @@
 ﻿@page "/equipmenthistories/create"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IEquipmentHistoryService Service
+
+@attribute [Authorize]
 
 <PageTitle>Create</PageTitle>
 
@@ -58,12 +61,10 @@
     [SupplyParameterFromForm]
     private EquipmentHistory EquipmentHistory { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddEquipmentHistory()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.EquipmentHistories.Add(EquipmentHistory);
-        await context.SaveChangesAsync();
+        string id = await Service.Create(EquipmentHistory);
+
         NavigationManager.NavigateTo("/equipmenthistories");
     }
 }

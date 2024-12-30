@@ -1,8 +1,11 @@
 ﻿@page "/serialnumbers/details"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject ISerialNumberService Service
+
+@attribute [Authorize]
 
 <PageTitle>Details</PageTitle>
 
@@ -33,16 +36,14 @@
     private SerialNumber? serialnumber;
 
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        serialnumber = await context.SerialNumbers.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            serialnumber = await Service.Get(Id);
 
         if (serialnumber is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 }

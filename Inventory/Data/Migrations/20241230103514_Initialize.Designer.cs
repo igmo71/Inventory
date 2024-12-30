@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241230101439_Initialize")]
+    [Migration("20241230103514_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -111,7 +111,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Equipments");
+                    b.ToTable("Equipment");
                 });
 
             modelBuilder.Entity("Inventory.Domain.EquipmentHistory", b =>

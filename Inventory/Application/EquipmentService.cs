@@ -23,13 +23,13 @@ namespace Inventory.Application
         public async Task<ListResult<Equipment>> GetList(int skip, int? take)
         {
             using var context = _dbFactory.CreateDbContext();
-            var query = context.Equipments.Skip(skip);
+            var query = context.Equipment.Skip(skip);
 
             if (take is not null)
                 query = query.Take((int)take);
 
             var result = await query.AsNoTracking().ToListAsync();
-            var total = context.Equipments.Count();
+            var total = context.Equipment.Count();
 
             return ListResult<Equipment>.Success(result, total);
         }
@@ -37,7 +37,7 @@ namespace Inventory.Application
         public async Task<Equipment?> Get(string id)
         {
             using var context = _dbFactory.CreateDbContext();
-            var equipment = await context.Equipments.FirstOrDefaultAsync(m => m.Id == id);
+            var equipment = await context.Equipment.FirstOrDefaultAsync(m => m.Id == id);
             return equipment;
         }
 
@@ -45,7 +45,7 @@ namespace Inventory.Application
         {
             using var context = _dbFactory.CreateDbContext();
             equipment.Id = Guid.CreateVersion7().ToString();
-            context.Equipments.Add(equipment);
+            context.Equipment.Add(equipment);
             await context.SaveChangesAsync();
             return equipment.Id;
         }
@@ -77,14 +77,14 @@ namespace Inventory.Application
         public async Task Delete(Equipment equipment)
         {
             using var context = _dbFactory.CreateDbContext();
-            context.Equipments.Remove(equipment);
+            context.Equipment.Remove(equipment);
             await context.SaveChangesAsync();
         }
 
         public bool Exists(string id)
         {
             using var context = _dbFactory.CreateDbContext();
-            return context.Equipments.Any(e => e.Id == id);
+            return context.Equipment.Any(e => e.Id == id);
         }
     }
 }

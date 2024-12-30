@@ -7,7 +7,7 @@ namespace Inventory.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
-        public DbSet<Equipment> Equipments { get; set; }
+        public DbSet<Equipment> Equipment { get; set; }
         public DbSet<EquipmentHistory> EquipmentHistories { get; set; }
         public DbSet<EquipmentOrder> EquipmentOrders { get; set; }
         public DbSet<Location> Locations { get; set; }

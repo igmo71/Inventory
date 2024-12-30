@@ -1,8 +1,11 @@
 ﻿@page "/equipment/create"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IEquipmentService Service
+
+@attribute [Authorize]
 
 <PageTitle>Create</PageTitle>
 
@@ -43,12 +46,10 @@
     [SupplyParameterFromForm]
     private Equipment Equipment { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddEquipment()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Equipments.Add(Equipment);
-        await context.SaveChangesAsync();
+        string id = await Service.Create(Equipment);
+
         NavigationManager.NavigateTo("/equipment");
     }
 }

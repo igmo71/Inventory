@@ -45,6 +45,8 @@ namespace Inventory
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
             builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+            builder.Services.AddScoped<IEquipmentHistoryService, EquipmentHistoryService>();
+            builder.Services.AddScoped<IEquipmentOrderService, EquipmentOrderService>();
             builder.Services.AddScoped<ILocationService, LocationService>();
             //builder.Services.AddScoped<IOrderService, OrderService>();
             //builder.Services.AddScoped<IOrderItemService, OrderItemService>();

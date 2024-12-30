@@ -1,8 +1,11 @@
 ﻿@page "/equipmenthistories/edit"
-@using Microsoft.EntityFrameworkCore
+@using Inventory.Application
 @using Inventory.Domain
-@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
+@inject IEquipmentHistoryService Service
+
+@attribute [Authorize]
 
 <PageTitle>Edit</PageTitle>
 
@@ -20,7 +23,7 @@ else
         <div class="col-md-4">
             <EditForm method="post" Model="EquipmentHistory" OnValidSubmit="UpdateEquipmentHistory" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary role="alert"/>
+                <ValidationSummary role="alert" />
                 <input type="hidden" name="EquipmentHistory.Id" value="@EquipmentHistory.Id" />
                 <div class="mb-3">
                     <label for="assigneeid" class="form-label">AssigneeId:</label>
@@ -64,51 +67,24 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    private string Id { get; set; }
+    private string? Id { get; set; }
 
     [SupplyParameterFromForm]
     private EquipmentHistory? EquipmentHistory { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        EquipmentHistory ??= await context.EquipmentHistories.FirstOrDefaultAsync(m => m.Id == Id);
+        if (Id is not null)
+            EquipmentHistory ??= await Service.Get(Id);
 
         if (EquipmentHistory is null)
-        {
             NavigationManager.NavigateTo("notfound");
-        }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateEquipmentHistory()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(EquipmentHistory!).State = EntityState.Modified;
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!EquipmentHistoryExists(EquipmentHistory!.Id))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
-        }
+        await Service.Update(EquipmentHistory!);
 
         NavigationManager.NavigateTo("/equipmenthistories");
-    }
-
-    private bool EquipmentHistoryExists(string id)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.EquipmentHistories.Any(e => e.Id == id);
     }
 }

@@ -12,7 +12,7 @@ namespace Inventory.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Equipments",
+                name: "Equipment",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
@@ -22,11 +22,11 @@ namespace Inventory.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Equipments", x => x.Id);
+                    table.PrimaryKey("PK_Equipment", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Equipments_Equipments_ParentId",
+                        name: "FK_Equipment_Equipment_ParentId",
                         column: x => x.ParentId,
-                        principalTable: "Equipments",
+                        principalTable: "Equipment",
                         principalColumn: "Id");
                 });
 
@@ -80,9 +80,9 @@ namespace Inventory.Migrations
                 {
                     table.PrimaryKey("PK_SerialNumbers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SerialNumbers_Equipments_EquipmentId",
+                        name: "FK_SerialNumbers_Equipment_EquipmentId",
                         column: x => x.EquipmentId,
-                        principalTable: "Equipments",
+                        principalTable: "Equipment",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -141,9 +141,9 @@ namespace Inventory.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_EquipmentHistories_Equipments_EquipmentId",
+                        name: "FK_EquipmentHistories_Equipment_EquipmentId",
                         column: x => x.EquipmentId,
-                        principalTable: "Equipments",
+                        principalTable: "Equipment",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_EquipmentHistories_Locations_LocationId",
@@ -186,9 +186,9 @@ namespace Inventory.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Orders_Equipments_EquipmentId",
+                        name: "FK_Orders_Equipment_EquipmentId",
                         column: x => x.EquipmentId,
-                        principalTable: "Equipments",
+                        principalTable: "Equipment",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Orders_Locations_LocationId",
@@ -272,6 +272,11 @@ namespace Inventory.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Equipment_ParentId",
+                table: "Equipment",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EquipmentHistories_AssigneeId",
                 table: "EquipmentHistories",
                 column: "AssigneeId");
@@ -290,11 +295,6 @@ namespace Inventory.Migrations
                 name: "IX_EquipmentHistories_SerialNumberId",
                 table: "EquipmentHistories",
                 column: "SerialNumberId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Equipments_ParentId",
-                table: "Equipments",
-                column: "ParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Locations_ParentId",
@@ -410,7 +410,7 @@ namespace Inventory.Migrations
                 name: "SerialNumbers");
 
             migrationBuilder.DropTable(
-                name: "Equipments");
+                name: "Equipment");
         }
     }
 }

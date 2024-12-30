@@ -108,7 +108,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Equipments");
+                    b.ToTable("Equipment");
                 });
 
             modelBuilder.Entity("Inventory.Domain.EquipmentHistory", b =>

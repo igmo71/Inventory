@@ -10,9 +10,9 @@ namespace Inventory.Application
     {
         Task<ListResult<Equipment>> GetList(int skip, int? take);
         Task<Domain.Equipment?> Get(string id);
-        Task<string> Create(Domain.Equipment equipment);
-        Task<Result> Update(Domain.Equipment equipment);
-        Task Delete(Domain.Equipment equipment);
+        Task<string> Create(Equipment equipment);
+        Task<Result> Update(Equipment equipment);
+        Task Delete(Equipment equipment);
         bool Exists(string id);
     }
 
@@ -20,7 +20,7 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<Domain.Equipment>> GetList(int skip, int? take)
+        public async Task<ListResult<Equipment>> GetList(int skip, int? take)
         {
             using var context = _dbFactory.CreateDbContext();
             var query = context.Equipments.Skip(skip);
@@ -31,17 +31,17 @@ namespace Inventory.Application
             var result = await query.AsNoTracking().ToListAsync();
             var total = context.Equipments.Count();
 
-            return ListResult<Domain.Equipment>.Success(result, total);
+            return ListResult<Equipment>.Success(result, total);
         }
 
-        public async Task<Domain.Equipment?> Get(string id)
+        public async Task<Equipment?> Get(string id)
         {
             using var context = _dbFactory.CreateDbContext();
             var equipment = await context.Equipments.FirstOrDefaultAsync(m => m.Id == id);
             return equipment;
         }
 
-        public async Task<string> Create(Domain.Equipment equipment)
+        public async Task<string> Create(Equipment equipment)
         {
             using var context = _dbFactory.CreateDbContext();
             equipment.Id = Guid.CreateVersion7().ToString();
@@ -50,7 +50,7 @@ namespace Inventory.Application
             return equipment.Id;
         }
 
-        public async Task<Result> Update(Domain.Equipment equipment)
+        public async Task<Result> Update(Equipment equipment)
         {
             using var context = _dbFactory.CreateDbContext();
             context.Attach(equipment).State = EntityState.Modified;
@@ -65,7 +65,7 @@ namespace Inventory.Application
             {
                 if (!Exists(equipment.Id!))
                 {
-                    return Result.Fail(new NotFoundException(nameof(Domain.Equipment), equipment.Id));
+                    return Result.Fail(new NotFoundException(nameof(Equipment), equipment.Id));
                 }
                 else
                 {
@@ -74,7 +74,7 @@ namespace Inventory.Application
             }
         }
 
-        public async Task Delete(Domain.Equipment equipment)
+        public async Task Delete(Equipment equipment)
         {
             using var context = _dbFactory.CreateDbContext();
             context.Equipments.Remove(equipment);

@@ -10,7 +10,7 @@ namespace Inventory.Domain
         public string? AssigneeId { get; set; }
 
         public Location? Location { get; set; }
-        public Location? LocationId { get; set; }
+        public string? LocationId { get; set; }
 
         public Material? Material { get; set; }
         public string? MaterialId { get; set; }

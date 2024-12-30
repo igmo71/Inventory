@@ -2,7 +2,7 @@
 {
     public class MaterialOrder : Order
     {
-        public List<OrderItem>? Items { get; set; }
+        //public List<OrderItem>? Items { get; set; }
 
     }
 }

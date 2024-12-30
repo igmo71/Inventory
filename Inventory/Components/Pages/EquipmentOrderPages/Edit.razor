@@ -24,8 +24,8 @@ else
                 <input type="hidden" name="EquipmentOrder.Id" value="@EquipmentOrder.Id" />
                 <div class="mb-3">
                     <label for="assetid" class="form-label">AssetId:</label>
-                    <InputText id="assetid" @bind-Value="EquipmentOrder.AssetId" class="form-control" />
-                    <ValidationMessage For="() => EquipmentOrder.AssetId" class="text-danger" />
+                    <InputText id="assetid" @bind-Value="EquipmentOrder.EquipmentId" class="form-control" />
+                    <ValidationMessage For="() => EquipmentOrder.EquipmentId" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="serialnumberid" class="form-label">SerialNumberId:</label>

@@ -44,13 +44,13 @@ namespace Inventory
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
-            builder.Services.AddScoped<IAssetService, AssetService>();
+            builder.Services.AddScoped<IEquipmentService, EquipmentService>();
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
-            builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+            //builder.Services.AddScoped<IOrderItemService, OrderItemService>();
             builder.Services.AddScoped<ISerialNumberService, SerialNumberService>();
-            builder.Services.AddScoped<IStockBalanceService, StockBalanceService>();
-            builder.Services.AddScoped<IStockTurnoverService, StockTurnoverService>();
+            //builder.Services.AddScoped<IStockBalanceService, StockBalanceService>();
+            //builder.Services.AddScoped<IStockTurnoverService, StockTurnoverService>();
 
             var app = builder.Build();
 

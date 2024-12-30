@@ -4,8 +4,8 @@
     {
         public string? Id { get; set; }
 
-        public Asset? Asset { get; set; }
-        public string? AssetId { get; set; }
+        public Equipment? Equipment { get; set; }
+        public string? EquipmentId { get; set; }
 
         public string? Number { get; set; }
     }

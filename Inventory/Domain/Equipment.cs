@@ -1,6 +1,6 @@
 ﻿namespace Inventory.Domain
 {
-    public class Asset
+    public class Equipment
     {
         public string? Id { get; set; }
 
@@ -8,11 +8,9 @@
 
         public bool IsFolder { get; set; }
 
-        public bool IsEquipment { get; set; }
-
         public string? ParentId { get; set; }
-        public Asset? Parent { get; set; }
+        public Equipment? Parent { get; set; }
 
-        public List<Asset>? Children { get; set; }
+        public List<Equipment>? Children { get; set; }
     }
 }

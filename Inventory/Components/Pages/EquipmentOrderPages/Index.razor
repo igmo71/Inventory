@@ -16,14 +16,15 @@
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
-    <PropertyColumn Property="equipmentorder => equipmentorder.EquipmentId" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumberId" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" />
+
     <PropertyColumn Property="equipmentorder => equipmentorder.Number" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.AuthorId" />
+    <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" />
+    <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty" />
+    <PropertyColumn Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty" />
+    <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty" />
     <PropertyColumn Property="equipmentorder => equipmentorder.IsAssigned" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.AssigneeId" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.LocationId" />
+    <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" />
+    <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" />
 
     <TemplateColumn Context="equipmentorder">
         <a href="@($"equipmentorders/edit?id={equipmentorder.Id}")">Edit</a> |
@@ -39,7 +40,7 @@
     {
         itemsProvider = async request =>
          {
-             var result = await Service.GetList(request.StartIndex, request.Count);
+             var result = await Service.GetList(request.StartIndex, request.Count, true, true, true, true, true);
 
              if (!result.IsSuccess || result.Value is null)
                  return default;

@@ -9,6 +9,7 @@ namespace Inventory.Application
     public interface IEquipmentService
     {
         Task<ListResult<Equipment>> GetList(int skip, int? take, bool isIncludeParent = false);
+        Task<List<Equipment>> GetListWithoutFolders();
         Task<List<Equipment>> GetFolders();
         Task<Domain.Equipment?> Get(string id, bool isIncludeParent = false);
         Task<string> Create(Equipment equipment);
@@ -36,6 +37,16 @@ namespace Inventory.Application
             var total = context.Equipment.Count();
 
             return ListResult<Equipment>.Success(result, total);
+        }
+
+        public async Task<List<Equipment>> GetListWithoutFolders()
+        {
+            using var context = _dbFactory.CreateDbContext();
+
+            var result = await context.Equipment.AsNoTracking()
+                .Where(e => !e.IsFolder).ToListAsync();
+
+            return result;
         }
 
         public async Task<List<Equipment>> GetFolders()

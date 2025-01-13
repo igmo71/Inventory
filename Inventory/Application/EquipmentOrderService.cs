@@ -3,12 +3,18 @@ using Inventory.Common.Results;
 using Inventory.Data;
 using Inventory.Domain;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Inventory.Application
 {
     public interface IEquipmentOrderService
     {
-        Task<ListResult<EquipmentOrder>> GetList(int skip, int? take);
+        Task<ListResult<EquipmentOrder>> GetList(int? skip, int? take,
+            bool isIncludeEquipment = false,
+            bool isIncludeSerialNumber = false,
+            bool isIncludeAuthor = false,
+            bool isIncludeAssignee = false,
+            bool isIncludeLocation = false);
         Task<EquipmentOrder?> Get(string id);
         Task<string> Create(EquipmentOrder equipmentOrder);
         Task<Result> Update(EquipmentOrder equipmentOrder);
@@ -20,13 +26,37 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<EquipmentOrder>> GetList(int skip, int? take)
+        public async Task<ListResult<EquipmentOrder>> GetList(int? skip, int? take, 
+            bool isIncludeEquipment = false, 
+            bool isIncludeSerialNumber = false,
+            bool isIncludeAuthor = false,
+            bool isIncludeAssignee = false,
+            bool isIncludeLocation = false)
         {
             using var context = _dbFactory.CreateDbContext();
-            var query = context.EquipmentOrders.Skip(skip);
+            var query = context.EquipmentOrders.AsNoTracking();
+
+            if(skip is not null)
+                query = query.Skip((int)skip);
 
             if (take is not null)
                 query = query.Take((int)take);
+
+            if (isIncludeEquipment)
+                query = query.Include(e => e.Equipment);
+
+            if (isIncludeSerialNumber)
+                query = query.Include(e => e.SerialNumber);
+
+            if (isIncludeAuthor)
+                query = query.Include(e => e.Author);
+
+            if (isIncludeAssignee)
+                query = query.Include(e => e.Assignee);
+
+            if (isIncludeLocation)
+                query = query.Include(e => e.Location);
+
 
             var result = await query.AsNoTracking().ToListAsync();
             var total = context.EquipmentOrders.Count();

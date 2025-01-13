@@ -48,11 +48,7 @@ namespace Inventory
             builder.Services.AddScoped<IEquipmentHistoryService, EquipmentHistoryService>();
             builder.Services.AddScoped<IEquipmentOrderService, EquipmentOrderService>();
             builder.Services.AddScoped<ILocationService, LocationService>();
-            //builder.Services.AddScoped<IOrderService, OrderService>();
-            //builder.Services.AddScoped<IOrderItemService, OrderItemService>();
             builder.Services.AddScoped<ISerialNumberService, SerialNumberService>();
-            //builder.Services.AddScoped<IStockBalanceService, StockBalanceService>();
-            //builder.Services.AddScoped<IStockTurnoverService, StockTurnoverService>();
 
             var app = builder.Build();
 
@@ -66,7 +62,7 @@ namespace Inventory
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-    app.UseMigrationsEndPoint();
+                app.UseMigrationsEndPoint();
             }
 
             app.UseHttpsRedirection();

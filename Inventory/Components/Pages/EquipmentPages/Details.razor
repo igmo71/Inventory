@@ -25,8 +25,8 @@
             <dd class="col-sm-10">@equipment.Name</dd>
             <dt class="col-sm-2">IsFolder</dt>
             <dd class="col-sm-10">@equipment.IsFolder</dd>
-            <dt class="col-sm-2">ParentId</dt>
-            <dd class="col-sm-10">@equipment.ParentId</dd>
+            <dt class="col-sm-2">Parent</dt>
+            <dd class="col-sm-10">@equipment.Parent?.Name</dd>
         </dl>
         <div>
             <a href="@($"/equipment/edit?id={equipment.Id}")">Edit</a> |
@@ -44,7 +44,7 @@
     protected override async Task OnInitializedAsync()
     {
         if (Id is not null)
-            equipment = await Service.Get(Id);
+            equipment = await Service.Get(Id, true);
 
         if (equipment is null)
             NavigationManager.NavigateTo("notfound");

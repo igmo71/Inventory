@@ -17,22 +17,27 @@
     <div class="col-md-4">
         <EditForm method="post" Model="Equipment" OnValidSubmit="AddEquipment" FormName="create" Enhance>
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
+            <ValidationSummary class="text-danger" role="alert" />
             <div class="mb-3">
-                <label for="name" class="form-label">Name:</label> 
-                <InputText id="name" @bind-Value="Equipment.Name" class="form-control" /> 
-                <ValidationMessage For="() => Equipment.Name" class="text-danger" /> 
-            </div>        
+                <label for="name" class="form-label">Name:</label>
+                <InputText id="name" @bind-Value="Equipment.Name" class="form-control" />
+                <ValidationMessage For="() => Equipment.Name" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="isfolder" class="form-label">IsFolder:</label> 
-                <InputCheckbox id="isfolder" @bind-Value="Equipment.IsFolder" class="form-check-input" /> 
-                <ValidationMessage For="() => Equipment.IsFolder" class="text-danger" /> 
-            </div>        
+                <label for="isfolder" class="form-label">IsFolder:</label>
+                <InputCheckbox id="isfolder" @bind-Value="Equipment.IsFolder" class="form-check-input" />
+                <ValidationMessage For="() => Equipment.IsFolder" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="parentid" class="form-label">ParentId:</label> 
-                <InputText id="parentid" @bind-Value="Equipment.ParentId" class="form-control" /> 
-                <ValidationMessage For="() => Equipment.ParentId" class="text-danger" /> 
-            </div>        
+                <label for="parentid" class="form-label">Parent:</label>
+                <InputSelect id="parentid" @bind-Value="Equipment.ParentId" class="form-control">
+                    <option value="">- Выберите -</option>
+                    @foreach (var folder in equipmentFolders){
+                        <option value="@folder.Id">@folder.Name</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Equipment.ParentId" class="text-danger" />
+            </div>
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -45,6 +50,13 @@
 @code {
     [SupplyParameterFromForm]
     private Equipment Equipment { get; set; } = new();
+
+    private List<Equipment> equipmentFolders = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        equipmentFolders = await Service.GetFolders();
+    }
 
     private async Task AddEquipment()
     {

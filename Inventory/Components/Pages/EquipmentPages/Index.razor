@@ -16,11 +16,13 @@
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
-    <PropertyColumn Property="equipment => equipment.Id" />
+   @*  <PropertyColumn Property="equipment => equipment.Id" /> *@
     <PropertyColumn Property="equipment => equipment.Name" />
     <PropertyColumn Property="equipment => equipment.IsFolder" />
-    <PropertyColumn Property="equipment => equipment.ParentId" />
-
+    @* <PropertyColumn Property="equipment => equipment.ParentId" /> *@
+    <TemplateColumn Context="equipment">
+        <span> @equipment.Parent?.Name</span>
+    </TemplateColumn>
     <TemplateColumn Context="equipment">
         <a href="@($"equipment/edit?id={equipment.Id}")">Edit</a> |
         <a href="@($"equipment/details?id={equipment.Id}")">Details</a> |
@@ -35,7 +37,7 @@
     {
         itemsProvider = async request =>
         {
-            var result = await Service.GetList(request.StartIndex, request.Count);
+            var result = await Service.GetList(request.StartIndex, request.Count, isIncludeParent: true);
 
             if (!result.IsSuccess || result.Value is null)
                 return default;

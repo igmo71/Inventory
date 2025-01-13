@@ -10,6 +10,7 @@ namespace Inventory.Application
     {
         Task<ListResult<Equipment>> GetList(int skip, int? take);
         Task<Domain.Equipment?> Get(string id);
+        Task<Domain.Equipment?> Get(string id, bool isIncludeParent = false);
         Task<string> Create(Equipment equipment);
         Task<Result> Update(Equipment equipment);
         Task Delete(Equipment equipment);

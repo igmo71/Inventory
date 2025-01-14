@@ -1,0 +1,45 @@
+﻿@page "/roles/create"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+
+@inject NavigationManager NavigationManager
+@inject RoleManager<IdentityRole> RoleManager
+
+@attribute [Authorize]
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Location</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="IdentityRole" OnValidSubmit="AddRole" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <InputText id="name" @bind-Value="IdentityRole.Name" class="form-control" />
+                <ValidationMessage For="() => IdentityRole.Name" class="text-danger" />
+            </div>            
+            <button type="submit" class="btn btn-primary">Создать</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/roles">Назад к списку</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private IdentityRole IdentityRole { get; set; } = new();
+
+    private async Task AddRole()
+    {
+        var result = await RoleManager.CreateAsync(IdentityRole);
+
+        NavigationManager.NavigateTo("/roles");
+    }
+}

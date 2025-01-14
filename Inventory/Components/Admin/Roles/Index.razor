@@ -1,0 +1,31 @@
+﻿@page "/roles"
+@using Inventory.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.AspNetCore.Identity
+
+@inject RoleManager<IdentityRole> RoleManager
+
+@attribute [Authorize]
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="roles/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="RoleManager.Roles">
+    <PropertyColumn Property="role => role.Id" />
+    <PropertyColumn Property="role => role.Name" />
+
+    <TemplateColumn Context="role">
+        <a href="@($"roles/edit?id={role.Id}")">Edit</a> |
+        <a href="@($"roles/details?id={role.Id}")">Details</a> |
+        <a href="@($"roles/delete?id={role.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+}

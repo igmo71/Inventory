@@ -8,7 +8,7 @@ namespace Inventory.Application
 {
     public interface IEquipmentService
     {
-        Task<ListResult<Equipment>> GetList(int skip, int? take, bool isIncludeParent = false);
+        Task<ListResult<Equipment>> GetList(int? skip = null, int? take = null, bool isIncludeParent = false);
         Task<List<Equipment>> GetListWithoutFolders();
         Task<List<Equipment>> GetFolders();
         Task<Domain.Equipment?> Get(string id, bool isIncludeParent = false);
@@ -22,10 +22,13 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<Equipment>> GetList(int skip, int? take, bool isIncludeParent = false)
+        public async Task<ListResult<Equipment>> GetList(int? skip = null, int? take = null, bool isIncludeParent = false)
         {
             using var context = _dbFactory.CreateDbContext();
-            var query = context.Equipment.Skip(skip);
+            var query = context.Equipment.AsNoTracking();
+
+            if (skip is not null)
+                query = query.Skip((int)skip);
 
             if (take is not null)
                 query = query.Take((int)take);
@@ -33,7 +36,7 @@ namespace Inventory.Application
             if (isIncludeParent)
                 query = query.Include(e => e.Parent);
 
-            var result = await query.AsNoTracking().ToListAsync();
+            var result = await query.ToListAsync();
             var total = context.Equipment.Count();
 
             return ListResult<Equipment>.Success(result, total);

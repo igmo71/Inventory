@@ -8,7 +8,7 @@ namespace Inventory.Application
 {
     public interface IEquipmentHistoryService
     {
-        Task<ListResult<EquipmentHistory>> GetList(int skip, int? take);
+        Task<ListResult<EquipmentHistory>> GetList(int? skip = null, int? take = null);
         Task<EquipmentHistory?> Get(string id);
         Task<string> Create(EquipmentHistory equipmentHistory);
         Task<Result> Update(EquipmentHistory equipmentHistory);
@@ -20,15 +20,18 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<EquipmentHistory>> GetList(int skip, int? take)
+        public async Task<ListResult<EquipmentHistory>> GetList(int? skip = null, int? take = null)
         {
             using var context = _dbFactory.CreateDbContext();
-            var query = context.EquipmentHistories.Skip(skip);
+            var query = context.EquipmentHistories.AsNoTracking();
+
+            if (skip is not null)
+                query = query.Skip((int)skip);
 
             if (take is not null)
                 query = query.Take((int)take);
 
-            var result = await query.AsNoTracking().ToListAsync();
+            var result = await query.ToListAsync();
             var total = context.Locations.Count();
 
             return ListResult<EquipmentHistory>.Success(result, total);

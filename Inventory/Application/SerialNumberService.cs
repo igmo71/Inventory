@@ -8,7 +8,9 @@ namespace Inventory.Application
 {
     public interface ISerialNumberService
     {
-        Task<ListResult<SerialNumber>> GetList(int skip, int? take, string? equipmentId = null);
+        Task<ListResult<SerialNumber>> GetList(int? skip = null, int? take = null, 
+            bool isIncludeEquipment = false, 
+            string? equipmentId = null);
         Task<SerialNumber?> Get(string id);
         Task<string> Create(SerialNumber serialNumber);
         Task<Result> Update(SerialNumber serialNumber);
@@ -20,23 +22,32 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<SerialNumber>> GetList(int skip, int? take, string? equipmentId = null)
+        public async Task<ListResult<SerialNumber>> GetList(int? skip = null, int? take = null, 
+            bool isIncludeEquipment = false, 
+            string? equipmentId = null)
         {
             using var context = _dbFactory.CreateDbContext();
-            var query = context.SerialNumbers.Skip(skip);
+            var query = context.SerialNumbers.AsNoTracking();
+
+
+            if (skip is not null)
+                query = query.Skip((int)skip);
 
             if (take is not null)
                 query = query.Take((int)take);
 
+            if (isIncludeEquipment)
+                query = query.Include(e => e.Equipment);
+
             if (equipmentId is not null)
                 query = query.Where(e => e.EquipmentId == equipmentId);
 
-            var result = await query.Include(e => e.Equipment).AsNoTracking().ToListAsync();
+            var result = await query.ToListAsync();
             var total = context.SerialNumbers.Count();
 
             return ListResult<SerialNumber>.Success(result, total);
         }
-     
+
         public async Task<SerialNumber?> Get(string id)
         {
             using var context = _dbFactory.CreateDbContext();

@@ -7,29 +7,45 @@
 
 @attribute [Authorize]
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Ордера на Оборудование</PageTitle>
 
-<h1>Index</h1>
+<h1>Ордера на Оборудование</h1>
 
 <p>
-    <a href="equipmentorders/create">Create New</a>
+    <a href="equipmentorders/create">Создать Новый</a>
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
 
-    <PropertyColumn Property="equipmentorder => equipmentorder.Number" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.IsAssigned" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" />
-    <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" />
+    <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty">
+        <HeaderTemplate><th>Автор</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Number">
+        <HeaderTemplate><th>Номер</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" Format="dd.MM.yyyy">
+        <HeaderTemplate><th>Дата</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty">
+        <HeaderTemplate><th>Оборудование</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty">
+        <HeaderTemplate><th>Серийный номер</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" >
+        <HeaderTemplate><th>Назначен На</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.IsAssigned" >
+        <HeaderTemplate><th>Назначен (подпись)</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" >
+        <HeaderTemplate><th>Локация</th></HeaderTemplate>
+    </PropertyColumn>
 
     <TemplateColumn Context="equipmentorder">
-        <a href="@($"equipmentorders/edit?id={equipmentorder.Id}")">Edit</a> |
-        <a href="@($"equipmentorders/details?id={equipmentorder.Id}")">Details</a> |
-        <a href="@($"equipmentorders/delete?id={equipmentorder.Id}")">Delete</a>
+        <a href="@($"equipmentorders/edit?id={equipmentorder.Id}")">Изменить</a> |
+        <a href="@($"equipmentorders/details?id={equipmentorder.Id}")">Детали</a> |
+        <a href="@($"equipmentorders/delete?id={equipmentorder.Id}")">Удалить</a>
     </TemplateColumn>
 </QuickGrid>
 

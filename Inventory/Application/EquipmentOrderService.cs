@@ -9,13 +9,18 @@ namespace Inventory.Application
 {
     public interface IEquipmentOrderService
     {
-        Task<ListResult<EquipmentOrder>> GetList(int? skip, int? take,
+        Task<ListResult<EquipmentOrder>> GetList(int? skip = null, int? take = null,
             bool isIncludeEquipment = false,
             bool isIncludeSerialNumber = false,
             bool isIncludeAuthor = false,
             bool isIncludeAssignee = false,
             bool isIncludeLocation = false);
-        Task<EquipmentOrder?> Get(string id);
+        Task<EquipmentOrder?> Get(string id,
+            bool isIncludeEquipment = false,
+            bool isIncludeSerialNumber = false,
+            bool isIncludeAuthor = false,
+            bool isIncludeAssignee = false,
+            bool isIncludeLocation = false);
         Task<string> Create(EquipmentOrder equipmentOrder);
         Task<Result> Update(EquipmentOrder equipmentOrder);
         Task Delete(EquipmentOrder equipmentOrder);
@@ -26,8 +31,8 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<EquipmentOrder>> GetList(int? skip, int? take, 
-            bool isIncludeEquipment = false, 
+        public async Task<ListResult<EquipmentOrder>> GetList(int? skip = null, int? take = null,
+            bool isIncludeEquipment = false,
             bool isIncludeSerialNumber = false,
             bool isIncludeAuthor = false,
             bool isIncludeAssignee = false,
@@ -36,7 +41,7 @@ namespace Inventory.Application
             using var context = _dbFactory.CreateDbContext();
             var query = context.EquipmentOrders.AsNoTracking();
 
-            if(skip is not null)
+            if (skip is not null)
                 query = query.Skip((int)skip);
 
             if (take is not null)
@@ -64,10 +69,33 @@ namespace Inventory.Application
             return ListResult<EquipmentOrder>.Success(result, total);
         }
 
-        public async Task<EquipmentOrder?> Get(string id)
+        public async Task<EquipmentOrder?> Get(string id, 
+            bool isIncludeEquipment = false,
+            bool isIncludeSerialNumber = false,
+            bool isIncludeAuthor = false,
+            bool isIncludeAssignee = false,
+            bool isIncludeLocation = false)
         {
             using var context = _dbFactory.CreateDbContext();
-            var equipmentOrder = await context.EquipmentOrders.FirstOrDefaultAsync(m => m.Id == id);
+
+            var query = context.EquipmentOrders.AsNoTracking();
+
+            if (isIncludeEquipment)
+                query = query.Include(e => e.Equipment);
+
+            if (isIncludeSerialNumber)
+                query = query.Include(e => e.SerialNumber);
+
+            if (isIncludeAuthor)
+                query = query.Include(e => e.Author);
+
+            if (isIncludeAssignee)
+                query = query.Include(e => e.Assignee);
+
+            if (isIncludeLocation)
+                query = query.Include(e => e.Location);
+
+            var equipmentOrder = await query.FirstOrDefaultAsync(m => m.Id == id);
             return equipmentOrder;
         }
 

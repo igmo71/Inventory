@@ -8,7 +8,7 @@ namespace Inventory.Application
 {
     public interface ILocationService
     {
-        Task<ListResult<Location>> GetList(int skip, int? take);
+        Task<ListResult<Location>> GetList(int? skip = null, int? take = null, bool isIncludeParent = false);
         Task<Location?> Get(string id);
         Task<string> Create(Location location);
         Task<Result> Update(Location location);
@@ -20,15 +20,21 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<Location>> GetList(int skip, int? take)
+        public async Task<ListResult<Location>> GetList(int? skip = null, int? take = null, bool isIncludeParent = false)
         {
             using var context = _dbFactory.CreateDbContext();
-            var query = context.Locations.Skip(skip);
+            var query = context.Locations.AsNoTracking();
+
+            if (skip is not null)
+                query = query.Skip((int)skip);
 
             if (take is not null)
                 query = query.Take((int)take);
 
-            var result = await query.Include(e => e.Parent).AsNoTracking().ToListAsync();
+            if (isIncludeParent)
+                query = query.Include(e => e.Parent);
+
+            var result = await query.ToListAsync();
             var total = context.Locations.Count();
 
             return ListResult<Location>.Success(result, total);

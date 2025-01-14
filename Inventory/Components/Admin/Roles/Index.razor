@@ -8,12 +8,12 @@
 
 @attribute [Authorize]
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Роли</PageTitle>
 
-<h1>Index</h1>
+<h1>Роли</h1>
 
 <p>
-    <a href="roles/create">Create New</a>
+    <a href="roles/create">Создать новую</a>
 </p>
 
 <QuickGrid Class="table" Items="RoleManager.Roles">
@@ -21,9 +21,9 @@
     <PropertyColumn Property="role => role.Name" />
 
     <TemplateColumn Context="role">
-        <a href="@($"roles/edit?id={role.Id}")">Edit</a> |
-        <a href="@($"roles/details?id={role.Id}")">Details</a> |
-        <a href="@($"roles/delete?id={role.Id}")">Delete</a>
+        <a href="@($"roles/edit?id={role.Id}")">Изменить</a> |
+        <a href="@($"roles/details?id={role.Id}")">Детали</a> |
+        <a href="@($"roles/delete?id={role.Id}")">Удалить</a>
     </TemplateColumn>
 </QuickGrid>
 

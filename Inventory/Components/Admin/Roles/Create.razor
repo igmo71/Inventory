@@ -7,11 +7,11 @@
 
 @attribute [Authorize]
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Создать</PageTitle>
 
-<h1>Create</h1>
+<h1>Создать</h1>
 
-<h2>Location</h2>
+<h2>Роль</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -38,7 +38,7 @@
 
     private async Task AddRole()
     {
-        var result = await RoleManager.CreateAsync(IdentityRole);
+        var result = await RoleManager.CreateAsync(IdentityRole); 
 
         NavigationManager.NavigateTo("/roles");
     }

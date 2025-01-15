@@ -1,0 +1,31 @@
+﻿@page "/users"
+@using Inventory.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<ApplicationUser> UserManager
+
+@attribute [Authorize]
+
+<PageTitle>Пользователи</PageTitle>
+
+<h1>Роли</h1>
+
+<p>
+    <a href="users/create">Создать нового</a>
+</p>
+
+<QuickGrid Class="table" Items="UserManager.Users">
+    <PropertyColumn Property="role => role.Id" />
+    <PropertyColumn Property="role => role.Name" />
+
+    <TemplateColumn Context="role">
+        <a href="@($"users/edit?id={role.Id}")">Изменить</a> |
+        <a href="@($"users/details?id={role.Id}")">Детали</a> |
+        <a href="@($"users/delete?id={role.Id}")">Удалить</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+}

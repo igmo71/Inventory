@@ -1,0 +1,73 @@
+﻿@page "/users/edit"
+
+@using Inventory.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+
+@inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+
+@attribute [Authorize]
+
+<PageTitle>Изменить</PageTitle>
+
+<h1>Изменить</h1>
+
+<h2>Пользователя</h2>
+<hr />
+@if (ApplicationUser is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="ApplicationUser" OnValidSubmit="UpdateApplicationUser" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert" />
+                <input type="hidden" name="ApplicationUser.Id" value="@ApplicationUser.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Имя:</label>
+                    <InputText id="name" @bind-Value="ApplicationUser.Name" class="form-control" />
+                    <ValidationMessage For="() => ApplicationUser.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="ApplicationUser.UserName" class="form-control" />
+                    <ValidationMessage For="() => ApplicationUser.UserName" class="text-danger" />
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/users">Назад к списку</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ApplicationUser? ApplicationUser { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id is not null)
+            ApplicationUser ??= await UserManager.FindByIdAsync(Id);
+
+        if (ApplicationUser is null)
+            NavigationManager.NavigateTo("notfound");
+    }
+
+    private async Task UpdateApplicationUser()
+    {
+        //await Service.Update(Location!);
+
+        NavigationManager.NavigateTo("/locations");
+    }
+}

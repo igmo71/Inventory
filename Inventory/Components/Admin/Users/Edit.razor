@@ -3,9 +3,11 @@
 @using Inventory.Data
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
 
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
 
 @attribute [Authorize]
 
@@ -15,7 +17,7 @@
 
 <h2>Пользователя</h2>
 <hr />
-@if (ApplicationUser is null)
+@if (Input is null)
 {
     <p><em>Loading...</em></p>
 }
@@ -23,21 +25,44 @@ else
 {
     <div class="row">
         <div class="col-md-4">
-            <EditForm method="post" Model="ApplicationUser" OnValidSubmit="UpdateApplicationUser" FormName="edit" Enhance>
+            @if (!string.IsNullOrEmpty(statusMessage))
+            {
+                <div class="alert alert-warning" role="alert">
+                    @statusMessage
+                </div>
+            }
+            <EditForm method="post" Model="Input" OnValidSubmit="UpdateUser" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
                 <ValidationSummary role="alert" />
-                <input type="hidden" name="ApplicationUser.Id" value="@ApplicationUser.Id" />
+                <input type="hidden" name="Input.Id" value="@Input.Id" />
                 <div class="mb-3">
                     <label for="name" class="form-label">Имя:</label>
-                    <InputText id="name" @bind-Value="ApplicationUser.Name" class="form-control" />
-                    <ValidationMessage For="() => ApplicationUser.Name" class="text-danger" />
+                    <InputText id="name" @bind-Value="Input.Name" class="form-control" />
+                    <ValidationMessage For="() => Input.Name" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email:</label>
-                    <InputText id="email" @bind-Value="ApplicationUser.UserName" class="form-control" />
-                    <ValidationMessage For="() => ApplicationUser.UserName" class="text-danger" />
+                    <InputText id="email" @bind-Value="Input.Email" class="form-control" />
+                    <ValidationMessage For="() => Input.Email" class="text-danger" />
                 </div>
-                
+
+                <label for="roles">Роли:</label>
+                <div class="card mb-3" id="roles">
+                    <div class="card-body">
+                        @foreach (var role in Input.Roles)
+                        {
+                            string roleKey = $"role_{role.Key}";
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" @bind="Input.Roles[role.Key]" value="@role.Value" id="@roleKey">
+                                <label class="form-check-label" for="@roleKey">
+                                    @role.Key
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary">Сохранить</button>
             </EditForm>
         </div>
@@ -53,21 +78,116 @@ else
     private string? Id { get; set; }
 
     [SupplyParameterFromForm]
-    private ApplicationUser? ApplicationUser { get; set; }
+    private InputModel Input { get; set; } = new();
+
+    private IEnumerable<IdentityError>? identityErrors;
+    private string? statusMessage => identityErrors is null ? null : $"Ошибка: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+
+    private ApplicationUser? user { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        if (Id is not null)
-            ApplicationUser ??= await UserManager.FindByIdAsync(Id);
+        await GetUser();
+        await SetInputModel();
+    }
 
-        if (ApplicationUser is null)
+    private async Task GetUser()
+    {
+        if (Id is not null)
+            user ??= await UserManager.FindByIdAsync(Id);
+
+        if (user is null)
             NavigationManager.NavigateTo("notfound");
     }
 
-    private async Task UpdateApplicationUser()
+    private async Task SetInputModel()
     {
-        //await Service.Update(Location!);
+        if (user is null)
+            return;
 
-        NavigationManager.NavigateTo("/locations");
+        Input.Id = user.Id;
+        Input.Email = user.Email ?? string.Empty;
+        Input.Name = user.Name ?? string.Empty;
+
+        await GetRoles();
+    }
+
+    private async Task GetRoles()
+    {
+        if (user is null)
+            return;
+
+        var roles = RoleManager.Roles.ToList();
+
+        foreach (var role in roles)
+        {
+            if (!string.IsNullOrEmpty(role.Name))
+            {
+                if (await UserManager.IsInRoleAsync(user, role.Name))
+                    Input.Roles.Add(role.Name, true);
+                else
+                    Input.Roles.Add(role.Name, false);
+            }
+        }
+    }
+
+    private async Task UpdateUser()
+    {
+        if (user is null)
+            return;
+
+        user.Name = Input.Name;
+        user.UserName = Input.Email;
+        user.Email = Input.Email;
+        user.EmailConfirmed = true;
+
+        await UpdateRolesTo(user);
+
+        var result = await UserManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            identityErrors = result.Errors;
+            return;
+        }
+
+        NavigationManager.NavigateTo("/users");
+    }
+
+    private async Task UpdateRolesTo(ApplicationUser user)
+    {
+        foreach (var role in Input.Roles)
+            if (role.Value)
+                await UserManager.AddToRoleAsync(user, role.Key);
+            else
+                await UserManager.RemoveFromRoleAsync(user, role.Key);
+    }
+
+    private sealed class InputModel
+    {
+        public string Id { get; set; } = "";
+
+        [Required(ErrorMessage = "Имя обязательно для заполнения.")]
+        [StringLength(maximumLength: 100, MinimumLength = 3, ErrorMessage = "Длина Имени должна быть не менее 3 не более 100 букв.")]
+        [Display(Name = "Имя")]
+        public string Name { get; set; } = "";
+
+        [Required(ErrorMessage = "Email обязательно для заполнения.")]
+        [EmailAddress(ErrorMessage = "Email содержит навалидный e-mail адрес.")]
+        [Display(Name = "Email")]
+        public string Email { get; set; } = "";
+
+        // [Required(ErrorMessage = "Пароль обязательно для заполнения.")]
+        // [StringLength(100, ErrorMessage = "Длина {0} должна быть не менее {2} и не более {1} символов.", MinimumLength = 6)]
+        // [DataType(DataType.Password)]
+        // [Display(Name = "Пароль")]
+        // public string Password { get; set; } = "";
+
+        // [DataType(DataType.Password)]
+        // [Display(Name = "Подтверждение пароля")]
+        // [Compare("Password", ErrorMessage = "Пароль и Подтверждение пароля не совпадают.")]
+        // public string ConfirmPassword { get; set; } = "";
+
+        public Dictionary<string, bool> Roles { get; set; } = new();
     }
 }

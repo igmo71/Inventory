@@ -1,6 +1,5 @@
 ﻿@page "/users/create"
 
-@using Inventory.Components.Account.Shared
 @using Inventory.Data
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
@@ -20,10 +19,10 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        @if (!string.IsNullOrEmpty(Message))
+        @if (!string.IsNullOrEmpty(statusMessage))
         {
             <div class="alert alert-warning" role="alert">
-                @Message
+                @statusMessage
             </div>
         }
         <EditForm method="post" Model="Input" OnValidSubmit="RegisterUser" FormName="create" Enhance>
@@ -49,28 +48,31 @@
                 <InputText type="password" @bind-Value="Input.ConfirmPassword" id="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
-            @foreach (var role in Input.Roles)
-            {
-                string id = $"role_{role.Key}";
 
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" @bind="Input.Roles[role.Key]" value="@role.Value" id="@id">
-                    <label class="form-check-label" for="@id">
-                        @role.Key
-                    </label>
+            <label for="roles">Роли:</label>
+            <div class="card mb-3" id="roles">
+                <div class="card-body">
+                    @foreach (var role in Input.Roles)
+                    {
+                        string roleKey = $"role_{role.Key}";
 
-                   @*  <InputCheckbox id="@id" @bind-Value="Input.Roles[role.Key]" class="form-check-input" />
-                    <label for="@id" class="form-label">@role.Key</label> *@
-
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" @bind="Input.Roles[role.Key]" value="@role.Value" id="@roleKey">
+                            <label class="form-check-label" for="@roleKey">
+                                @role.Key
+                            </label>
+                        </div>
+                    }
                 </div>
-            }
+            </div>
+
             <button type="submit" class="btn btn-primary">Создать</button>
         </EditForm>
     </div>
 </div>
 
 <div>
-    <a href="/locations">Назад к списку</a>
+    <a href="/users">Назад к списку</a>
 </div>
 
 @code {
@@ -80,13 +82,22 @@
     private Dictionary<string, bool> roles = new();
 
     private IEnumerable<IdentityError>? identityErrors;
-    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+    private string? statusMessage => identityErrors is null ? null : $"Ошибка: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
     protected override void OnInitialized()
     {
-        var identityRoles = RoleManager.Roles.ToList();
-        foreach (var item in identityRoles)
-            Input.Roles.Add(item.Name, false);
+        GetRoles();
+    }
+
+    private void GetRoles()
+    {
+        var roles = RoleManager.Roles.ToList();
+        
+        foreach (var role in roles)
+        {
+            if (!string.IsNullOrEmpty(role.Name))
+                Input.Roles.Add(role.Name, false);
+        }
     }
 
     public async Task RegisterUser(EditContext editContext)
@@ -94,12 +105,14 @@
         var user = CreateUser(Input);
 
         var result = await UserManager.CreateAsync(user, Input.Password);
-
+        
         if (!result.Succeeded)
         {
             identityErrors = result.Errors;
             return;
         }
+
+        await AddRolesTo(user);
 
         NavigationManager.NavigateTo("/users");
     }
@@ -122,6 +135,13 @@
             throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
                 $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
         }
+    }
+
+    private async Task AddRolesTo(ApplicationUser user)
+    {
+        foreach (var role in Input.Roles)
+            if (role.Value)
+                await UserManager.AddToRoleAsync(user, role.Key);
     }
 
     private sealed class InputModel

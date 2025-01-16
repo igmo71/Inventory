@@ -16,7 +16,7 @@
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
-        </div>   
+        </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="locations">
@@ -38,16 +38,16 @@
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="equipmentorders">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ордера Оборудования
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ордера(оборудование)
             </NavLink>
-        </div>        
+        </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="equipmenthistories">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> История Оборудован
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> История
             </NavLink>
-        </div> 
-        
+        </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="materials">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Материалы
@@ -56,19 +56,19 @@
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="materialorders">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ордера Материалов
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ордера(материалы)
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="materialbalances">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Остатки Материалов
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Остатки
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="materialturnovers">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Обороты Материалов
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Обороты
             </NavLink>
         </div>
 
@@ -112,15 +112,22 @@
         <AuthorizeView Roles="Admin">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="users">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Пользователи
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-gear" viewBox="0 0 16 16">
+                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m.256 7a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1zm3.63-4.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382zM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0" />
+                    </svg>
+                    <span> Пользователи </span>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="roles">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Роли
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-bounding-box" viewBox="0 0 16 16">
+                        <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5M.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5" />
+                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                    </svg>
+                    <span> Роли </span>
                 </NavLink>
             </div>
-            <div class="nav-item px-3">
+            @* <div class="nav-item px-3">
                 <NavLink class="nav-link" href="counter">
                     <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
                 </NavLink>
@@ -129,7 +136,7 @@
                 <NavLink class="nav-link" href="weather">
                     <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
                 </NavLink>
-            </div>
+            </div> *@
         </AuthorizeView>
     </nav>
 </div>

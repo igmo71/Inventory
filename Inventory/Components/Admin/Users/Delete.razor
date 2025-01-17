@@ -1,0 +1,86 @@
+﻿@page "/users/delete"
+
+@using Inventory.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+
+@inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+
+@attribute [Authorize]
+
+<PageTitle>Удалить</PageTitle>
+
+<h1>Удалить</h1>
+
+<p>Вы уверены, что хотите удалить?</p>    
+<div>
+    <h2>Пользователя</h2>
+    <hr />
+    @if (user is null)
+    {
+        <p><em>загрузка...</em></p>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-4">
+                @if (!string.IsNullOrEmpty(statusMessage))
+                {
+                    <div class="alert alert-warning" role="alert">
+                        @statusMessage
+                    </div>
+                }
+            </div>
+        </div>
+        <dl class="row">
+            <dt class="col-sm-2">Имя</dt>
+            <dd class="col-sm-10">@user.Name</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@user.Email</dd>
+        </dl>
+        <EditForm method="post" Model="user" OnValidSubmit="DeleteUser" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(user is null)">Удалить</button> |
+            <a href="/users">Назад к списку</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private ApplicationUser? user { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? Id { get; set; }
+    
+    private IEnumerable<IdentityError>? identityErrors;
+    private string? statusMessage => identityErrors is null ? null : $"Ошибка: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUser();
+    }
+
+    private async Task GetUser()
+    {
+        if (Id is not null)
+            user ??= await UserManager.FindByIdAsync(Id);
+
+        if (user is null)
+            NavigationManager.NavigateTo("notfound");
+    }
+
+    private async Task DeleteUser()
+    {
+        var result = await UserManager.DeleteAsync(user!);
+        
+        if (!result.Succeeded)
+        {
+            identityErrors = result.Errors;
+            return;
+        }
+        
+        NavigationManager.NavigateTo("/users");
+    }
+}

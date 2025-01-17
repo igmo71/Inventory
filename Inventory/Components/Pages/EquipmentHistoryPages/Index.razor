@@ -16,12 +16,24 @@
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
-    <PropertyColumn Property="equipmenthistory => equipmenthistory.AssigneeId" />
-    <PropertyColumn Property="equipmenthistory => equipmenthistory.LocationId" />
-    <PropertyColumn Property="equipmenthistory => equipmenthistory.EquipmentId" />
-    <PropertyColumn Property="equipmenthistory => equipmenthistory.SerialNumberId" />
-    <PropertyColumn Property="equipmenthistory => equipmenthistory.DateBegin" />
-    <PropertyColumn Property="equipmenthistory => equipmenthistory.DateEnd" />
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.Equipment.Name" >
+        <HeaderTemplate><th>Оборудование</th></HeaderTemplate>
+        </PropertyColumn>
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.SerialNumber.Number">
+        <HeaderTemplate><th>Серийный Номер</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.Assignee.Name">
+        <HeaderTemplate><th>Ответственный</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.Location.Name">
+        <HeaderTemplate><th>Локация</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.DateBegin">
+        <HeaderTemplate><th>Выдано</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmenthistory => equipmenthistory.DateEnd">
+        <HeaderTemplate><th>Сдано</th></HeaderTemplate>
+    </PropertyColumn>
 
     <TemplateColumn Context="equipmenthistory">
         <a href="@($"equipmenthistories/edit?id={equipmenthistory.Id}")">Edit</a> |
@@ -37,7 +49,7 @@
     {
         itemsProvider = async request =>
         {
-            var result = await Service.GetList(request.StartIndex, request.Count);
+            var result = await Service.GetList(request.StartIndex, request.Count, true, true, true, true);
 
             if (!result.IsSuccess || result.Value is null)
                 return default;

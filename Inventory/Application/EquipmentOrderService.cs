@@ -3,7 +3,6 @@ using Inventory.Common.Results;
 using Inventory.Data;
 using Inventory.Domain;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Inventory.Application
 {
@@ -14,7 +13,9 @@ namespace Inventory.Application
             bool isIncludeSerialNumber = false,
             bool isIncludeAuthor = false,
             bool isIncludeAssignee = false,
-            bool isIncludeLocation = false);
+            bool isIncludeLocation = false,
+            ApplicationUser? assignee = null);
+
         Task<EquipmentOrder?> Get(string id,
             bool isIncludeEquipment = false,
             bool isIncludeSerialNumber = false,
@@ -36,7 +37,8 @@ namespace Inventory.Application
             bool isIncludeSerialNumber = false,
             bool isIncludeAuthor = false,
             bool isIncludeAssignee = false,
-            bool isIncludeLocation = false)
+            bool isIncludeLocation = false,
+            ApplicationUser? assignee = null)
         {
             using var context = _dbFactory.CreateDbContext();
             var query = context.EquipmentOrders.AsNoTracking();
@@ -62,6 +64,8 @@ namespace Inventory.Application
             if (isIncludeLocation)
                 query = query.Include(e => e.Location);
 
+            if(assignee is not null)
+                query = query.Where(e => e.AssigneeId == assignee.Id);
 
             var result = await query.AsNoTracking().ToListAsync();
             var total = context.EquipmentOrders.Count();

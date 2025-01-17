@@ -8,7 +8,12 @@ namespace Inventory.Application
 {
     public interface IEquipmentHistoryService
     {
-        Task<ListResult<EquipmentHistory>> GetList(int? skip = null, int? take = null);
+        Task<ListResult<EquipmentHistory>> GetList(int? skip = null, int? take = null,
+            bool isIncludeEquipment = false,
+            bool isIncludeSerialNumber = false,
+            bool isIncludeAssignee = false,
+            bool isIncludeLocation = false);
+
         Task<EquipmentHistory?> Get(string id);
         Task<string> Create(EquipmentHistory equipmentHistory);
         Task<Result> Update(EquipmentHistory equipmentHistory);
@@ -20,7 +25,11 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<EquipmentHistory>> GetList(int? skip = null, int? take = null)
+        public async Task<ListResult<EquipmentHistory>> GetList(int? skip = null, int? take = null,
+            bool isIncludeEquipment = false,
+            bool isIncludeSerialNumber = false,
+            bool isIncludeAssignee = false,
+            bool isIncludeLocation = false)
         {
             using var context = _dbFactory.CreateDbContext();
             var query = context.EquipmentHistories.AsNoTracking();
@@ -30,6 +39,18 @@ namespace Inventory.Application
 
             if (take is not null)
                 query = query.Take((int)take);
+            
+            if (isIncludeEquipment)
+                query = query.Include(e => e.Equipment);
+
+            if (isIncludeSerialNumber)
+                query = query.Include(e => e.SerialNumber);
+
+            if (isIncludeAssignee)
+                query = query.Include(e => e.Assignee);
+
+            if (isIncludeLocation)
+                query = query.Include(e => e.Location);
 
             var result = await query.ToListAsync();
             var total = context.Locations.Count();

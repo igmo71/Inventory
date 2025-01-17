@@ -1,0 +1,84 @@
+﻿@page "/equipmentorders/myequipment"
+
+@using Inventory.Application
+@using Inventory.Data
+@using Inventory.Domain
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.AspNetCore.Identity
+
+@inject IEquipmentOrderService Service
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@attribute [Authorize]
+
+<PageTitle>Мое Оборудование</PageTitle>
+
+<h1>Мое Оборудование</h1>
+<h3>@applicationUser?.Name</h3>
+<QuickGrid Class="table" ItemsProvider="itemsProvider">
+
+    <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty">
+        <HeaderTemplate><th>Автор</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Number">
+        <HeaderTemplate><th>Номер</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" Format="dd.MM.yyyy">
+        <HeaderTemplate><th>Дата</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty">
+        <HeaderTemplate><th>Оборудование</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty">
+        <HeaderTemplate><th>Серийный номер</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" >
+        <HeaderTemplate><th>Ответственный</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.IsAssigned" >
+        <HeaderTemplate><th> Принят (подпись)</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" >
+        <HeaderTemplate><th>Локация</th></HeaderTemplate>
+    </PropertyColumn>
+
+    <TemplateColumn Context="equipmentorder">
+        <a href="@($"equipmentorders/edit?id={equipmentorder.Id}")">Изменить</a> |
+        <a href="@($"equipmentorders/details?id={equipmentorder.Id}")">Детали</a> |
+        <a href="@($"equipmentorders/delete?id={equipmentorder.Id}")">Удалить</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    GridItemsProvider<EquipmentOrder>? itemsProvider;
+
+    private ApplicationUser? applicationUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetApplicationUser();
+
+        itemsProvider = async request =>
+         {
+             var result = await Service.GetList(request.StartIndex, request.Count, true, true, true, true, true, applicationUser);
+
+             if (!result.IsSuccess || result.Value is null)
+                 return default;
+
+             var response = GridItemsProviderResult.From(
+                 items: result.Value,
+                 totalItemCount: result.Total
+             );
+
+             return response;
+         };
+    }
+
+    private async Task GetApplicationUser()
+    {
+        var authstate = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        applicationUser = await UserManager.GetUserAsync(authstate.User);
+    }
+}

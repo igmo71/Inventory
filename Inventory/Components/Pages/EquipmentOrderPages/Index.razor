@@ -33,10 +33,10 @@
         <HeaderTemplate><th>Серийный номер</th></HeaderTemplate>
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" >
-        <HeaderTemplate><th>Назначен На</th></HeaderTemplate>
+        <HeaderTemplate><th>Ответственный</th></HeaderTemplate>
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.IsAssigned" >
-        <HeaderTemplate><th>Назначен (подпись)</th></HeaderTemplate>
+        <HeaderTemplate><th> Принят (подпись)</th></HeaderTemplate>
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" >
         <HeaderTemplate><th>Локация</th></HeaderTemplate>

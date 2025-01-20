@@ -10,8 +10,10 @@ namespace Inventory.Application
     {
         Task<ListResult<SerialNumber>> GetList(int? skip = null, int? take = null, 
             bool isIncludeEquipment = false, 
-            string? equipmentId = null);
-        Task<SerialNumber?> Get(string id);
+            string? equipmentId = null,
+            bool isNotAssignedOnly = false);
+        Task<SerialNumber?> Get(string id,
+            bool isIncludeEquipment = false);
         Task<string> Create(SerialNumber serialNumber);
         Task<Result> Update(SerialNumber serialNumber);
         Task Delete(SerialNumber serialNumber);
@@ -24,7 +26,8 @@ namespace Inventory.Application
 
         public async Task<ListResult<SerialNumber>> GetList(int? skip = null, int? take = null, 
             bool isIncludeEquipment = false, 
-            string? equipmentId = null)
+            string? equipmentId = null,
+            bool isNotAssignedOnly = false)
         {
             using var context = _dbFactory.CreateDbContext();
             var query = context.SerialNumbers.AsNoTracking();
@@ -37,10 +40,16 @@ namespace Inventory.Application
                 query = query.Take((int)take);
 
             if (isIncludeEquipment)
-                query = query.Include(e => e.Equipment);
+                query = query.Include(e => e.Equipment)
+                    .Where(e => e.Equipment != null)
+                    .OrderBy(e => e.Equipment!.Name)
+                    .ThenBy(e => e.Number);
 
             if (equipmentId is not null)
                 query = query.Where(e => e.EquipmentId == equipmentId);
+
+            if (isNotAssignedOnly)
+                query = query.Where(e => !e.IsAssigned);
 
             var result = await query.ToListAsync();
             var total = context.SerialNumbers.Count();
@@ -48,11 +57,18 @@ namespace Inventory.Application
             return ListResult<SerialNumber>.Success(result, total);
         }
 
-        public async Task<SerialNumber?> Get(string id)
+        public async Task<SerialNumber?> Get(string id,
+            bool isIncludeEquipment = false)
         {
             using var context = _dbFactory.CreateDbContext();
-            var serialNumber = await context.SerialNumbers.FirstOrDefaultAsync(m => m.Id == id);
-            return serialNumber;
+
+            var query = context.SerialNumbers.AsNoTracking();
+
+            if (isIncludeEquipment)
+                query = query.Include(e => e.Equipment);
+
+            var serialNumber = await query.FirstOrDefaultAsync(m => m.Id == id);
+                return serialNumber;
         }
 
         public async Task<string> Create(SerialNumber serialNumber)

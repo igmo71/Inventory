@@ -1,17 +1,20 @@
 ﻿@page "/serialnumbers/create"
+
 @using Inventory.Application
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
+
 @inject NavigationManager NavigationManager
 @inject ISerialNumberService Service
+@inject IEquipmentService EquipmentService
 
 @attribute [Authorize]
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Создать</PageTitle>
 
-<h1>Create</h1>
+<h1>Создать</h1>
 
-<h2>SerialNumber</h2>
+<h2>Серийный Номер</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -19,27 +22,44 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
-                <label for="equipmentid" class="form-label">EquipmentId:</label> 
-                <InputText id="equipmentid" @bind-Value="SerialNumber.EquipmentId" class="form-control" /> 
+                <label for="equipmentid" class="form-label">Оборудование:</label> 
+                <InputSelect id="equipmentid" @bind-Value="SerialNumber.EquipmentId" class="form-control">
+                    <option value="">- Выберите -</option>
+                    @foreach (var equip in equipment)
+                    {
+                        <option value="@equip.Id">@equip.Name </option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => SerialNumber.EquipmentId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="number" class="form-label">Number:</label> 
+                <label for="number" class="form-label">Серийный Номер:</label> 
                 <InputText id="number" @bind-Value="SerialNumber.Number" class="form-control" /> 
                 <ValidationMessage For="() => SerialNumber.Number" class="text-danger" /> 
             </div>        
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" class="btn btn-primary">Создать</button>
         </EditForm>
     </div>
 </div>
 
 <div>
-    <a href="/serialnumbers">Back to List</a>
+    <a href="/serialnumbers">Назад к Списку</a>
 </div>
 
 @code {
     [SupplyParameterFromForm]
     private SerialNumber SerialNumber { get; set; } = new();
+
+    private List<Equipment> equipment = new();
+
+    protected override async Task OnInitializedAsync(){
+        await GetEquipment();
+    }
+
+    private async Task GetEquipment()
+    {
+        equipment = await EquipmentService.GetListWithoutFolders();
+    }
 
     private async Task AddSerialNumber()
     {

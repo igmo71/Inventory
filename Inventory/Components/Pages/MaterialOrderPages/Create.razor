@@ -29,12 +29,7 @@
                 <label for="authorid" class="form-label">AuthorId:</label> 
                 <InputText id="authorid" @bind-Value="MaterialOrder.AuthorId" class="form-control" /> 
                 <ValidationMessage For="() => MaterialOrder.AuthorId" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="isassigned" class="form-label">IsAssigned:</label> 
-                <InputCheckbox id="isassigned" @bind-Value="MaterialOrder.IsAssigned" class="form-check-input" /> 
-                <ValidationMessage For="() => MaterialOrder.IsAssigned" class="text-danger" /> 
-            </div>        
+            </div>                  
             <div class="mb-3">
                 <label for="assigneeid" class="form-label">AssigneeId:</label> 
                 <InputText id="assigneeid" @bind-Value="MaterialOrder.AssigneeId" class="form-control" /> 

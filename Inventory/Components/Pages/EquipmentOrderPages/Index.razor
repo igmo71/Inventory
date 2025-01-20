@@ -35,11 +35,14 @@
     <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" >
         <HeaderTemplate><th>Ответственный</th></HeaderTemplate>
     </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.IsAssigned" >
-        <HeaderTemplate><th> Принят (подпись)</th></HeaderTemplate>
-    </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" >
         <HeaderTemplate><th>Локация</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.ReceiptDate" Format="dd.MM.yyyy">
+        <HeaderTemplate><th> Дата получения</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.ReturnDate" Format="dd.MM.yyyy">
+        <HeaderTemplate><th> Дата возврата</th></HeaderTemplate>
     </PropertyColumn>
 
     <TemplateColumn Context="equipmentorder">

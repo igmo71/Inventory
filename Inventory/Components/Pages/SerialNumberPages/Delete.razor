@@ -7,30 +7,30 @@
 
 @attribute [Authorize]
 
-<PageTitle>Delete</PageTitle>
+<PageTitle>Удалить</PageTitle>
 
-<h1>Delete</h1>
+<h1>Удалить</h1>
 
-<p>Are you sure you want to delete this?</p>
+<p>Вы уверены, что хотите удалить?</p>
 <div>
-    <h2>SerialNumber</h2>
+    <h2>Серийный Номер</h2>
     <hr />
     @if (serialnumber is null)
     {
-        <p><em>Loading...</em></p>
+        <p><em>Загрузка...</em></p>
     }
     else {
         <dl class="row">
-            <dt class="col-sm-2">EquipmentId</dt>
-            <dd class="col-sm-10">@serialnumber.EquipmentId</dd>
+            <dt class="col-sm-2">Оборудование</dt>
+            <dd class="col-sm-10">@serialnumber.Equipment?.Name</dd>
         </dl>
         <dl class="row">
-            <dt class="col-sm-2">Number</dt>
+            <dt class="col-sm-2">Серийный Номер</dt>
             <dd class="col-sm-10">@serialnumber.Number</dd>
         </dl>
         <EditForm method="post" Model="serialnumber" OnValidSubmit="DeleteSerialNumber" FormName="delete" Enhance>
-            <button type="submit" class="btn btn-danger" disabled="@(serialnumber is null)">Delete</button> |
-            <a href="/serialnumbers">Back to List</a>
+            <button type="submit" class="btn btn-danger" disabled="@(serialnumber is null)">Удалить</button> |
+            <a href="/serialnumbers">Назад к Списку</a>
         </EditForm>
     }
 </div>
@@ -44,7 +44,7 @@
     protected override async Task OnInitializedAsync()
     {
         if (Id is not null)
-            serialnumber = await Service.Get(Id);
+            serialnumber = await Service.Get(Id, isIncludeEquipment: true);
 
         if (serialnumber is null)
             NavigationManager.NavigateTo("notfound");

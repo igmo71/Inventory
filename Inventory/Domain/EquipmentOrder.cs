@@ -7,5 +7,7 @@
 
         public SerialNumber? SerialNumber { get; set; }
         public string? SerialNumberId { get; set; }
+
+        public DateTime? ReturnDate { get; set; }
     }
 }

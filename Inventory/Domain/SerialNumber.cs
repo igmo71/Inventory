@@ -8,5 +8,7 @@
         public string? EquipmentId { get; set; }
 
         public string? Number { get; set; }
+
+        public bool IsAssigned { get; set; }
     }
 }

@@ -8,7 +8,6 @@ namespace Inventory.Data
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
         public DbSet<Equipment> Equipment { get; set; }
-        public DbSet<EquipmentHistory> EquipmentHistories { get; set; }
         public DbSet<EquipmentOrder> EquipmentOrders { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Material> Materials { get; set; }
@@ -29,18 +28,7 @@ namespace Inventory.Data
             builder.Entity<Equipment>().HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).HasPrincipalKey(e => e.Id);
             builder.Entity<Equipment>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<Equipment>().Property(e => e.ParentId).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<Equipment>().Property(e => e.Name).HasMaxLength(AppSettings.NAME_LENGTH);
-
-            builder.Entity<EquipmentHistory>().HasKey(e => e.Id);
-            builder.Entity<EquipmentHistory>().HasOne(e => e.Assignee).WithMany().HasForeignKey(e => e.AssigneeId).HasPrincipalKey(e => e.Id);
-            builder.Entity<EquipmentHistory>().HasOne(e => e.Location).WithMany().HasForeignKey(e => e.LocationId).HasPrincipalKey(e => e.Id);
-            builder.Entity<EquipmentHistory>().HasOne(e => e.Equipment).WithMany().HasForeignKey(e => e.EquipmentId).HasPrincipalKey(e => e.Id);
-            builder.Entity<EquipmentHistory>().HasOne(e => e.SerialNumber).WithMany().HasForeignKey(e => e.SerialNumberId).HasPrincipalKey(e => e.Id);
-            builder.Entity<EquipmentHistory>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<EquipmentHistory>().Property(e => e.AssigneeId).HasMaxLength(AppSettings.USER_ID_LENGTH);
-            builder.Entity<EquipmentHistory>().Property(e => e.LocationId).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<EquipmentHistory>().Property(e => e.EquipmentId).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<EquipmentHistory>().Property(e => e.SerialNumberId).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<Equipment>().Property(e => e.Name).HasMaxLength(AppSettings.NAME_LENGTH);           
 
             builder.Entity<EquipmentOrder>().HasOne(e => e.Equipment).WithMany().HasForeignKey(e => e.EquipmentId).HasPrincipalKey(e => e.Id);
             builder.Entity<EquipmentOrder>().HasOne(e => e.SerialNumber).WithMany().HasForeignKey(e => e.SerialNumberId).HasPrincipalKey(e => e.Id);

@@ -30,12 +30,14 @@
             <dd class="col-sm-10">@equipmentorder.Number</dd>
             <dt class="col-sm-2">AuthorId</dt>
             <dd class="col-sm-10">@equipmentorder.AuthorId</dd>
-            <dt class="col-sm-2">IsAssigned</dt>
-            <dd class="col-sm-10">@equipmentorder.IsAssigned</dd>
             <dt class="col-sm-2">AssigneeId</dt>
             <dd class="col-sm-10">@equipmentorder.AssigneeId</dd>
             <dt class="col-sm-2">LocationId</dt>
             <dd class="col-sm-10">@equipmentorder.LocationId</dd>
+            <dt class="col-sm-2">Дата выдачи</dt>
+            <dd class="col-sm-10">@equipmentorder.ReceiptDate</dd>
+            <dt class="col-sm-2">Дата возврата</dt>
+            <dd class="col-sm-10">@equipmentorder.ReturnDate</dd>
         </dl>
         <div>
             <a href="@($"/equipmentorders/edit?id={equipmentorder.Id}")">Edit</a> |

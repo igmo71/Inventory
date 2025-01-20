@@ -66,7 +66,7 @@ namespace Inventory.Application
         {
             using var context = _dbFactory.CreateDbContext();
             
-            var query = context.Equipment.AsQueryable();
+            var query = context.Equipment.AsNoTracking();
             
             if(isIncludeParent)
                 query = query.Include(e => e.Parent);

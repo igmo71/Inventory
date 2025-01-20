@@ -10,7 +10,6 @@
 @inject IEquipmentService EquipmentService
 @inject ISerialNumberService SerialNumberService
 @inject ILocationService LocationService
-@inject IEquipmentHistoryService EquipmentHistoryService
 
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -34,6 +33,9 @@ else
             <EditForm method="post" Model="EquipmentOrder" OnValidSubmit="UpdateEquipmentOrder" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
                 <ValidationSummary role="alert" />
+
+                <input type="hidden" name="EquipmentOrder.Id" value="@EquipmentOrder.Id" />
+
                 <div class="mb-3">
                     <label for="authorid" class="form-label">Автор: @EquipmentOrder.Author?.Name</label>
                     @* <InputText id="authorid" @bind-Value="EquipmentOrder.AuthorId" class="form-control" /> *@
@@ -48,12 +50,10 @@ else
                     <label for="datetime" class="form-label">Дата:</label>
                     <InputDate id="datetime" @bind-Value="EquipmentOrder.DateTime" class="form-control" disabled />
                     <ValidationMessage For="() => EquipmentOrder.DateTime" class="text-danger" />
-                </div>
-
-                <input type="hidden" name="EquipmentOrder.Id" value="@EquipmentOrder.Id" />
-                <div class="mb-3">
+                </div>                
+                <div class="mb-3">                   
                     <label for="equipmentid" class="form-label">Оборудование:</label>
-                    <InputSelect id="equipmentid" @bind-Value="EquipmentOrder.EquipmentId" @bind-Value:after="GetSerialNumbers" class="form-control">
+                    <InputSelect id="equipmentid" @bind-Value="EquipmentOrder.EquipmentId" @bind-Value:after="GetSerialNumbers" class="form-control" disabled="@isEquipmentIdDisabled">
                         <option value="">- Выберите -</option>
                         @foreach (var equip in equipment)
                         {
@@ -64,7 +64,7 @@ else
                 </div>
                 <div class="mb-3">
                     <label for="serialnumberid" class="form-label">Серийный Номер:</label>
-                    <InputSelect id="serialnumberid" @bind-Value="EquipmentOrder.SerialNumberId" class="form-control">
+                    <InputSelect id="serialnumberid" @bind-Value="EquipmentOrder.SerialNumberId" class="form-control" disabled="@isSerialNumberIdDisabled">
                         <option value="">- Выберите -</option>
                         @foreach (var serialNumber in serialNumbers)
                         {
@@ -74,7 +74,7 @@ else
                     <ValidationMessage For="() => EquipmentOrder.SerialNumberId" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="assigneeid" class="form-label">Назначить На:</label>
+                    <label for="assigneeid" class="form-label">Ответственный:</label>
                     <InputSelect id="assigneeid" @bind-Value="EquipmentOrder.AssigneeId" class="form-control">
                         <option value="">- Выберите -</option>
                         @foreach (var user in applicationUsers)
@@ -83,11 +83,6 @@ else
                         }
                     </InputSelect>
                     <ValidationMessage For="() => EquipmentOrder.AssigneeId" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="isassigned" class="form-label">Назначен (подпись):</label>
-                    <InputCheckbox id="isassigned" @bind-Value="EquipmentOrder.IsAssigned" class="form-check-input" />
-                    <ValidationMessage For="() => EquipmentOrder.IsAssigned" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="locationid" class="form-label">Локация:</label>
@@ -100,6 +95,16 @@ else
                     </InputSelect>
                     <ValidationMessage For="() => EquipmentOrder.LocationId" class="text-danger" />
                 </div>
+                <div class="mb-3">   
+                    <label for="ReceiptDate" class="form-label">Дата получения:</label>
+                    <InputDate id="ReceiptDate" @bind-Value="EquipmentOrder.ReceiptDate" class="form-control" disabled="@isReceiptDateDisabled" />
+                    <ValidationMessage For="() => EquipmentOrder.ReceiptDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="ReturnDate" class="form-label">Дата возврата:</label>
+                    <InputDate id="ReturnDate" @bind-Value="EquipmentOrder.ReturnDate" class="form-control" disabled="@isReturnDateDiasbled" />
+                    <ValidationMessage For="() => EquipmentOrder.ReturnDate" class="text-danger" />
+                </div>
                 <button type="submit" class="btn btn-primary">Сохранить</button>
             </EditForm>
         </div>
@@ -107,7 +112,7 @@ else
 }
 
 <div>
-    <a href="/equipmentorders">Назад к списку</a>
+    <a href="/equipmentorders">Назад к Списку</a>
 </div>
 
 @code {
@@ -123,7 +128,10 @@ else
     private List<ApplicationUser> applicationUsers = new();
     private ApplicationUser? applicationUser;
 
-    private bool isAssignedOnInitialize;
+    private bool isEquipmentIdDisabled;
+    private bool isSerialNumberIdDisabled;
+    private bool isReceiptDateDisabled;
+    private bool isReturnDateDiasbled;
 
     protected override async Task OnInitializedAsync()
     {
@@ -133,8 +141,6 @@ else
         if (EquipmentOrder is null)
             NavigationManager.NavigateTo("notfound");
 
-        isAssignedOnInitialize = EquipmentOrder is not null ? EquipmentOrder.IsAssigned : false;
-
         await GetEquipment();
         await GetSerialNumbers();
         await GetLocations();
@@ -142,23 +148,34 @@ else
         await GetApplicationUser();
 
         GetApplicationUsers();
+
+        isEquipmentIdDisabled = EquipmentOrder?.EquipmentId != null;
+        isSerialNumberIdDisabled = EquipmentOrder?.SerialNumberId != null;
+        isReceiptDateDisabled = EquipmentOrder?.ReceiptDate != null;
+        isReturnDateDiasbled = EquipmentOrder?.ReturnDate != null;
     }
 
     private async Task UpdateEquipmentOrder()
     {
         await Service.Update(EquipmentOrder!);
 
-        if (EquipmentOrder is not null && EquipmentOrder.IsAssigned && EquipmentOrder.IsAssigned != isAssignedOnInitialize)
-            await EquipmentHistoryService.Create(new EquipmentHistory
-                {
-                    AssigneeId = EquipmentOrder.AssigneeId,
-                    EquipmentId = EquipmentOrder.EquipmentId,
-                    SerialNumberId = EquipmentOrder.SerialNumberId,
-                    LocationId = EquipmentOrder.LocationId,
-                    DateBegin = DateTime.Now
-                });
+        await UpdateSerialNumber();
 
         NavigationManager.NavigateTo("/equipmentorders");
+    }
+
+    private async Task UpdateSerialNumber()
+    {
+        if (EquipmentOrder is not null && EquipmentOrder.SerialNumber != null)
+        {
+            if (EquipmentOrder.AssigneeId != null && EquipmentOrder.ReturnDate == null)
+                EquipmentOrder.SerialNumber.IsAssigned = true;
+
+            if (EquipmentOrder.ReturnDate != null)
+                EquipmentOrder.SerialNumber.IsAssigned = false;
+
+            await SerialNumberService.Update(EquipmentOrder.SerialNumber);
+        }
     }
 
     private async Task GetEquipment()

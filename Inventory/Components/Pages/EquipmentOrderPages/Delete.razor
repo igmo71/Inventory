@@ -42,20 +42,24 @@
             <dd class="col-sm-10">@equipmentorder.SerialNumber?.Number</dd>
         </dl>
         <dl class="row">
-            <dt class="col-sm-2">Назначен На</dt>
+            <dt class="col-sm-2">Ответственный</dt>
             <dd class="col-sm-10">@equipmentorder.Assignee?.Name</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Назначен (подпись)</dt>
-            <dd class="col-sm-10">@equipmentorder.IsAssigned</dd>
-        </dl>
+        </dl>        
         <dl class="row">
             <dt class="col-sm-2">Локация</dt>
             <dd class="col-sm-10">@equipmentorder.Location?.Name</dd>
         </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Дата выдачи</dt>
+            <dd class="col-sm-10">@equipmentorder.ReceiptDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Дата возврата</dt>
+            <dd class="col-sm-10">@equipmentorder.ReturnDate</dd>
+        </dl>
         <EditForm method="post" Model="equipmentorder" OnValidSubmit="DeleteEquipmentOrder" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(equipmentorder is null)">Удалить</button> |
-            <a href="/equipmentorders">Назад к списку</a>
+            <a href="/equipmentorders">Назад к Списку</a>
         </EditForm>
     }
 </div>

@@ -7,26 +7,29 @@
 
 @attribute [Authorize]
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Серийные Номера</PageTitle>
 
-<h1>Index</h1>
+<h1>Серийные Номера</h1>
 
 <p>
-    <a href="serialnumbers/create">Create New</a>
+    <a href="serialnumbers/create">Создать Серийный Номер</a>
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
-    <PropertyColumn Property="serialnumber => serialnumber.Id" />
-    <PropertyColumn Property="serialnumber => serialnumber.EquipmentId" />
-    <TemplateColumn Context="serialnumber">
-        <span>@serialnumber.Equipment?.Name</span>
-    </TemplateColumn>
-    <PropertyColumn Property="serialnumber => serialnumber.Number" />
+    <PropertyColumn Property="serialnumber => serialnumber.Equipment != null ? serialnumber.Equipment.Name : string.Empty">
+        <HeaderTemplate><th>ЮОборудование</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="serialnumber => serialnumber.Number">
+        <HeaderTemplate><th>Серийный Номер</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="serialnumber => serialnumber.IsAssigned">
+        <HeaderTemplate><th>Выдан</th></HeaderTemplate>
+    </PropertyColumn>
 
     <TemplateColumn Context="serialnumber">
-        <a href="@($"serialnumbers/edit?id={serialnumber.Id}")">Edit</a> |
-        <a href="@($"serialnumbers/details?id={serialnumber.Id}")">Details</a> |
-        <a href="@($"serialnumbers/delete?id={serialnumber.Id}")">Delete</a>
+        <a href="@($"serialnumbers/edit?id={serialnumber.Id}")">Изменить</a> |
+        <a href="@($"serialnumbers/details?id={serialnumber.Id}")">Детали</a> |
+        <a href="@($"serialnumbers/delete?id={serialnumber.Id}")">Удалить</a>
     </TemplateColumn>
 </QuickGrid>
 
@@ -37,7 +40,7 @@
     {
         itemsProvider = async request =>
         {
-            var result = await Service.GetList(request.StartIndex, request.Count);
+            var result = await Service.GetList(request.StartIndex, request.Count, isIncludeEquipment: true);
 
             if (!result.IsSuccess || result.Value is null)
                 return default;

@@ -66,7 +66,7 @@
                 <ValidationMessage For="() => EquipmentOrder.SerialNumberId" class="text-danger" />
             </div>
             <div class="mb-3">
-                <label for="assigneeid" class="form-label">Назначить На:</label>
+                <label for="assigneeid" class="form-label">Ответственный:</label>
                 <InputSelect id="assigneeid" @bind-Value="EquipmentOrder.AssigneeId" class="form-control">
                     <option value="">- Выберите -</option>
                     @foreach (var user in applicationUsers)
@@ -75,12 +75,7 @@
                     }
                 </InputSelect>
                 <ValidationMessage For="() => EquipmentOrder.AssigneeId" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="isassigned" class="form-label">Назначен (подпись):</label>
-                <InputCheckbox id="isassigned" @bind-Value="EquipmentOrder.IsAssigned" class="form-check-input" disabled />
-                <ValidationMessage For="() => EquipmentOrder.IsAssigned" class="text-danger" />
-            </div>
+            </div>            
             <div class="mb-3">
                 <label for="locationid" class="form-label">Локация:</label>
                 <InputSelect id="locationid" @bind-Value="EquipmentOrder.LocationId" class="form-control">
@@ -91,6 +86,16 @@
                     }
                 </InputSelect>
                 <ValidationMessage For="() => EquipmentOrder.LocationId" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="ReceiptDate" class="form-label">Дата получения:</label>
+                <InputDate id="ReceiptDate" @bind-Value="EquipmentOrder.ReceiptDate" class="form-control" disabled />
+                <ValidationMessage For="() => EquipmentOrder.ReceiptDate" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="ReturnDate" class="form-label">Дата возврата:</label>
+                <InputDate id="ReturnDate" @bind-Value="EquipmentOrder.ReturnDate" class="form-control" disabled />
+                <ValidationMessage For="() => EquipmentOrder.ReturnDate" class="text-danger" />
             </div>
             <button type="submit" class="btn btn-primary">Создать</button>
         </EditForm>
@@ -139,7 +144,7 @@
     private async Task GetSerialNumbers()
     {
         var equipmentId = EquipmentOrder.EquipmentId;
-        var result = await SerialNumberService.GetList(0, null, true, equipmentId);
+        var result = await SerialNumberService.GetList(0, null, isIncludeEquipment: true, equipmentId, isNotAssignedOnly: true);
         if (result.IsSuccess)
             serialNumbers = result.Value;
     }

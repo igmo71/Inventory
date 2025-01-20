@@ -1,0 +1,113 @@
+﻿@page "/myequipment/replace"
+@using Inventory.Application
+@using Inventory.Data
+@using Inventory.Domain
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+
+@inject NavigationManager NavigationManager
+@inject IEquipmentOrderService Service
+@inject IEquipmentService EquipmentService
+@inject ISerialNumberService SerialNumberService
+@inject ILocationService LocationService
+
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@attribute [Authorize]
+
+<PageTitle>Переместить</PageTitle>
+
+<h1>Переместить</h1>
+
+<h2>Оборудование</h2>
+<hr />
+@if (equipmentOrder is null)
+{
+    <p><em>Загрузка...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <EditForm method="post" Model="equipmentOrder" OnValidSubmit="UpdateEquipmentOrder" FormName="edit" Enhance>
+
+                <input type="hidden" name="equipmentOrder.Id" value="@equipmentOrder.Id" />
+
+                <dl class="row">
+                    <dt class="col-sm-3">Автор Ордера</dt>
+                    <dd class="col-sm-9">@equipmentOrder.Author?.Name</dd>
+                    <dt class="col-sm-3">Номер Ордера</dt>
+                    <dd class="col-sm-9">@equipmentOrder.Number</dd>
+                    <dt class="col-sm-3">Дата Ордера</dt>
+                    <dd class="col-sm-9">@equipmentOrder.DateTime</dd>
+                    <dt class="col-sm-3">Оборудование</dt>
+                    <dd class="col-sm-9">@equipmentOrder.Equipment?.Name</dd>
+                    <dt class="col-sm-3">Серийный Номер</dt>
+                    <dd class="col-sm-9">@equipmentOrder.SerialNumber?.Number</dd>
+                    <dt class="col-sm-3">Ответственный</dt>
+                    <dd class="col-sm-9">@equipmentOrder.Assignee?.Name</dd>
+                    <dt class="col-sm-3">Дата получения</dt>
+                    <dd class="col-sm-9">@equipmentOrder.ReceiptDate</dd>
+                    <dt class="col-sm-3">Локация</dt>
+                    <dd class="col-sm-9">
+                        <InputSelect id="locationid" @bind-Value="equipmentOrder.LocationId" class="form-control">
+                            <option value="">- Выберите -</option>
+                            @foreach (var location in locations)
+                            {
+                                <option value="@location.Id">@location.Name </option>
+                            }
+                        </InputSelect>
+                    </dd>
+                    
+                    <ValidationMessage For="() => equipmentOrder.LocationId" class="text-danger" />
+                </dl>
+                <button type="submit" class="btn btn-primary">Переместить</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/myequipment">Назад к Списку</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private EquipmentOrder? equipmentOrder { get; set; }
+
+    private List<Location> locations = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id is not null)
+            equipmentOrder = await Service.Get(Id,
+                isIncludeEquipment: true,
+                isIncludeSerialNumber: true,
+                isIncludeAuthor: true,
+                isIncludeAssignee: true,
+                isIncludeLocation: false);
+
+        if (equipmentOrder is null)
+            NavigationManager.NavigateTo("notfound");
+
+        await GetLocations();
+    }
+
+    private async Task GetLocations()
+    {
+        var locationsResult = await LocationService.GetList(0, null);
+        if (locationsResult.IsSuccess)
+            locations = locationsResult.Value;
+    }
+
+    private async Task UpdateEquipmentOrder()
+    {
+        await Service.Update(equipmentOrder!);
+
+        NavigationManager.NavigateTo("/myequipment");
+    }
+}

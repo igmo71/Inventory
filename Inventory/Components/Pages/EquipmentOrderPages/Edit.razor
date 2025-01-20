@@ -24,7 +24,7 @@
 <hr />
 @if (EquipmentOrder is null)
 {
-    <p><em>Loading...</em></p>
+    <p><em>Загрузка...</em></p>
 }
 else
 {
@@ -38,7 +38,10 @@ else
 
                 <div class="mb-3">
                     <label for="authorid" class="form-label">Автор: @EquipmentOrder.Author?.Name</label>
-                    @* <InputText id="authorid" @bind-Value="EquipmentOrder.AuthorId" class="form-control" /> *@
+                    @if (EquipmentOrder.Author != null)
+                    {
+                        <InputText id="authorid" @bind-Value="EquipmentOrder.Author.Name" class="form-control" disabled />
+                    }
                     <ValidationMessage For="() => EquipmentOrder.AuthorId" class="text-danger" />
                 </div>
                 <div class="mb-3">
@@ -50,8 +53,8 @@ else
                     <label for="datetime" class="form-label">Дата:</label>
                     <InputDate id="datetime" @bind-Value="EquipmentOrder.DateTime" class="form-control" disabled />
                     <ValidationMessage For="() => EquipmentOrder.DateTime" class="text-danger" />
-                </div>                
-                <div class="mb-3">                   
+                </div>
+                <div class="mb-3">
                     <label for="equipmentid" class="form-label">Оборудование:</label>
                     <InputSelect id="equipmentid" @bind-Value="EquipmentOrder.EquipmentId" @bind-Value:after="GetSerialNumbers" class="form-control" disabled="@isEquipmentIdDisabled">
                         <option value="">- Выберите -</option>
@@ -95,14 +98,14 @@ else
                     </InputSelect>
                     <ValidationMessage For="() => EquipmentOrder.LocationId" class="text-danger" />
                 </div>
-                <div class="mb-3">   
+                <div class="mb-3">
                     <label for="ReceiptDate" class="form-label">Дата получения:</label>
-                    <InputDate id="ReceiptDate" @bind-Value="EquipmentOrder.ReceiptDate" class="form-control" disabled="@isReceiptDateDisabled" />
+                    <InputDate id="ReceiptDate" @bind-Value="EquipmentOrder.ReceiptDate" class="form-control" />
                     <ValidationMessage For="() => EquipmentOrder.ReceiptDate" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="ReturnDate" class="form-label">Дата возврата:</label>
-                    <InputDate id="ReturnDate" @bind-Value="EquipmentOrder.ReturnDate" class="form-control" disabled="@isReturnDateDiasbled" />
+                    <InputDate id="ReturnDate" @bind-Value="EquipmentOrder.ReturnDate" class="form-control" />
                     <ValidationMessage For="() => EquipmentOrder.ReturnDate" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Сохранить</button>
@@ -136,7 +139,12 @@ else
     protected override async Task OnInitializedAsync()
     {
         if (Id is not null)
-            EquipmentOrder ??= await Service.Get(Id, true, true, true, true, true);
+            EquipmentOrder ??= await Service.Get(Id, 
+                isIncludeEquipment: true, 
+                isIncludeSerialNumber: true, 
+                isIncludeAuthor: true, 
+                isIncludeAssignee: false, 
+                isIncludeLocation: false);
 
         if (EquipmentOrder is null)
             NavigationManager.NavigateTo("notfound");

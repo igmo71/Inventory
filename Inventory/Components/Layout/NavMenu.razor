@@ -17,35 +17,42 @@
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
+        <AuthorizeView Roles="Manager">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="equipmentorders">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ордера
+                </NavLink>
+            </div>        <div class="nav-item px-3">
+                <NavLink class="nav-link" href="equipment">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Оборудование
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="equipmentorders">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ордера
-            </NavLink>
-        </div>        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="equipment">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Оборудование
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="serialnumbers">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Серийные номера
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="serialnumbers">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Серийные номера
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="locations">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Локации
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="locations">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Локации
-            </NavLink>
-        </div>        
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="materials">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Материалы
-            </NavLink>
-        </div>
-
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="materials">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Материалы
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles="User">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="myequipment">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Мое Оборудование
+                </NavLink>
+            </div>
+        </AuthorizeView>
         @* <div class="nav-item px-3">
             <NavLink class="nav-link" href="materialorders">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ордера(материалы)

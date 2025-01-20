@@ -1,4 +1,4 @@
-﻿@page "/equipmentorders/myequipment"
+﻿@page "/myequipment"
 
 @using Inventory.Application
 @using Inventory.Data
@@ -34,20 +34,36 @@
     <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty">
         <HeaderTemplate><th>Серийный номер</th></HeaderTemplate>
     </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" >
-        <HeaderTemplate><th>Ответственный</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.IsAssigned" >
-        <HeaderTemplate><th> Принят (подпись)</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" >
+    <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty">
         <HeaderTemplate><th>Локация</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.ReceiptDate" Format="dd.MM.yyyy">
+        <HeaderTemplate><th> Дата получения</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.ReturnDate" Format="dd.MM.yyyy">
+        <HeaderTemplate><th> Дата возврата</th></HeaderTemplate>
     </PropertyColumn>
 
     <TemplateColumn Context="equipmentorder">
-        <a href="@($"equipmentorders/edit?id={equipmentorder.Id}")">Изменить</a> |
-        <a href="@($"equipmentorders/details?id={equipmentorder.Id}")">Детали</a> |
-        <a href="@($"equipmentorders/delete?id={equipmentorder.Id}")">Удалить</a>
+        @if (equipmentorder.ReceiptDate == null)
+        {
+            <a class="link-danger text-nowrap" href="@($"myequipment/sign?id={equipmentorder.Id}")">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-diamond-fill" viewBox="0 0 16 16">
+                    <path d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                </svg>
+                <span> Подписать </span>
+            </a>
+        }
+
+        @if (equipmentorder.ReceiptDate != null && equipmentorder.ReturnDate == null)
+        {
+            <a class="text-nowrap" href="@($"myequipment/replace?id={equipmentorder.Id}")">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-reply-fill" viewBox="0 0 16 16">
+                    <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z" />
+                </svg>
+                <span> Переместить </span>
+                    </a>
+        }
     </TemplateColumn>
 </QuickGrid>
 

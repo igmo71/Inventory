@@ -15,7 +15,7 @@
 <div>
     <h2>Ордер на Оборудование</h2>
     <hr />
-    @if (equipmentorder is null)
+    @if (equipmentOrder is null)
     {
         <p><em>Loading...</em></p>
     }
@@ -23,49 +23,49 @@
     {
         <dl class="row">
             <dt class="col-sm-2">Автор</dt>
-            <dd class="col-sm-10">@equipmentorder.Author?.Name</dd>
+            <dd class="col-sm-10">@equipmentOrder.Author?.Name</dd>
         </dl>
         <dl class="row">
             <dt class="col-sm-2">Номер</dt>
-            <dd class="col-sm-10">@equipmentorder.Number</dd>
+            <dd class="col-sm-10">@equipmentOrder.Number</dd>
         </dl>
         <dl class="row">
             <dt class="col-sm-2">Дата</dt>
-            <dd class="col-sm-10">@equipmentorder.DateTime</dd>
+            <dd class="col-sm-10">@equipmentOrder.DateTime</dd>
         </dl>        
         <dl class="row">
             <dt class="col-sm-2">Оборудование</dt>
-            <dd class="col-sm-10">@equipmentorder.Equipment?.Name</dd>
+            <dd class="col-sm-10">@equipmentOrder.Equipment?.Name</dd>
         </dl>
         <dl class="row">
             <dt class="col-sm-2">Серийный Номер</dt>
-            <dd class="col-sm-10">@equipmentorder.SerialNumber?.Number</dd>
+            <dd class="col-sm-10">@equipmentOrder.SerialNumber?.Number</dd>
         </dl>
         <dl class="row">
             <dt class="col-sm-2">Ответственный</dt>
-            <dd class="col-sm-10">@equipmentorder.Assignee?.Name</dd>
+            <dd class="col-sm-10">@equipmentOrder.Assignee?.Name</dd>
         </dl>        
         <dl class="row">
             <dt class="col-sm-2">Локация</dt>
-            <dd class="col-sm-10">@equipmentorder.Location?.Name</dd>
+            <dd class="col-sm-10">@equipmentOrder.Location?.Name</dd>
         </dl>
         <dl class="row">
             <dt class="col-sm-2">Дата выдачи</dt>
-            <dd class="col-sm-10">@equipmentorder.ReceiptDate</dd>
+            <dd class="col-sm-10">@equipmentOrder.ReceiptDate</dd>
         </dl>
         <dl class="row">
             <dt class="col-sm-2">Дата возврата</dt>
-            <dd class="col-sm-10">@equipmentorder.ReturnDate</dd>
+            <dd class="col-sm-10">@equipmentOrder.ReturnDate</dd>
         </dl>
-        <EditForm method="post" Model="equipmentorder" OnValidSubmit="DeleteEquipmentOrder" FormName="delete" Enhance>
-            <button type="submit" class="btn btn-danger" disabled="@(equipmentorder is null)">Удалить</button> |
+        <EditForm method="post" Model="equipmentOrder" OnValidSubmit="DeleteEquipmentOrder" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(equipmentOrder is null)">Удалить</button> |
             <a href="/equipmentorders">Назад к Списку</a>
         </EditForm>
     }
 </div>
 
 @code {
-    private EquipmentOrder? equipmentorder;
+    private EquipmentOrder? equipmentOrder;
 
     [SupplyParameterFromQuery]
     private string? Id { get; set; }
@@ -73,15 +73,15 @@
     protected override async Task OnInitializedAsync()
     {
         if (Id is not null)
-            equipmentorder = await Service.Get(Id, true, true, true, true, true);
+            equipmentOrder = await Service.Get(Id, true, true, true, true, true);
 
-        if (equipmentorder is null)
+        if (equipmentOrder is null)
             NavigationManager.NavigateTo("notfound");
     }
 
     private async Task DeleteEquipmentOrder()
     {
-        await Service.Delete(equipmentorder!);
+        await Service.Delete(equipmentOrder!);
 
         NavigationManager.NavigateTo("/equipmentorders");
     }

@@ -14,40 +14,40 @@
 <div>
     <h2>EquipmentOrder</h2>
     <hr />
-    @if (equipmentorder is null)
+    @if (equipmentOrder is null)
     {
         <p><em>Loading...</em></p>
     }
     else {
         <dl class="row">
             <dt class="col-sm-2">EquipmentId</dt>
-            <dd class="col-sm-10">@equipmentorder.EquipmentId</dd>
+            <dd class="col-sm-10">@equipmentOrder.EquipmentId</dd>
             <dt class="col-sm-2">SerialNumberId</dt>
-            <dd class="col-sm-10">@equipmentorder.SerialNumberId</dd>
+            <dd class="col-sm-10">@equipmentOrder.SerialNumberId</dd>
             <dt class="col-sm-2">DateTime</dt>
-            <dd class="col-sm-10">@equipmentorder.DateTime</dd>
+            <dd class="col-sm-10">@equipmentOrder.DateTime</dd>
             <dt class="col-sm-2">Number</dt>
-            <dd class="col-sm-10">@equipmentorder.Number</dd>
+            <dd class="col-sm-10">@equipmentOrder.Number</dd>
             <dt class="col-sm-2">AuthorId</dt>
-            <dd class="col-sm-10">@equipmentorder.AuthorId</dd>
+            <dd class="col-sm-10">@equipmentOrder.AuthorId</dd>
             <dt class="col-sm-2">AssigneeId</dt>
-            <dd class="col-sm-10">@equipmentorder.AssigneeId</dd>
+            <dd class="col-sm-10">@equipmentOrder.AssigneeId</dd>
             <dt class="col-sm-2">LocationId</dt>
-            <dd class="col-sm-10">@equipmentorder.LocationId</dd>
+            <dd class="col-sm-10">@equipmentOrder.LocationId</dd>
             <dt class="col-sm-2">Дата выдачи</dt>
-            <dd class="col-sm-10">@equipmentorder.ReceiptDate</dd>
+            <dd class="col-sm-10">@equipmentOrder.ReceiptDate</dd>
             <dt class="col-sm-2">Дата возврата</dt>
-            <dd class="col-sm-10">@equipmentorder.ReturnDate</dd>
+            <dd class="col-sm-10">@equipmentOrder.ReturnDate</dd>
         </dl>
         <div>
-            <a href="@($"/equipmentorders/edit?id={equipmentorder.Id}")">Edit</a> |
+            <a href="@($"/equipmentorders/edit?id={equipmentOrder.Id}")">Edit</a> |
             <a href="@($"/equipmentorders")">Back to List</a>
         </div>
     }
 </div>
 
 @code {
-    private EquipmentOrder? equipmentorder;
+    private EquipmentOrder? equipmentOrder;
 
     [SupplyParameterFromQuery]
     private string? Id { get; set; }
@@ -55,9 +55,9 @@
     protected override async Task OnInitializedAsync()
     {
         if (Id is not null) 
-            equipmentorder = await Service.Get(Id);
+            equipmentOrder = await Service.Get(Id);
 
-        if (equipmentorder is null)
+        if (equipmentOrder is null)
             NavigationManager.NavigateTo("notfound");
     }
 }

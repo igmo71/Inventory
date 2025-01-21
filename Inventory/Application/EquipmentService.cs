@@ -11,7 +11,9 @@ namespace Inventory.Application
         Task<ListResult<Equipment>> GetList(int? skip = null, int? take = null, bool isIncludeParent = false);
         Task<List<Equipment>> GetListWithoutFolders();
         Task<List<Equipment>> GetFolders();
-        Task<Domain.Equipment?> Get(string id, bool isIncludeParent = false);
+        Task<List<Equipment>> GetListWithoutParents();
+        Task<List<Equipment>> GetChildren(string id);
+        Task<Equipment?> Get(string id, bool isIncludeParent = false);
         Task<string> Create(Equipment equipment);
         Task<Result> Update(Equipment equipment);
         Task Delete(Equipment equipment);
@@ -58,6 +60,26 @@ namespace Inventory.Application
 
             var result = await context.Equipment.AsNoTracking()
                 .Where(e => e.IsFolder).ToListAsync();
+
+            return result;
+        }
+
+        public async Task<List<Equipment>> GetListWithoutParents()
+        {
+            using var context = _dbFactory.CreateDbContext();
+
+            var result = await context.Equipment.AsNoTracking()
+                .Where(e => e.ParentId == null).ToListAsync();
+
+            return result;
+        }
+
+        public async Task<List<Equipment>> GetChildren(string id)
+        {
+            using var context = _dbFactory.CreateDbContext();
+
+            var result = await context.Equipment.AsNoTracking()
+                .Where(e => e.ParentId == id).ToListAsync();
 
             return result;
         }

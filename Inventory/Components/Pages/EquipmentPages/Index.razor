@@ -7,33 +7,22 @@
 
 @attribute [Authorize]
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Оборудование</PageTitle>
 
-<h1>Index</h1>
+<h1>Оборудование</h1>
 
 <p>
-    <a href="equipment/create">Create New</a>
+    <a href="equipment/create">Создать</a>
 </p>
 
-<QuickGrid Class="table" ItemsProvider="itemsProvider">
-   @*  <PropertyColumn Property="equipment => equipment.Id" /> *@
-    <PropertyColumn Property="equipment => equipment.Name" />
-    <PropertyColumn Property="equipment => equipment.IsFolder" />
-    @* <PropertyColumn Property="equipment => equipment.ParentId" /> *@
-    <TemplateColumn Context="equipment">
-        <span> @equipment.Parent?.Name</span>
-    </TemplateColumn>
-    <TemplateColumn Context="equipment">
-        <a href="@($"equipment/edit?id={equipment.Id}")">Edit</a> |
-        <a href="@($"equipment/details?id={equipment.Id}")">Details</a> |
-        <a href="@($"equipment/delete?id={equipment.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+<TreeTable EquipmentVms="equipmentVms"></TreeTable>
 
 @code {
-    GridItemsProvider<Equipment>? itemsProvider;
+    GridItemsProvider<EquipmentVm>? itemsProvider;
 
-    protected override void OnInitialized()
+    private List<EquipmentVm> equipmentVms = new();
+
+    protected override async Task OnInitializedAsync()
     {
         itemsProvider = async request =>
         {
@@ -43,11 +32,28 @@
                 return default;
 
             var response = GridItemsProviderResult.From(
-                items: result.Value,
+                items: result.Value.Select(e => new EquipmentVm(e)).ToList(),
                 totalItemCount: result.Total
             );
 
             return response;
         };
+
+        await GetEquipmentVms();
     }
+
+    private async Task GetEquipmentVms()
+    {
+        var equipment = await Service.GetListWithoutParents();
+        equipmentVms = equipment.Select(e => new EquipmentVm(e)).ToList();
+    }
+
+    private async Task Expand(EquipmentVm vm)
+    {
+        if (vm.Id == null)
+            return;
+
+        vm.Expanded = true;
+        vm.Children = await Service.GetChildren(vm.Id);
+    }    
 }

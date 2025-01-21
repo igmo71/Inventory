@@ -1,0 +1,53 @@
+﻿@page "/equipment/simple"
+@using Inventory.Application
+@using Inventory.Domain
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject IEquipmentService Service
+
+@attribute [Authorize]
+
+<PageTitle>Оборудование</PageTitle>
+
+<h1>Оборудование</h1>
+
+<p>
+    <a href="equipment/create">Создать</a>
+</p>
+
+<QuickGrid Class="table" ItemsProvider="itemsProvider">
+   @*  <PropertyColumn Property="equipment => equipment.Id" /> *@
+    <PropertyColumn Property="equipment => equipment.Name" />
+    <PropertyColumn Property="equipment => equipment.IsFolder" />
+    @* <PropertyColumn Property="equipment => equipment.ParentId" /> *@
+    <TemplateColumn Context="equipment">
+        <span> @equipment.Parent?.Name</span>
+    </TemplateColumn>
+    <TemplateColumn Context="equipment">
+        <a href="@($"equipment/edit?id={equipment.Id}")">Изменить</a> |
+        <a href="@($"equipment/details?id={equipment.Id}")">Детали</a> |
+        <a href="@($"equipment/delete?id={equipment.Id}")">Удалить</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    GridItemsProvider<Equipment>? itemsProvider;
+
+    protected override void OnInitialized()
+    {
+        itemsProvider = async request =>
+        {
+            var result = await Service.GetList(request.StartIndex, request.Count, isIncludeParent: true);
+
+            if (!result.IsSuccess || result.Value is null)
+                return default;
+
+            var response = GridItemsProviderResult.From(
+                items: result.Value,
+                totalItemCount: result.Total
+            );
+
+            return response;
+        };
+    }
+}

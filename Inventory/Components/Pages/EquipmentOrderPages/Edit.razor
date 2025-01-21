@@ -37,7 +37,7 @@ else
                 <input type="hidden" name="EquipmentOrder.Id" value="@EquipmentOrder.Id" />
 
                 <div class="mb-3">
-                    <label for="authorid" class="form-label">Автор: @EquipmentOrder.Author?.Name</label>
+                    <label for="authorid" class="form-label">Автор:</label>
                     @if (EquipmentOrder.Author != null)
                     {
                         <InputText id="authorid" @bind-Value="EquipmentOrder.Author.Name" class="form-control" disabled />

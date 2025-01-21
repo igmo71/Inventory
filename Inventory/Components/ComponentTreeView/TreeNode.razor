@@ -1,0 +1,24 @@
+﻿@if (TreeItem != null)
+{
+    <li class="list-group-item py-0 pe-0 border-0">
+
+        @TreeItemTemplate(TreeItem)
+
+        @if (TreeItem.IsExpanded && TreeItem.Children != null && TreeItem.Children.Count > 0)
+        {
+            <ul class="list-group">
+                @foreach (var child in TreeItem.Children)
+                {
+                    <TreeNode TreeItem="child" TreeItemTemplate="TreeItemTemplate" />
+                }
+            </ul>
+        }
+    </li>
+}
+@code {
+    [Parameter]
+    public TreeItem? TreeItem { get; set; }
+
+    [Parameter]
+    public RenderFragment<TreeItem> TreeItemTemplate { get; set; } = default!;
+}

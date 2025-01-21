@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.QuickGrid
 @inject IEquipmentService Service
+@inject ISerialNumberService SerialNumberService
 
 @attribute [Authorize]
 
@@ -15,12 +16,30 @@
     <a href="equipment/create">Создать</a>
 </p>
 
-<TreeTable EquipmentVms="equipmentVms"></TreeTable>
+<div class="row">
+    <div class="col-8" @onclick="() => GetSerialNumbers()">
+        <TreeTable EquipmentVms="equipmentVms" ></TreeTable>
+    </div>
+    <div class="col-4">
+        @if (serialNumbers != null){
+            <table class="table">
+                @foreach (var serialNumber in serialNumbers)
+                {
+                    <tr>
+                        <td>@serialNumber.Number</td>
+                        <td>@serialNumber.IsAssigned</td>
+                    </tr>
+                }
+            </table>
+        }
+    </div>
+</div>
 
 @code {
     GridItemsProvider<EquipmentVm>? itemsProvider;
 
     private List<EquipmentVm> equipmentVms = new();
+    private List<SerialNumber> serialNumbers = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,5 +74,13 @@
 
         vm.Expanded = true;
         vm.Children = await Service.GetChildren(vm.Id);
-    }    
+    }
+
+    private async Task GetSerialNumbers(EquipmentVm vm)
+    {
+        var listResult = await SerialNumberService.GetList(equipmentId: vm.Id);
+
+        if (listResult.IsSuccess)
+            serialNumbers = listResult.Value;
+    }
 }

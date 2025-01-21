@@ -1,0 +1,17 @@
+﻿@if (TreeItems != null && TreeItems.Any())
+{
+    <ul class="list-group">
+        @foreach (var item in TreeItems)
+        {
+            <TreeNode TreeItem="item" TreeItemTemplate="TreeItemTemplate" />
+        }
+    </ul>
+}
+
+@code {
+    [Parameter]
+    public List<TreeItem>? TreeItems { get; set; }
+
+    [Parameter]
+    public RenderFragment<TreeItem> TreeItemTemplate { get; set; } = default!;
+}

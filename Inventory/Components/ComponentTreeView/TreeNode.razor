@@ -2,12 +2,16 @@
 {
     <li class="list-group-item py-0 pe-0 border-0">
 
-        @TreeItemTemplate(TreeItem)
+        <div @onmouseover="SetBgColor" @onmouseout="ResetBgColor">
+            <div class="@bgColor">
+                @TreeItemTemplate(TreeItem)
+            </div>
+        </div>
 
-        @if (TreeItem.IsExpanded && TreeItem.Children != null && TreeItem.Children.Count > 0)
+        @if (TreeItem.IsExpanded && TreeItem.HasChildren)
         {
             <ul class="list-group">
-                @foreach (var child in TreeItem.Children)
+                @foreach (var child in TreeItem.Children!)
                 {
                     <TreeNode TreeItem="child" TreeItemTemplate="TreeItemTemplate" />
                 }
@@ -21,4 +25,16 @@
 
     [Parameter]
     public RenderFragment<TreeItem> TreeItemTemplate { get; set; } = default!;
+
+    private string bgColor = string.Empty;
+
+    private void SetBgColor()
+    {
+        bgColor = "bg-body-tertiary";
+    }
+
+    private void ResetBgColor()
+    {
+        bgColor = string.Empty;
+    }
 }

@@ -133,7 +133,19 @@
     {
         string id = await Service.Create(EquipmentOrder);
 
+        await UpdateSerialNumber();
+
         NavigationManager.NavigateTo("/equipmentorders");
+    }
+
+    private async Task UpdateSerialNumber()
+    {
+        if (EquipmentOrder is not null && EquipmentOrder.SerialNumber != null)
+        {
+            EquipmentOrder.SerialNumber.IsAssigned = true;
+
+            await SerialNumberService.Update(EquipmentOrder.SerialNumber);
+        }
     }
 
     private async Task GetEquipment()

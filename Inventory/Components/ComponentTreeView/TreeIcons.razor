@@ -1,0 +1,22 @@
+﻿@using Inventory.Components.Icons
+@if (TreeItem != null)
+{
+    if (TreeItem.IsFolder)
+    {
+        if (TreeItem.IsExpanded)
+        {
+           <Folder2OpenIcon />
+        }
+        else
+        {
+            <FolderIcon />
+        }
+    }
+    else
+    {
+       <GearWideConnectedIcon />
+    }
+}
+@code {
+    [Parameter] public TreeItem? TreeItem { get; set; }
+}

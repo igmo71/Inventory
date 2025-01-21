@@ -1,5 +1,110 @@
-﻿<h3>IndexTree</h3>
+﻿@page "/equipment/tree"
+
+@using Inventory.Application
+@using Inventory.Components.ComponentTreeView
+@using Inventory.Components.Icons
+@using Inventory.Domain
+
+@inject IEquipmentService Service
+
+<PageTitle>Оборудование</PageTitle>
+
+<h1>Оборудование</h1>
+
+<p>
+    <a href="equipment/create">Создать</a>
+</p>
+
+<div class="row">
+    <div class="col">
+        <TreeView TreeItems="treeItems">
+            <TreeItemTemplate Context="treeItem">
+                <div class="d-flex flex-row @(treeItem == selectedTreeItem ? "bg-body-secondary" : string.Empty)">
+                    <div class="btn" @onclick="() => ExpandItem(treeItem)">
+                        <TreeIcons TreeItem="treeItem" />
+                    </div>
+                    <div class="btn text-start" @onclick="() => SelectItem(treeItem)">
+                        @treeItem.Value
+                    </div>
+                    <div class="ms-auto">
+                        <div class="btn-group">
+                            <button class="btn btn-outline-success" title="Изменить"><PencilIcon /></button>
+                            <button class="btn btn-outline-danger" title="Удалить"><Trash3Icon /></button>
+                        </div>
+                        <button class="btn btn-outline-primary" title="Создать дочерний"><PluslgIcon /></button>
+                    </div>
+                </div>
+            </TreeItemTemplate>
+        </TreeView>
+    </div>
+    <div class="col">
+        <div>    <b>Раскрыт:</b> @expandedTreeItem?.Value</div>
+        <div>    <b>Выбран:</b> @selectedTreeItem?.Value</div>
+    </div>
+</div>
+
 
 @code {
+    private List<TreeItem>? treeItems;
 
+    private TreeItem? expandedTreeItem;
+    private TreeItem? selectedTreeItem;
+    private TreeItem? mouseOverTreeItem;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetItems();
+    }
+
+    private async Task GetItems(TreeItem? parentTreeItem = null)
+    {
+        List<Equipment>? equipment;
+
+        if (parentTreeItem is null)
+        {
+            equipment = await Service.GetListWithoutParents();
+
+            treeItems = From(equipment);
+        }
+        else if (parentTreeItem.IsExpanded)
+        {
+            var listResult = await Service.GetList(parentId: parentTreeItem.Id);
+
+            if (!listResult.IsSuccess)
+                return;
+
+            equipment = listResult.Value;
+
+            parentTreeItem.Children = From(equipment);
+        }
+        else
+        {
+            parentTreeItem.Children = null;
+        }
+    }
+
+    private List<TreeItem> From(List<Equipment> equipment)
+    {
+        return equipment.Select(e => new TreeItem
+            {
+                Id = e.Id,
+                Value = e.Name,
+                IsFolder = e.IsFolder
+            })
+                .ToList();
+    }
+
+    private async Task ExpandItem(TreeItem treeItem)
+    {
+        expandedTreeItem = treeItem;
+
+        expandedTreeItem.IsExpanded = !expandedTreeItem.IsExpanded;
+
+        await GetItems(expandedTreeItem);
+    }
+
+    private void SelectItem(TreeItem treeItem)
+    {
+        selectedTreeItem = treeItem;
+    }
 }

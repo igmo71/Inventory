@@ -2,7 +2,7 @@
 {
     public class TreeItem
     {
-        public Guid Id { get; set; }
+        public string? Id { get; set; }
 
         public string? Value { get; set; }
 
@@ -10,7 +10,7 @@
 
         public List<TreeItem>? Children { get; set; }
 
-        public bool HasChildren { get; set; }
+        public bool HasChildren => Children != null && Children.Count > 0;
 
         public bool IsFolder { get; set; }
 

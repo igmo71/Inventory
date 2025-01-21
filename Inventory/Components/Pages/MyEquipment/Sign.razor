@@ -84,6 +84,18 @@ else
     {
         await Service.Update(equipmentOrder!);
 
+        await UpdateSerialNumber();
+
         NavigationManager.NavigateTo("/myequipment");
-    }    
+    }  
+    
+    private async Task UpdateSerialNumber()
+    {
+        if (equipmentOrder is not null && equipmentOrder.SerialNumber != null)
+        {            
+            equipmentOrder.SerialNumber.IsAssigned = true;
+
+            await SerialNumberService.Update(equipmentOrder.SerialNumber);
+        }
+    }
 }

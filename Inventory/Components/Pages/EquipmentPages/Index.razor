@@ -17,8 +17,8 @@
 </p>
 
 <div class="row">
-    <div class="col-8" @onclick="() => GetSerialNumbers()">
-        <TreeTable EquipmentVms="equipmentVms" ></TreeTable>
+    <div class="col-8">
+        <TreeTable EquipmentVms="equipmentVms" OnClick="GetSerialNumbers"></TreeTable>
     </div>
     <div class="col-4">
         @if (serialNumbers != null){

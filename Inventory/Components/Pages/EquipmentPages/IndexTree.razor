@@ -22,9 +22,11 @@
         <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
             <div class="card-body">
                 <div class="d-flex flex-row mb-1">
-                    <button class="d-inline-flex ms-auto btn btn-outline-primary" title="Создать на верхнем уровне">
-                        <PluslgIcon /><span> Создать </span>
-                    </button>
+                    <div class="d-inline-flex ms-auto">
+                        <button class="btn btn-outline-primary" title="Создать на верхнем уровне">
+                            <PluslgIcon /><span> Создать </span>
+                        </button>
+                    </div>
                 </div>
 
                 <TreeView TreeItems="treeItems">
@@ -37,11 +39,11 @@
                                 @treeItem.Value
                             </div>
                             <div class="ms-auto">
+                                <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать дочерний"><PluslgIcon /></button>
                                 <div class="btn-group">
                                     <button class="btn btn-outline-success" title="Изменить"><PencilIcon /></button>
                                     <button class="btn btn-outline-danger" title="Удалить"><Trash3Icon /></button>
                                 </div>
-                                <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать дочерний"><PluslgIcon /></button>
                             </div>
                         </div>
                     </TreeItemTemplate>

@@ -18,7 +18,7 @@
         <div class="d-flex flex-row mb-1">
             <div class="d-inline-flex ms-auto">
                 <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
-                @onclick="() => OpenCreateDialog()">
+                        @onclick="() => OpenCreateDialog()">
                     <PlusLgIcon /><span> Создать </span>
                 </button>
             </div>
@@ -34,7 +34,7 @@
                     </div>
                     <div class="ms-auto">
                         <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
-                        @onclick="() => OpenCreateDialog(treeItem)">
+                                @onclick="() => OpenCreateDialog(treeItem)">
                             <PlusLgIcon />
                         </button>
                         <div class="btn-group">
@@ -49,10 +49,9 @@
     <div class="col-md-4">
         <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
             <div class="card-body">
-                @* <div><b>Раскрыт:</b> @expandedTreeItem?.Value</div> *@
                 <div><b>@selectedTreeItem?.Value</b></div>
                 <div>
-                    @if (serialNumbers != null)
+                    @if (serialNumbers is not null && serialNumbers.Count > 0)
                     {
                         <b>Серийные номера</b>
                         <table>
@@ -77,51 +76,56 @@
     </ModalBody>
 </ModalDialog>
 
-
+<ModalDialog @ref="@DeleteDialog" Title="Удалить Оборудование">
+    <ModalBody>
+        <DeleteForm Equipment="deleteEquipment" OnValidSubmit="Delete" />
+    </ModalBody>
+</ModalDialog>
 
 
 @code {
     ModalDialog? CreateDialog { get; set; }
     ModalDialog? DeleteDialog { get; set; }
+    ModalDialog? EditDialog { get; set; }
 
     private List<TreeItem>? treeItems;
     private List<SerialNumber>? serialNumbers;
-
-    //private TreeItem? expandedTreeItem;
     private TreeItem? selectedTreeItem;
-
     private TreeItem? parentTreeItem;
     private Equipment? parentEquipment;
+    private Equipment? deleteEquipment;
 
     protected override async Task OnInitializedAsync()
     {
         await GetItems();
     }
 
-    private async Task GetItems(TreeItem? parentTreeItem = null)
+    private async Task GetItems(TreeItem? treeItem = null)
     {
         List<Equipment>? equipment;
 
-        if (parentTreeItem is null)
+        if (treeItem is null)
         {
             equipment = await Service.GetListWithoutParents();
 
             treeItems = From(equipment);
         }
-        else if (parentTreeItem.IsExpanded)
+        else if (treeItem.IsExpanded)
         {
-            var listResult = await Service.GetList(parentId: parentTreeItem.Id);
+            var listResult = await Service.GetList(isIncludeParent: true, parentId: treeItem.Id);
 
             if (!listResult.IsSuccess)
                 return;
 
             equipment = listResult.Value;
 
-            parentTreeItem.Children = From(equipment);
+            treeItem.Children = From(equipment);
+            foreach (var child in treeItem.Children)
+                child.Parent = treeItem;
         }
         else
         {
-            parentTreeItem.Children = null;
+            treeItem.Children = null;
         }
     }
 
@@ -138,11 +142,8 @@
 
     private async Task ExpandItem(TreeItem treeItem)
     {
-        // expandedTreeItem = treeItem;
-        // expandedTreeItem.IsExpanded = !expandedTreeItem.IsExpanded;
-        // await GetItems(expandedTreeItem);
-
         treeItem.IsExpanded = !treeItem.IsExpanded;
+
         await GetItems(treeItem);
     }
 
@@ -159,9 +160,12 @@
     {
         parentTreeItem = treeItem;
 
-        parentEquipment = treeItem is null
-            ? null
-            : new Equipment { Id = treeItem.Id, Name = treeItem.Value ?? string.Empty, IsFolder = treeItem.IsFolder };
+        parentEquipment = treeItem is null ? null : new Equipment
+            {
+                Id = treeItem.Id,
+                Name = treeItem.Value ?? string.Empty,
+                IsFolder = treeItem.IsFolder
+            };
 
         CreateDialog?.Open();
     }
@@ -181,11 +185,10 @@
         {
             parentTreeItem.IsExpanded = true;
 
-            parentTreeItem.Children ??= [];
-
             await GetItems(parentTreeItem);
 
-            selectedTreeItem = parentTreeItem.Children.FirstOrDefault(e => e.Id == id);
+            if (parentTreeItem.Children is not null)
+                selectedTreeItem = parentTreeItem.Children.FirstOrDefault(e => e.Id == id);
         }
 
         CreateDialog?.Close();
@@ -196,8 +199,33 @@
 
     }
 
-    private void OpenDeleteDialog(TreeItem? treeItem = null)
+    private async Task OpenDeleteDialog(TreeItem? treeItem)
     {
+        if (treeItem is null)
+            return;
 
+        selectedTreeItem = treeItem.Parent;
+        parentTreeItem = treeItem.Parent;
+
+        if (parentTreeItem is not null)
+            parentTreeItem.IsExpanded = true;
+
+        deleteEquipment = await Service.Get(treeItem.Id!, isIncludeParent: true);
+
+        if (deleteEquipment is null)
+            return;
+
+        treeItem = null;
+
+        DeleteDialog?.Open();
+    }
+
+    private async Task Delete(Equipment equipment)
+    {
+        await Service.Delete(equipment);
+
+        await GetItems(parentTreeItem);
+
+        DeleteDialog?.Close();
     }
 }

@@ -1,5 +1,33 @@
-﻿<h3>DeleteForm</h3>
+﻿@using Inventory.Domain
 
+@if (Equipment is not null)
+{
+    <h6>Вы уверены, что хотите удалить?</h6>
+
+    <dl class="row">
+        <dt class="col-sm-3">Наименование</dt>
+        <dd class="col-sm-9">@Equipment.Name</dd>
+    </dl>
+    <dl class="row">
+        <dt class="col-sm-3">Это Папка</dt>
+        <dd class="col-sm-9">@Equipment.IsFolder</dd>
+    </dl>
+    <dl class="row">
+        <dt class="col-sm-3">В Папке</dt>
+        <dd class="col-sm-9">@Equipment.Parent?.Name</dd>
+    </dl>
+    <EditForm method="post" Model="Equipment" OnValidSubmit="DeleteEquipment" FormName="delete" Enhance>
+        <button type="submit" class="btn btn-danger" disabled="@(Equipment is null)">Удалить</button>        
+    </EditForm>
+}
 @code {
+    [Parameter] public Equipment? Equipment { get; set; }
 
+    [Parameter]
+    public EventCallback<Equipment> OnValidSubmit { get; set; }
+
+    private async Task DeleteEquipment()
+    {
+        await OnValidSubmit.InvokeAsync(Equipment);
+    }
 }

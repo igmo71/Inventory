@@ -1,12 +1,12 @@
 ﻿@page "/equipment"
+
 @using Inventory.Application
+@using Inventory.Components.ComponentTreeView
+@using Inventory.Components.Icons
 @using Inventory.Domain
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.QuickGrid
+
 @inject IEquipmentService Service
 @inject ISerialNumberService SerialNumberService
-
-@attribute [Authorize]
 
 <PageTitle>Оборудование</PageTitle>
 
@@ -18,69 +18,127 @@
 
 <div class="row">
     <div class="col-8">
-        <TreeTable EquipmentVms="equipmentVms" OnClick="GetSerialNumbers"></TreeTable>
+
+        <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
+            <div class="card-body">
+                <div class="d-flex flex-row mb-1">
+                    <div class="d-inline-flex ms-auto">
+                        <a class="btn btn-outline-primary" title="Создать на верхнем уровне">
+                            <PluslgIcon /><span> Создать </span>
+                        </a>
+                    </div>
+                </div>
+
+                <TreeView TreeItems="treeItems">
+                    <TreeItemTemplate Context="treeItem">
+                        <div class="d-flex flex-row @(treeItem == selectedTreeItem ? "bg-body-secondary" : string.Empty)">
+                            <div class="btn" @onclick="() => ExpandItem(treeItem)">
+                                <TreeIcons TreeItem="treeItem" />
+                            </div>
+                            <div class="btn text-start" @onclick="() => SelectItem(treeItem)">
+                                @treeItem.Value
+                            </div>
+                            <div class="ms-auto">
+                                <a class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать дочерний"><PluslgIcon /></a>
+                                <div class="btn-group">
+                                    <a class="btn btn-outline-success" title="Изменить"><PencilIcon /></a>
+                                    <a class="btn btn-outline-danger" title="Удалить"><Trash3Icon /></a>
+                                </div>
+                            </div>
+                        </div>
+                    </TreeItemTemplate>
+                </TreeView>
+            </div>
+        </div>
+
     </div>
     <div class="col-4">
-        @if (serialNumbers != null){
-            <table class="table">
-                @foreach (var serialNumber in serialNumbers)
-                {
-                    <tr>
-                        <td>@serialNumber.Number</td>
-                        <td>@serialNumber.IsAssigned</td>
-                    </tr>
-                }
-            </table>
-        }
+        <div><b>Раскрыт:</b> @expandedTreeItem?.Value</div>
+        <div><b>Выбран:</b> @selectedTreeItem?.Value</div>
+        <div>
+            @if (serialNumbers != null)
+            {
+                <b>Серийные номера</b>
+                <table>
+                    @foreach (var serialNumber in serialNumbers)
+                    {
+                        <tr>
+                            <td>@serialNumber.Number</td>
+                            <td>@serialNumber.IsAssigned</td>
+                        </tr>
+                    }
+                </table>
+            }
+        </div>
     </div>
 </div>
 
-@code {
-    GridItemsProvider<EquipmentVm>? itemsProvider;
 
-    private List<EquipmentVm> equipmentVms = new();
-    private List<SerialNumber> serialNumbers = new();
+@code {
+    private List<TreeItem>? treeItems;
+    private List<SerialNumber>? serialNumbers;
+
+    private TreeItem? expandedTreeItem;
+    private TreeItem? selectedTreeItem;
 
     protected override async Task OnInitializedAsync()
     {
-        itemsProvider = async request =>
+        await GetItems();
+    }
+
+    private async Task GetItems(TreeItem? parentTreeItem = null)
+    {
+        List<Equipment>? equipment;
+
+        if (parentTreeItem is null)
         {
-            var result = await Service.GetList(request.StartIndex, request.Count, isIncludeParent: true);
+            equipment = await Service.GetListWithoutParents();
 
-            if (!result.IsSuccess || result.Value is null)
-                return default;
+            treeItems = From(equipment);
+        }
+        else if (parentTreeItem.IsExpanded)
+        {
+            var listResult = await Service.GetList(parentId: parentTreeItem.Id);
 
-            var response = GridItemsProviderResult.From(
-                items: result.Value.Select(e => new EquipmentVm(e)).ToList(),
-                totalItemCount: result.Total
-            );
+            if (!listResult.IsSuccess)
+                return;
 
-            return response;
-        };
+            equipment = listResult.Value;
 
-        await GetEquipmentVms();
+            parentTreeItem.Children = From(equipment);
+        }
+        else
+        {
+            parentTreeItem.Children = null;
+        }
     }
 
-    private async Task GetEquipmentVms()
+    private List<TreeItem> From(List<Equipment> equipment)
     {
-        var equipment = await Service.GetListWithoutParents();
-        equipmentVms = equipment.Select(e => new EquipmentVm(e)).ToList();
+        return equipment.Select(e => new TreeItem
+            {
+                Id = e.Id,
+                Value = e.Name,
+                IsFolder = e.IsFolder
+            })
+        .ToList();
     }
 
-    private async Task Expand(EquipmentVm vm)
+    private async Task ExpandItem(TreeItem treeItem)
     {
-        if (vm.Id == null)
-            return;
+        expandedTreeItem = treeItem;
 
-        vm.Expanded = true;
-        vm.Children = await Service.GetChildren(vm.Id);
+        expandedTreeItem.IsExpanded = !expandedTreeItem.IsExpanded;
+
+        await GetItems(expandedTreeItem);
     }
 
-    private async Task GetSerialNumbers(EquipmentVm vm)
+    private async Task SelectItem(TreeItem treeItem)
     {
-        var listResult = await SerialNumberService.GetList(equipmentId: vm.Id);
+        selectedTreeItem = treeItem;
 
-        if (listResult.IsSuccess)
-            serialNumbers = listResult.Value;
+        var listResult = await SerialNumberService.GetList(equipmentId: treeItem.Id);
+
+        serialNumbers = listResult.Value;
     }
 }

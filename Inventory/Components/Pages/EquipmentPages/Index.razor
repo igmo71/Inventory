@@ -1,6 +1,7 @@
 ﻿@page "/equipment"
 
 @using Inventory.Application
+@using Inventory.Components.ComponentModalDialog
 @using Inventory.Components.ComponentTreeView
 @using Inventory.Components.Icons
 @using Inventory.Domain
@@ -23,8 +24,9 @@
             <div class="card-body">
                 <div class="d-flex flex-row mb-1">
                     <div class="d-inline-flex ms-auto">
-                        <a class="btn btn-outline-primary" title="Создать на верхнем уровне">
-                            <PluslgIcon /><span> Создать </span>
+                        <a class="btn btn-outline-primary" title="Создать  на верхнем уровне"
+                           @onclick="() => OpenCreateDialog()">
+                            <PlusLgIcon /><span> Создать </span>
                         </a>
                     </div>
                 </div>
@@ -39,10 +41,13 @@
                                 @treeItem.Value
                             </div>
                             <div class="ms-auto">
-                                <a class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать дочерний"><PluslgIcon /></a>
+                                <a class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
+                                   @onclick="() => OpenCreateDialog(treeItem)">
+                                    <PlusLgIcon />
+                                </a>
                                 <div class="btn-group">
-                                    <a class="btn btn-outline-success" title="Изменить"><PencilIcon /></a>
-                                    <a class="btn btn-outline-danger" title="Удалить"><Trash3Icon /></a>
+                                    <a href="equipment/edit?id=@treeItem.Id" class="btn btn-outline-success" title="Изменить"><PencilIcon /></a>
+                                    <a href="equipment/delete?id=@treeItem.Id" class="btn btn-outline-danger" title="Удалить"><Trash3Icon /></a>
                                 </div>
                             </div>
                         </div>
@@ -73,13 +78,27 @@
     </div>
 </div>
 
+<ModalDialog @ref="@CreateDialog" Title="Создать Оборудование">
+    <ModalBody>
+        <CreateForm ParentEquipment="parentEquipment" OnValidSubmit="Create" />
+    </ModalBody>
+</ModalDialog>
+
+
+
 
 @code {
+    ModalDialog? CreateDialog { get; set; }
+    ModalDialog? DeleteDialog { get; set; }
+
     private List<TreeItem>? treeItems;
     private List<SerialNumber>? serialNumbers;
 
     private TreeItem? expandedTreeItem;
     private TreeItem? selectedTreeItem;
+
+    private TreeItem? parentTreeItem;
+    private Equipment? parentEquipment;
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,5 +159,41 @@
         var listResult = await SerialNumberService.GetList(equipmentId: treeItem.Id);
 
         serialNumbers = listResult.Value;
+    }
+
+    private void OpenCreateDialog(TreeItem? treeItem = null)
+    {
+        parentTreeItem = treeItem;
+
+        parentEquipment = treeItem is null
+            ? null
+            : new Equipment { Id = treeItem.Id, Name = treeItem.Value ?? string.Empty, IsFolder = treeItem.IsFolder };
+
+        CreateDialog?.Open();
+    }
+
+    private async Task Create(Equipment equipment)
+    {
+        var id = await Service.Create(equipment);
+
+        if (parentTreeItem is null)
+        {
+            await GetItems();
+
+            if (treeItems is not null)
+                selectedTreeItem = treeItems.FirstOrDefault(e => e.Id == id);
+        }
+        else
+        {
+            parentTreeItem.IsExpanded = true;
+
+            parentTreeItem.Children ??= [];
+
+            await GetItems(parentTreeItem);
+
+            selectedTreeItem = parentTreeItem.Children.FirstOrDefault(e => e.Id == id);
+        }
+
+        CreateDialog?.Close();
     }
 }

@@ -1,0 +1,57 @@
+﻿<input type="search" class="form-control" value="@searchText" placeholder="@(Placeholder ?? "Search...")" @oninput="OnInput" />
+@if (!string.IsNullOrEmpty(searchText))
+{
+    if (filteredItems.Any())
+    {
+        <ul class="list-group position-absolute">
+            @foreach (var item in filteredItems)
+            {
+                <li class="list-group-item list-group-item-action" @onclick="() => SelectItem(item)">
+                    <span class="user-select-none">@item</span>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <ul class="list-group position-absolute">
+            <li class="list-group-item list-group-item-action">
+                <span class="user-select-none">@(Notfound ?? "Not Found")</span>
+            </li>
+        </ul>
+    }
+}
+
+@code {
+    //[Parameter] public List<string>? Items { get; set; }
+    [Parameter] public IQueryable<string>? Items { get; set; }
+
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? Notfound { get; set; }
+
+    string searchText = string.Empty;
+
+    List<string> filteredItems = new();
+
+    void OnInput(ChangeEventArgs e)
+    {
+        searchText = e.Value?.ToString() ?? string.Empty;
+        FilterItems();
+    }
+
+    void FilterItems()
+    {
+        if (Items is null)
+            return;
+
+        filteredItems = Items
+            .Where(item => item.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    void SelectItem(string item)
+    {
+        searchText = item;
+        filteredItems.Clear();
+    }
+}

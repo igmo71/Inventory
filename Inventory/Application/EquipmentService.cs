@@ -8,8 +8,8 @@ namespace Inventory.Application
 {
     public interface IEquipmentService
     {
-        Task<ListResult<Equipment>> GetList(int? skip = null, int? take = null, 
-            bool isIncludeParent = false, 
+        Task<ListResult<Equipment>> GetList(int? skip = null, int? take = null,
+            bool isIncludeParent = false,
             bool isIncludeChildren = false,
             string? parentId = null);
         Task<List<Equipment>> GetListWithoutFolders();
@@ -27,8 +27,8 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<Equipment>> GetList(int? skip = null, int? take = null, 
-            bool isIncludeParent = false, 
+        public async Task<ListResult<Equipment>> GetList(int? skip = null, int? take = null,
+            bool isIncludeParent = false,
             bool isIncludeChildren = false,
             string? parentId = null)
         {
@@ -47,7 +47,7 @@ namespace Inventory.Application
             if (isIncludeChildren)
                 query = query.Include(e => e.Children);
 
-            if(parentId != null)
+            if (parentId != null)
                 query = query.Where(e => e.ParentId == parentId);
 
             var result = await query.ToListAsync();
@@ -71,7 +71,9 @@ namespace Inventory.Application
             using var context = _dbFactory.CreateDbContext();
 
             var result = await context.Equipment.AsNoTracking()
-                .Where(e => e.IsFolder).ToListAsync();
+                .Where(e => e.IsFolder)
+                .OrderBy(e => e.Name)
+                .ToListAsync();
 
             return result;
         }
@@ -99,14 +101,14 @@ namespace Inventory.Application
         public async Task<Equipment?> Get(string id, bool isIncludeParent = false)
         {
             using var context = _dbFactory.CreateDbContext();
-            
+
             var query = context.Equipment.AsNoTracking();
-            
-            if(isIncludeParent)
+
+            if (isIncludeParent)
                 query = query.Include(e => e.Parent);
-            
+
             var equipment = await query.FirstOrDefaultAsync(m => m.Id == id);
-            
+
             return equipment;
         }
 

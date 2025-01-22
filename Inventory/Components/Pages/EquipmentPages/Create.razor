@@ -7,11 +7,11 @@
 
 @attribute [Authorize]
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Создать</PageTitle>
 
-<h1>Create</h1>
+<h1>Создать</h1>
 
-<h2>Equipment</h2>
+<h2>Оборудование</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -19,17 +19,17 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert" />
             <div class="mb-3">
-                <label for="name" class="form-label">Name:</label>
+                <label for="name" class="form-label">Наименование:</label>
                 <InputText id="name" @bind-Value="Equipment.Name" class="form-control" />
                 <ValidationMessage For="() => Equipment.Name" class="text-danger" />
             </div>
             <div class="mb-3">
-                <label for="isfolder" class="form-label">IsFolder:</label>
+                <label for="isfolder" class="form-label">Это Папка:</label>
                 <InputCheckbox id="isfolder" @bind-Value="Equipment.IsFolder" class="form-check-input" />
                 <ValidationMessage For="() => Equipment.IsFolder" class="text-danger" />
             </div>
             <div class="mb-3">
-                <label for="parentid" class="form-label">Parent:</label>
+                <label for="parentid" class="form-label">В Папке:</label>
                 <InputSelect id="parentid" @bind-Value="Equipment.ParentId" class="form-control">
                     <option value="">- Выберите -</option>
                     @foreach (var folder in equipmentFolders){
@@ -38,16 +38,19 @@
                 </InputSelect>
                 <ValidationMessage For="() => Equipment.ParentId" class="text-danger" />
             </div>
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" class="btn btn-primary">Создать</button>
         </EditForm>
     </div>
 </div>
 
 <div>
-    <a href="/equipment">Back to List</a>
+    <a href="/equipment">Назад к Списку</a>
 </div>
 
 @code {
+    [SupplyParameterFromQuery]
+    private string? Id { get; set; }
+
     [SupplyParameterFromForm]
     private Equipment Equipment { get; set; } = new();
 
@@ -56,6 +59,9 @@
     protected override async Task OnInitializedAsync()
     {
         equipmentFolders = await Service.GetFolders();
+
+        if (Id != null)
+            Equipment.ParentId = Id;
     }
 
     private async Task AddEquipment()

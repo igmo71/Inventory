@@ -1,0 +1,43 @@
+﻿@using Inventory.Domain
+<EditForm method="post" Model="Equipment" OnValidSubmit="AddEquipment" FormName="create" Enhance>
+    <DataAnnotationsValidator />
+    <ValidationSummary class="text-danger" role="alert" />    
+    <div class="mb-3">
+        <label for="parent" class="form-label">Папка:</label>
+        <input type="text" class="form-control" id="parent" placeholder="@(ParentEquipment is null ? "- Верхний Уровень -" : ParentEquipment.Name)" disabled>
+        <div id="emailHelp" class="form-text">Оборудование создается в этой папке.</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Наименование:</label>
+        <InputText id="name" @bind-Value="Equipment.Name" class="form-control" />
+        <ValidationMessage For="() => Equipment.Name" class="text-danger" />
+    </div>
+    <div class="mb-3">
+        <label for="isfolder" class="form-label">Это Папка:</label>
+        <InputCheckbox id="isfolder" @bind-Value="Equipment.IsFolder" class="form-check-input" />
+        <ValidationMessage For="() => Equipment.IsFolder" class="text-danger" />
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Создать</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Equipment? ParentEquipment { get; set; }
+
+    [SupplyParameterFromForm]
+    private Equipment Equipment { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<Equipment> OnValidSubmit { get; set; }
+
+    private async Task AddEquipment()
+    {
+        Equipment.ParentId = ParentEquipment?.Id;
+
+        await OnValidSubmit.InvokeAsync(Equipment);
+
+        Equipment = new();
+    }
+}

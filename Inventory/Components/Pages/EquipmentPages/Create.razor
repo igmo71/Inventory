@@ -44,7 +44,7 @@
 </div>
 
 <div>
-    <a href="/equipment">Назад к Списку</a>
+    <a href="/equipment/qg">Назад к Списку</a>
 </div>
 
 @code {
@@ -68,6 +68,6 @@
     {
         string id = await Service.Create(Equipment);
 
-        NavigationManager.NavigateTo("/equipment");
+        NavigationManager.NavigateTo("/equipment/qg");
     }
 }

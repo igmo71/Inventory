@@ -13,67 +13,60 @@
 
 <h1>Оборудование</h1>
 
-<p>
-    <a href="equipment/create">Создать</a>
-</p>
-
 <div class="row">
-    <div class="col-8">
-
-        <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
-            <div class="card-body">
-                <div class="d-flex flex-row mb-1">
-                    <div class="d-inline-flex ms-auto">
-                        <a class="btn btn-outline-primary" title="Создать  на верхнем уровне"
-                           @onclick="() => OpenCreateDialog()">
-                            <PlusLgIcon /><span> Создать </span>
-                        </a>
-                    </div>
-                </div>
-
-                <TreeView TreeItems="treeItems">
-                    <TreeItemTemplate Context="treeItem">
-                        <div class="d-flex flex-row @(treeItem == selectedTreeItem ? "bg-body-secondary" : string.Empty)">
-                            <div class="btn" @onclick="() => ExpandItem(treeItem)">
-                                <TreeIcons TreeItem="treeItem" />
-                            </div>
-                            <div class="btn text-start" @onclick="() => SelectItem(treeItem)">
-                                @treeItem.Value
-                            </div>
-                            <div class="ms-auto">
-                                <a class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
-                                   @onclick="() => OpenCreateDialog(treeItem)">
-                                    <PlusLgIcon />
-                                </a>
-                                <div class="btn-group">
-                                    <a href="equipment/edit?id=@treeItem.Id" class="btn btn-outline-success" title="Изменить"><PencilIcon /></a>
-                                    <a href="equipment/delete?id=@treeItem.Id" class="btn btn-outline-danger" title="Удалить"><Trash3Icon /></a>
-                                </div>
-                            </div>
-                        </div>
-                    </TreeItemTemplate>
-                </TreeView>
+    <div class="col-md-8">
+        <div class="d-flex flex-row mb-1">
+            <div class="d-inline-flex ms-auto">
+                <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
+                @onclick="() => OpenCreateDialog()">
+                    <PlusLgIcon /><span> Создать </span>
+                </button>
             </div>
         </div>
-
+        <TreeView TreeItems="treeItems">
+            <TreeItemTemplate Context="treeItem">
+                <div class="d-flex flex-row @(treeItem == selectedTreeItem ? "bg-body-secondary" : string.Empty)">
+                    <div class="btn" @onclick="() => ExpandItem(treeItem)">
+                        <TreeIcons TreeItem="treeItem" />
+                    </div>
+                    <div class="btn text-start" @onclick="() => SelectItem(treeItem)">
+                        @treeItem.Value
+                    </div>
+                    <div class="ms-auto">
+                        <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
+                        @onclick="() => OpenCreateDialog(treeItem)">
+                            <PlusLgIcon />
+                        </button>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-success" @onclick="() => OpenEditDialog(treeItem)" title="Изменить"><PencilIcon /></button>
+                            <button class="btn btn-outline-danger" @onclick="() => OpenDeleteDialog(treeItem)" title="Удалить"><Trash3Icon /></button>
+                        </div>
+                    </div>
+                </div>
+            </TreeItemTemplate>
+        </TreeView>
     </div>
-    <div class="col-4">
-        <div><b>Раскрыт:</b> @expandedTreeItem?.Value</div>
-        <div><b>Выбран:</b> @selectedTreeItem?.Value</div>
-        <div>
-            @if (serialNumbers != null)
-            {
-                <b>Серийные номера</b>
-                <table>
-                    @foreach (var serialNumber in serialNumbers)
+    <div class="col-md-4">
+        <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
+            <div class="card-body">
+                @* <div><b>Раскрыт:</b> @expandedTreeItem?.Value</div> *@
+                <div><b>@selectedTreeItem?.Value</b></div>
+                <div>
+                    @if (serialNumbers != null)
                     {
-                        <tr>
-                            <td>@serialNumber.Number</td>
-                            <td>@serialNumber.IsAssigned</td>
-                        </tr>
+                        <b>Серийные номера</b>
+                        <table>
+                            @foreach (var serialNumber in serialNumbers)
+                            {
+                                <tr>
+                                    <td>@serialNumber.Number</td>
+                                    <td>@serialNumber.IsAssigned</td>
+                                </tr>
+                            }
+                        </table>
                     }
-                </table>
-            }
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -94,7 +87,7 @@
     private List<TreeItem>? treeItems;
     private List<SerialNumber>? serialNumbers;
 
-    private TreeItem? expandedTreeItem;
+    //private TreeItem? expandedTreeItem;
     private TreeItem? selectedTreeItem;
 
     private TreeItem? parentTreeItem;
@@ -145,11 +138,12 @@
 
     private async Task ExpandItem(TreeItem treeItem)
     {
-        expandedTreeItem = treeItem;
+        // expandedTreeItem = treeItem;
+        // expandedTreeItem.IsExpanded = !expandedTreeItem.IsExpanded;
+        // await GetItems(expandedTreeItem);
 
-        expandedTreeItem.IsExpanded = !expandedTreeItem.IsExpanded;
-
-        await GetItems(expandedTreeItem);
+        treeItem.IsExpanded = !treeItem.IsExpanded;
+        await GetItems(treeItem);
     }
 
     private async Task SelectItem(TreeItem treeItem)
@@ -195,5 +189,15 @@
         }
 
         CreateDialog?.Close();
+    }
+
+    private void OpenEditDialog(TreeItem? treeItem = null)
+    {
+
+    }
+
+    private void OpenDeleteDialog(TreeItem? treeItem = null)
+    {
+
     }
 }

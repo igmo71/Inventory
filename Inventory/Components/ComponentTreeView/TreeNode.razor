@@ -1,6 +1,6 @@
 ﻿@if (TreeItem != null)
 {
-    <li class="list-group-item py-0 pe-0 border-0">
+    <li class="list-group-item border-0 pe-0 pb-0">
 
         <div @onmouseover="SetBgColor" @onmouseout="ResetBgColor">
             <div class="@bgColor">
@@ -28,13 +28,7 @@
 
     private string bgColor = string.Empty;
 
-    private void SetBgColor()
-    {
-        bgColor = "bg-body-tertiary";
-    }
+    private void SetBgColor() => bgColor = "bg-body-tertiary";
 
-    private void ResetBgColor()
-    {
-        bgColor = string.Empty;
-    }
+    private void ResetBgColor() => bgColor = string.Empty;
 }

@@ -20,14 +20,15 @@
         <button type="submit" class="btn btn-danger" disabled="@(Equipment is null)">Удалить</button>        
     </EditForm>
 }
+
 @code {
     [Parameter] public Equipment? Equipment { get; set; }
 
     [Parameter]
-    public EventCallback<Equipment> OnValidSubmit { get; set; }
+    public EventCallback<Equipment> OnDelete { get; set; }
 
     private async Task DeleteEquipment()
     {
-        await OnValidSubmit.InvokeAsync(Equipment);
+        await OnDelete.InvokeAsync(Equipment);
     }
 }

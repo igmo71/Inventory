@@ -70,34 +70,53 @@
     </div>
 </div>
 
-<ModalDialog @ref="@CreateDialog" Title="Создать Оборудование">
+<ModalDialog @ref="@createDialog" Title="Создать Оборудование">
     <ModalBody>
-        <CreateForm ParentEquipment="parentEquipment" OnValidSubmit="Create" />
+        <CreateEuipmentForm ParentEquipment="parentEquipment" OnCreate="OnCreate" />
     </ModalBody>
 </ModalDialog>
 
-<ModalDialog @ref="@DeleteDialog" Title="Удалить Оборудование">
+<ModalDialog @ref="@editDialog" Title="Удалить Оборудование">
     <ModalBody>
-        <DeleteForm Equipment="deleteEquipment" OnValidSubmit="Delete" />
+        <EditEquipmentForm Equipment="editEquipment" Folders="folders" OnUpdate="OnEdit" />
     </ModalBody>
 </ModalDialog>
 
+<ModalDialog @ref="@deleteDialog" Title="Удалить Оборудование">
+    <ModalBody>
+        <DeleteEquipmentForm Equipment="deleteEquipment" OnDelete="OnDelete" />
+    </ModalBody>
+</ModalDialog>
+
+<ModalDialog @ref="@errorDialog" Title="Ошибка">
+    <ModalBody>
+        <div class="alert alert-danger">
+            @errorMessage
+        </div>
+    </ModalBody>
+</ModalDialog>
 
 @code {
-    ModalDialog? CreateDialog { get; set; }
-    ModalDialog? DeleteDialog { get; set; }
-    ModalDialog? EditDialog { get; set; }
-
     private List<TreeItem>? treeItems;
     private List<SerialNumber>? serialNumbers;
+    private List<Equipment>? folders;
+
     private TreeItem? selectedTreeItem;
     private TreeItem? parentTreeItem;
     private Equipment? parentEquipment;
+    private Equipment? editEquipment;
     private Equipment? deleteEquipment;
+
+    private ModalDialog? createDialog;
+    private ModalDialog? editDialog;
+    private ModalDialog? deleteDialog;
+    private ModalDialog? errorDialog;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
         await GetItems();
+        await GetFolders();
     }
 
     private async Task GetItems(TreeItem? treeItem = null)
@@ -120,6 +139,7 @@
             equipment = listResult.Value;
 
             treeItem.Children = From(equipment);
+
             foreach (var child in treeItem.Children)
                 child.Parent = treeItem;
         }
@@ -138,6 +158,11 @@
                 IsFolder = e.IsFolder
             })
         .ToList();
+    }
+
+    private async Task GetFolders()
+    {
+        folders = await Service.GetFolders();
     }
 
     private async Task ExpandItem(TreeItem treeItem)
@@ -163,14 +188,14 @@
         parentEquipment = treeItem is null ? null : new Equipment
             {
                 Id = treeItem.Id,
-                Name = treeItem.Value ?? string.Empty,
+                Name = treeItem.Value,
                 IsFolder = treeItem.IsFolder
             };
 
-        CreateDialog?.Open();
+        createDialog?.Open();
     }
 
-    private async Task Create(Equipment equipment)
+    private async Task OnCreate(Equipment equipment)
     {
         var id = await Service.Create(equipment);
 
@@ -191,12 +216,32 @@
                 selectedTreeItem = parentTreeItem.Children.FirstOrDefault(e => e.Id == id);
         }
 
-        CreateDialog?.Close();
+        createDialog?.Close();
     }
 
-    private void OpenEditDialog(TreeItem? treeItem = null)
+    private async Task OpenEditDialog(TreeItem? treeItem)
     {
+        if (treeItem is null)
+            return;
 
+        selectedTreeItem = treeItem;
+        parentTreeItem = treeItem.Parent;
+
+        if (parentTreeItem is not null)
+            parentTreeItem.IsExpanded = true;
+
+        editEquipment = await Service.Get(treeItem.Id!, isIncludeParent: false);
+
+        editDialog?.Open();
+    }
+
+    private async Task OnEdit(Equipment equipment)
+    {
+        await Service.Update(equipment);
+
+        await GetItems(parentTreeItem);
+
+        editDialog?.Close();
     }
 
     private async Task OpenDeleteDialog(TreeItem? treeItem)
@@ -204,7 +249,6 @@
         if (treeItem is null)
             return;
 
-        selectedTreeItem = treeItem.Parent;
         parentTreeItem = treeItem.Parent;
 
         if (parentTreeItem is not null)
@@ -217,15 +261,29 @@
 
         treeItem = null;
 
-        DeleteDialog?.Open();
+        deleteDialog?.Open();
     }
 
-    private async Task Delete(Equipment equipment)
+    private async Task OnDelete(Equipment equipment)
     {
-        await Service.Delete(equipment);
+        try
+        {
+            await Service.Delete(equipment);
 
-        await GetItems(parentTreeItem);
+            await GetItems(parentTreeItem);
 
-        DeleteDialog?.Close();
+            selectedTreeItem = parentTreeItem;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            if (ex.InnerException is not null)
+                errorMessage = ex.InnerException.Message;
+            errorDialog?.Open();
+        }
+        finally
+        {
+            deleteDialog?.Close();
+        }
     }
 }

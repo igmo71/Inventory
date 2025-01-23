@@ -1,0 +1,51 @@
+﻿@using Inventory.Domain
+
+@if (Equipment is not null)
+{
+    <EditForm method="post" Model="Equipment" OnValidSubmit="UpdateEquipment" FormName="edit" Enhance>
+        <DataAnnotationsValidator />
+        <ValidationSummary role="alert" />
+        <input type="hidden" name="Equipment.Id" value="@Equipment.Id" />
+        <div class="mb-3">
+            <label for="name" class="form-label">Наименование:</label>
+            <InputText id="name" @bind-Value="Equipment.Name" class="form-control" />
+            <ValidationMessage For="() => Equipment.Name" class="text-danger" />
+        </div>
+        <div class="mb-3">
+            <label for="isfolder" class="form-label">Это Папка:</label>
+            <InputCheckbox id="isfolder" @bind-Value="Equipment.IsFolder" class="form-check-input" />
+            <ValidationMessage For="() => Equipment.IsFolder" class="text-danger" />
+        </div>
+        <div class="mb-3">
+            <label for="parentid" class="form-label">В Папке:</label>
+            <InputSelect id="parentid" @bind-Value="Equipment.ParentId" class="form-control">
+                <option value="">- Выберите -</option>
+                @if (Folders is not null)
+                {
+                    foreach (var folder in Folders)
+                    {
+                        <option value="@folder.Id">@folder.Name</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Equipment.ParentId" class="text-danger" />
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Equipment? Equipment { get; set; }
+
+    [Parameter]
+    public List<Equipment>? Folders { get; set; }
+
+    [Parameter]
+    public EventCallback<Equipment> OnUpdate { get; set; }
+
+    private async Task UpdateEquipment()
+    {
+        await OnUpdate.InvokeAsync(Equipment);
+    }
+}

@@ -30,13 +30,13 @@
     private Equipment Equipment { get; set; } = new();
 
     [Parameter]
-    public EventCallback<Equipment> OnValidSubmit { get; set; }
+    public EventCallback<Equipment> OnCreate { get; set; }
 
     private async Task AddEquipment()
     {
         Equipment.ParentId = ParentEquipment?.Id;
 
-        await OnValidSubmit.InvokeAsync(Equipment);
+        await OnCreate.InvokeAsync(Equipment);
 
         Equipment = new();
     }

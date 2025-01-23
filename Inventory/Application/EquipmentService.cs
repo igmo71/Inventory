@@ -125,6 +125,7 @@ namespace Inventory.Application
         {
             using var context = _dbFactory.CreateDbContext();
             context.Attach(equipment).State = EntityState.Modified;
+            //context.Equipment.Update(equipment);
 
             try
             {

@@ -35,7 +35,7 @@
         </dl>
         <EditForm method="post" Model="equipment" OnValidSubmit="DeleteEquipment" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(equipment is null)">Удалить</button> |
-            <a href="/equipment/qg">Назад к Списку</a>
+            <a href="/equipment/t">Назад к Списку</a>
         </EditForm>
     }
 </div>
@@ -59,6 +59,6 @@
     {
         await Service.Delete(equipment!);
 
-        NavigationManager.NavigateTo("/equipment/qg");
+        NavigationManager.NavigateTo("/equipment/t");
     }
 }

@@ -9,6 +9,11 @@
 @inject IEquipmentService Service
 @inject ISerialNumberService SerialNumberService
 
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject ProtectedSessionStorage ProtectedSessionStore
+
 <PageTitle>Оборудование</PageTitle>
 
 <h1>Оборудование</h1>
@@ -98,8 +103,8 @@
 
 @code {
     private List<TreeItem>? treeItems;
-    private List<SerialNumber>? serialNumbers;
     private List<Equipment>? folders;
+    private List<SerialNumber>? serialNumbers;
 
     private TreeItem? selectedTreeItem;
     private TreeItem? parentTreeItem;
@@ -113,9 +118,20 @@
     private ModalDialog? errorDialog;
     private string? errorMessage;
 
+    private JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+        {
+            ReferenceHandler = ReferenceHandler.Preserve,
+            MaxDepth = 16
+        };
+
     protected override async Task OnInitializedAsync()
     {
-        await GetItems();
+        var browserStorageResult = await ProtectedSessionStore.GetAsync<string>(nameof(treeItems));
+        if (browserStorageResult.Success && browserStorageResult.Value is not null)
+            treeItems = JsonSerializer.Deserialize<List<TreeItem>?>(browserStorageResult.Value, jsonOptions);
+        else
+            await GetItems();
+
         await GetFolders();
     }
 
@@ -146,6 +162,12 @@
         else
         {
             treeItem.Children = null;
+        }
+
+        if (treeItems is not null)
+        {
+            string treeItemsString = JsonSerializer.Serialize(treeItems, jsonOptions);
+            await ProtectedSessionStore.SetAsync(nameof(treeItems), treeItemsString);
         }
     }
 

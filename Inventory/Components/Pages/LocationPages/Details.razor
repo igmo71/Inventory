@@ -7,30 +7,30 @@
 
 @attribute [Authorize]
 
-<PageTitle>Details</PageTitle>
+<PageTitle>Детали</PageTitle>
 
-<h1>Details</h1>
+<h1>Детали</h1>
 
 <div>
-    <h2>Location</h2>
+    <h2>Локации</h2>
     <hr />
     @if (location is null)
     {
-        <p><em>Loading...</em></p>
+        <p><em>Загрузка...</em></p>
     }
     else
     {
         <dl class="row">
-            <dt class="col-sm-2">Name</dt>
+            <dt class="col-sm-2">Наименование</dt>
             <dd class="col-sm-10">@location.Name</dd>
-            <dt class="col-sm-2">IsFolder</dt>
+            <dt class="col-sm-2">Это Папка</dt>
             <dd class="col-sm-10">@location.IsFolder</dd>
-            <dt class="col-sm-2">ParentId</dt>
-            <dd class="col-sm-10">@location.ParentId</dd>
+            <dt class="col-sm-2">Родительская Локация</dt>
+            <dd class="col-sm-10">@location.Parent?.Name</dd>
         </dl>
         <div>
-            <a href="@($"/locations/edit?id={location.Id}")">Edit</a> |
-            <a href="@($"/locations")">Back to List</a>
+            <a href="@($"/locations/edit?id={location.Id}")">Изменить</a> |
+            <a href="@($"/locations")">Назад к Списку</a>
         </div>
     }
 </div>
@@ -44,7 +44,7 @@
     protected override async Task OnInitializedAsync()
     {
         if (Id is not null)
-            location = await Service.Get(Id);
+            location = await Service.Get(Id, isIncludeParent: true);
 
         if (location is null)
             NavigationManager.NavigateTo("notfound");

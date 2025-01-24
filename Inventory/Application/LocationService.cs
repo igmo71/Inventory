@@ -3,13 +3,14 @@ using Inventory.Common.Results;
 using Inventory.Data;
 using Inventory.Domain;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Inventory.Application
 {
     public interface ILocationService
     {
         Task<ListResult<Location>> GetList(int? skip = null, int? take = null, bool isIncludeParent = false);
-        Task<Location?> Get(string id);
+        Task<Location?> Get(string id, bool isIncludeParent = false);
         Task<string> Create(Location location);
         Task<Result> Update(Location location);
         Task Delete(Location location);
@@ -40,10 +41,16 @@ namespace Inventory.Application
             return ListResult<Location>.Success(result, total);
         }
 
-        public async Task<Location?> Get(string id)
+        public async Task<Location?> Get(string id, bool isIncludeParent = false)
         {
             using var context = _dbFactory.CreateDbContext();
-            var location = await context.Locations.FirstOrDefaultAsync(m => m.Id == id);
+            var query = context.Locations.AsNoTracking();
+
+            if (isIncludeParent)
+                query = query.Include(e => e.Parent);
+
+            var location = await query.FirstOrDefaultAsync(m => m.Id == id);
+
             return location;
         }
 

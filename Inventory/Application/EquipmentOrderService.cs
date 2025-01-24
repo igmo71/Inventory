@@ -2,19 +2,17 @@
 using Inventory.Common.Results;
 using Inventory.Data;
 using Inventory.Domain;
+using Microsoft.AspNetCore.Components.QuickGrid;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Application
 {
     public interface IEquipmentOrderService
     {
-        Task<ListResult<EquipmentOrder>> GetList(int? skip = null, int? take = null,
-            bool isIncludeEquipment = false,
-            bool isIncludeSerialNumber = false,
-            bool isIncludeAuthor = false,
-            bool isIncludeAssignee = false,
-            bool isIncludeLocation = false,
-            ApplicationUser? assignee = null);
+        Task<ListResult<EquipmentOrder>> GetList(
+            GridItemsProviderRequest<EquipmentOrder> request,
+            EquipmentOrderIncludeParameters includeParameters,
+            EquipmentOrderFilterParameters filterParameters);
 
         Task<EquipmentOrder?> Get(string id,
             bool isIncludeEquipment = false,
@@ -32,43 +30,26 @@ namespace Inventory.Application
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<EquipmentOrder>> GetList(int? skip = null, int? take = null,
-            bool isIncludeEquipment = false,
-            bool isIncludeSerialNumber = false,
-            bool isIncludeAuthor = false,
-            bool isIncludeAssignee = false,
-            bool isIncludeLocation = false,
-            ApplicationUser? assignee = null)
+        public async Task<ListResult<EquipmentOrder>> GetList(
+            GridItemsProviderRequest<EquipmentOrder> request,
+            EquipmentOrderIncludeParameters includeParameters,
+            EquipmentOrderFilterParameters filterParameters)
         {
             using var context = _dbFactory.CreateDbContext();
             var query = context.EquipmentOrders.AsNoTracking();
 
-            if (skip is not null)
-                query = query.Skip((int)skip);
+            if (request.StartIndex > 0)
+                query = query.Skip(request.StartIndex);
 
-            if (take is not null)
-                query = query.Take((int)take);
+            if (request.Count is not null)
+                query = query.Take((int)request.Count);            
 
-            if (isIncludeEquipment)
-                query = query.Include(e => e.Equipment);
-
-            if (isIncludeSerialNumber)
-                query = query.Include(e => e.SerialNumber);
-
-            if (isIncludeAuthor)
-                query = query.Include(e => e.Author);
-
-            if (isIncludeAssignee)
-                query = query.Include(e => e.Assignee);
-
-            if (isIncludeLocation)
-                query = query.Include(e => e.Location);
-
-            if(assignee is not null)
-                query = query.Where(e => e.AssigneeId == assignee.Id);
-
-            var result = await query.AsNoTracking().ToListAsync();
-            var total = context.EquipmentOrders.Count();
+            var result = await query
+                .PerformInclude(includeParameters)
+                .PerformFilter(filterParameters)
+                .OrderBy(e => e.DateTime)
+                .ToListAsync();
+            var total = result.Count;
 
             return ListResult<EquipmentOrder>.Success(result, total);
         }

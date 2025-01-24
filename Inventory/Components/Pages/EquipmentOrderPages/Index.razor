@@ -15,35 +15,46 @@
     <a href="equipmentorders/create">Создать Новый</a>
 </p>
 
-<QuickGrid Class="table" ItemsProvider="itemsProvider">
+<QuickGrid Class="table" ItemsProvider="itemsProvider" Virtualize="true" @ref="grid">
+    <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty" Title="Автор">
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Number" Title="Номер">
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" Format="dd.MM.yyyy" Title="Дата">
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty" Title="Оборудование">
+        <ColumnOptions >
+            <div class="search-box">
+                <input class="form-control" type="search" autofocus value="@filterParameters.equipment" @oninput="OnInputEquipmentFilter" placeholder="Оборудование..." />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty" Title="Серийный номер">
+        <ColumnOptions>
+            <div class="search-box">
+                <input class="form-control" type="search" autofocus value="@filterParameters.serialNumber" @oninput="OnInputSerialNumberFilter" placeholder="Серийный Номер..." />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" Title="Ответственный">
+        <ColumnOptions>
+            <div class="search-box">
+                <input class="form-control" type="search" autofocus value="@filterParameters.assignee" @oninput="OnInputAssigneeFilter" placeholder="Ответственный..." />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" Title="Локация">
+        <ColumnOptions>
+            <div class="search-box">
+                <input class="form-control" type="search" autofocus value="@filterParameters.location" @oninput="OnInputLocationFilter" placeholder="Локация..." />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.ReceiptDate" Format="dd.MM.yyyy" Title="Дата получения">
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.ReturnDate" Format="dd.MM.yyyy" Title="Дата возврата">
+    </PropertyColumn>
 
-    <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty">
-        <HeaderTemplate><th>Автор</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.Number">
-        <HeaderTemplate><th>Номер</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" Format="dd.MM.yyyy">
-        <HeaderTemplate><th>Дата</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty">
-        <HeaderTemplate><th>Оборудование</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty">
-        <HeaderTemplate><th>Серийный номер</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" >
-        <HeaderTemplate><th>Ответственный</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" >
-        <HeaderTemplate><th>Локация</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.ReceiptDate" Format="dd.MM.yyyy">
-        <HeaderTemplate><th> Дата получения</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.ReturnDate" Format="dd.MM.yyyy">
-        <HeaderTemplate><th> Дата возврата</th></HeaderTemplate>
-    </PropertyColumn>
 
     <TemplateColumn Context="equipmentorder">
         <a href="@($"equipmentorders/edit?id={equipmentorder.Id}")">Изменить</a> |
@@ -55,21 +66,63 @@
 @code {
     GridItemsProvider<EquipmentOrder>? itemsProvider;
 
+    QuickGrid<EquipmentOrder>? grid;
+    
+    int numResults;
+
+    EquipmentOrderFilterParameters filterParameters;
+
     protected override void OnInitialized()
     {
         itemsProvider = async request =>
          {
-             var result = await Service.GetList(request.StartIndex, request.Count, true, true, true, true, true);
+             var result = await Service.GetList(request,
+                 new EquipmentOrderIncludeParameters
+                     {
+                         isIncludeEquipment = true,
+                         isIncludeSerialNumber = true,
+                         isIncludeAuthor = true,
+                         isIncludeAssignee = true,
+                         isIncludeLocation = true
+                     },
+                 filterParameters);
 
              if (!result.IsSuccess || result.Value is null)
                  return default;
 
-             var response = GridItemsProviderResult.From(
-                 items: result.Value,
-                 totalItemCount: result.Total
-             );
+             if (numResults != result.Total)
+             {
+                 numResults = result.Total;
+                 StateHasChanged();
+             }
+
+             var response = GridItemsProviderResult.From(items: result.Value, totalItemCount: result.Total);
 
              return response;
          };
+    }
+
+    void OnInputEquipmentFilter(ChangeEventArgs e)
+    {
+        filterParameters.equipment = e.Value?.ToString() ?? string.Empty;
+        grid!.RefreshDataAsync();
+    }
+
+    void OnInputSerialNumberFilter(ChangeEventArgs e)
+    {
+        filterParameters.serialNumber = e.Value?.ToString() ?? string.Empty;
+        grid!.RefreshDataAsync();
+    }
+
+    void OnInputAssigneeFilter(ChangeEventArgs e)
+    {
+        filterParameters.assignee = e.Value?.ToString() ?? string.Empty;
+        grid!.RefreshDataAsync();
+    }
+
+    void OnInputLocationFilter(ChangeEventArgs e)
+    {
+        filterParameters.location = e.Value?.ToString() ?? string.Empty;
+        grid!.RefreshDataAsync();
     }
 }

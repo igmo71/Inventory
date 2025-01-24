@@ -17,15 +17,9 @@
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
-    <PropertyColumn Property="serialnumber => serialnumber.Equipment != null ? serialnumber.Equipment.Name : string.Empty">
-        <HeaderTemplate><th>ЮОборудование</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="serialnumber => serialnumber.Number">
-        <HeaderTemplate><th>Серийный Номер</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="serialnumber => serialnumber.IsAssigned">
-        <HeaderTemplate><th>Выдан</th></HeaderTemplate>
-    </PropertyColumn>
+    <PropertyColumn Property="serialnumber => serialnumber.Equipment != null ? serialnumber.Equipment.Name : string.Empty" Title="Оборудование" />
+    <PropertyColumn Property="serialnumber => serialnumber.Number" Title="Серийный Номер" />
+    <PropertyColumn Property="serialnumber => serialnumber.IsAssigned" Title="Выдан" />
 
     <TemplateColumn Context="serialnumber">
         <a href="@($"serialnumbers/edit?id={serialnumber.Id}")">Изменить</a> |

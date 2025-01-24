@@ -16,24 +16,14 @@
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
-    @* <PropertyColumn Property="location => location.Id" /> *@
-    <PropertyColumn Property="location => location.Name">
-        <HeaderTemplate><th>Локация</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="location => location.IsFolder">
-        <HeaderTemplate><th>Это Папка</th></HeaderTemplate>
-    </PropertyColumn>
-    <PropertyColumn Property="location => location.Parent != null ? location.Parent.Name : string.Empty">
-        <HeaderTemplate><th>Родительская Локация</th></HeaderTemplate>
-    </PropertyColumn>
-    @* <TemplateColumn Context="location">
-        <span>@location.Parent?.Name</span>
-    </TemplateColumn> *@
+    <PropertyColumn Property="location => location.Name" Title="Локация" />
+    <PropertyColumn Property="location => location.IsFolder" Title="Это Папка" />
+    <PropertyColumn Property="location => location.Parent != null ? location.Parent.Name : string.Empty" Title="Родительская Локация" />
 
     <TemplateColumn Context="location">
-        <a href="@($"locations/edit?id={location.Id}")">Edit</a> |
-        <a href="@($"locations/details?id={location.Id}")">Details</a> |
-        <a href="@($"locations/delete?id={location.Id}")">Delete</a>
+        <a href="@($"locations/edit?id={location.Id}")">Изменить</a> |
+        <a href="@($"locations/details?id={location.Id}")">Детали</a> |
+        <a href="@($"locations/delete?id={location.Id}")">Удалить</a>
     </TemplateColumn>
 </QuickGrid>
 

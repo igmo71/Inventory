@@ -43,7 +43,7 @@ namespace Inventory.Application
                 query = query.Where(e =>
                     e.Assignee != null &&
                     e.Assignee.Name != null &&
-                    e.Assignee.Name.Contains(filterParameters.assignee));
+                    (e.Assignee.Name.Contains(filterParameters.assignee) || e.Assignee.Id == filterParameters.assignee));
 
             if (filterParameters.location is not null)
                 query = query.Where(e =>

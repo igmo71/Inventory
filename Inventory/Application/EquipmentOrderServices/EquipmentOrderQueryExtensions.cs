@@ -1,7 +1,7 @@
 ﻿using Inventory.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Inventory.Application
+namespace Inventory.Application.EquipmentOrderServices
 {
     public static class EquipmentOrderQueryExtensions
     {
@@ -28,9 +28,9 @@ namespace Inventory.Application
         public static IQueryable<EquipmentOrder> PerformFilter(this IQueryable<EquipmentOrder> query, EquipmentOrderFilterParameters filterParameters)
         {
             if (filterParameters.equipment is not null)
-                query = query.Where(e => 
-                    e.Equipment != null && 
-                    e.Equipment.Name != null && 
+                query = query.Where(e =>
+                    e.Equipment != null &&
+                    e.Equipment.Name != null &&
                     e.Equipment.Name.Contains(filterParameters.equipment));
 
             if (filterParameters.serialNumber is not null)

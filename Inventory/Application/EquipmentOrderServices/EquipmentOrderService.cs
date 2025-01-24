@@ -5,7 +5,7 @@ using Inventory.Domain;
 using Microsoft.AspNetCore.Components.QuickGrid;
 using Microsoft.EntityFrameworkCore;
 
-namespace Inventory.Application
+namespace Inventory.Application.EquipmentOrderServices
 {
     public interface IEquipmentOrderService
     {
@@ -42,7 +42,7 @@ namespace Inventory.Application
                 query = query.Skip(request.StartIndex);
 
             if (request.Count is not null)
-                query = query.Take((int)request.Count);            
+                query = query.Take((int)request.Count);
 
             var result = await query
                 .PerformInclude(includeParameters)
@@ -54,7 +54,7 @@ namespace Inventory.Application
             return ListResult<EquipmentOrder>.Success(result, total);
         }
 
-        public async Task<EquipmentOrder?> Get(string id, 
+        public async Task<EquipmentOrder?> Get(string id,
             bool isIncludeEquipment = false,
             bool isIncludeSerialNumber = false,
             bool isIncludeAuthor = false,

@@ -1,4 +1,4 @@
-﻿namespace Inventory.Application
+﻿namespace Inventory.Application.EquipmentOrderServices
 {
     public struct EquipmentOrderFilterParameters
     {

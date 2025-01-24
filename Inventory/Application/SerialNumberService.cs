@@ -16,6 +16,7 @@ namespace Inventory.Application
             bool isIncludeEquipment = false);
         Task<string> Create(SerialNumber serialNumber);
         Task<Result> Update(SerialNumber serialNumber);
+        Task Assign(string id);
         Task Delete(SerialNumber serialNumber);
         bool Exists(string id);
     }
@@ -115,6 +116,16 @@ namespace Inventory.Application
         {
             using var context = _dbFactory.CreateDbContext();
             return context.SerialNumbers.Any(e => e.Id == id);
+        }
+
+        public async Task Assign(string id)
+        {
+            using var context = _dbFactory.CreateDbContext();
+            var serialNunber = context.SerialNumbers.FirstOrDefault(e => e.Id == id);
+            if (serialNunber == null)
+                return;
+            serialNunber.IsAssigned = true;
+            await context.SaveChangesAsync();
         }
     }
 }

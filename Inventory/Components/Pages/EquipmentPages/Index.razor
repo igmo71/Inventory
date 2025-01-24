@@ -52,26 +52,45 @@
         </TreeView>
     </div>
     <div class="col-md-4">
-        <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
-            <div class="card-body">
-                <div><b>@selectedTreeItem?.Value</b></div>
-                <div>
-                    @if (serialNumbers is not null && serialNumbers.Count > 0)
-                    {
-                        <b>Серийные номера</b>
-                        <table>
-                            @foreach (var serialNumber in serialNumbers)
-                            {
-                                <tr>
-                                    <td>@serialNumber.Number</td>
-                                    <td>@serialNumber.IsAssigned</td>
-                                </tr>
-                            }
-                        </table>
-                    }
+        @if (selectedTreeItem is not null)
+        {
+            <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
+                <div class="card-body">
+                    <div><b>@selectedTreeItem?.Value</b></div>
+                    <div>
+                        @if (serialNumbers is not null && serialNumbers.Count > 0)
+                        {
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Серийный Номер</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var serialNumber in serialNumbers)
+                                    {
+                                        <tr>
+                                            <td>@serialNumber.Number</td>
+                                            <td>
+                                                @if (serialNumber.IsAssigned)
+                                                {
+                                                    <span>Выдано</span>
+                                                }
+                                                else
+                                                {
+                                                    <a href="equipmentorders/create?equipmentId=@(selectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">Выдать</a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     </div>
 </div>
 
@@ -126,11 +145,38 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var browserStorageResult = await ProtectedSessionStore.GetAsync<string>(nameof(treeItems));
-        if (browserStorageResult.Success && browserStorageResult.Value is not null)
-            treeItems = JsonSerializer.Deserialize<List<TreeItem>?>(browserStorageResult.Value, jsonOptions);
-        else
+        try
+        {
+            var browserTreeItems = await ProtectedSessionStore.GetAsync<string>(nameof(treeItems));
+            if (browserTreeItems.Success)
+            {
+                if (browserTreeItems.Value is not null)
+                {
+                    string treeItemsString = browserTreeItems.Value;
+                    treeItems = JsonSerializer.Deserialize<List<TreeItem>?>(treeItemsString, jsonOptions);
+                }
+            }
+            else
+                await GetItems();
+
+            var browserSelectedTreeItem = await ProtectedSessionStore.GetAsync<string>(nameof(selectedTreeItem));
+            if (browserSelectedTreeItem.Success)
+            {
+                if (browserSelectedTreeItem.Value is not null)
+                {
+                    string selectedTreeItemString = browserSelectedTreeItem.Value;
+                    selectedTreeItem = JsonSerializer.Deserialize<TreeItem?>(selectedTreeItemString, jsonOptions);
+                    if (selectedTreeItem is not null){
+                        var listResult = await SerialNumberService.GetList(equipmentId: selectedTreeItem.Id);
+                        serialNumbers = listResult.Value;
+                    }
+                }
+            }
+        }
+        catch (Exception)
+        {
             await GetItems();
+        }
 
         await GetFolders();
     }
@@ -166,8 +212,15 @@
 
         if (treeItems is not null)
         {
-            string treeItemsString = JsonSerializer.Serialize(treeItems, jsonOptions);
-            await ProtectedSessionStore.SetAsync(nameof(treeItems), treeItemsString);
+            try
+            {
+                string treeItemsString = JsonSerializer.Serialize(treeItems, jsonOptions);
+                await ProtectedSessionStore.SetAsync(nameof(treeItems), treeItemsString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 
@@ -201,6 +254,16 @@
         var listResult = await SerialNumberService.GetList(equipmentId: treeItem.Id);
 
         serialNumbers = listResult.Value;
+
+        try
+        {
+            string selectedTreeItemString = JsonSerializer.Serialize(selectedTreeItem, jsonOptions);
+            await ProtectedSessionStore.SetAsync(nameof(selectedTreeItem), selectedTreeItemString);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private void OpenCreateDialog(TreeItem? treeItem = null)

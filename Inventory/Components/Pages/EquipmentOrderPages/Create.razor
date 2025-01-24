@@ -88,7 +88,7 @@
                 <ValidationMessage For="() => EquipmentOrder.LocationId" class="text-danger" />
             </div>
             <div class="mb-3">
-                <label for="ReceiptDate" class="form-label">Дата получения:</label>
+                <label for="ReceiptDate" class="form-label">Дата выдачи:</label>
                 <InputDate id="ReceiptDate" @bind-Value="EquipmentOrder.ReceiptDate" class="form-control" disabled />
                 <ValidationMessage For="() => EquipmentOrder.ReceiptDate" class="text-danger" />
             </div>
@@ -103,10 +103,16 @@
 </div>
 
 <div>
-    <a href="/equipmentorders">Назад к Списку</a>
+    <a href="/equipmentorders">Назад к Списку Ордеров</a> | <a href="/equipment">Назад к Оборудованию</a>
 </div>
 
 @code {
+    [SupplyParameterFromQuery]
+    public string? EquipmentId { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? SerialNumberId { get; set; }
+
     [SupplyParameterFromForm]
     private EquipmentOrder EquipmentOrder { get; set; } = new();
 
@@ -126,6 +132,13 @@
 
         EquipmentOrder.DateTime = DateTime.Now;
 
+        if (EquipmentId is not null){
+            EquipmentOrder.EquipmentId = EquipmentId;
+            await GetSerialNumbers();
+            if (SerialNumberId is not null)
+                EquipmentOrder.SerialNumberId = SerialNumberId;
+        }
+
         GetApplicationUsers();     
     }
 
@@ -133,18 +146,16 @@
     {
         string id = await Service.Create(EquipmentOrder);
 
-        await UpdateSerialNumber();
+        await AssignSerialNumber();
 
         NavigationManager.NavigateTo("/equipmentorders");
     }
 
-    private async Task UpdateSerialNumber()
+    private async Task AssignSerialNumber()
     {
-        if (EquipmentOrder is not null && EquipmentOrder.SerialNumber != null)
+        if (EquipmentOrder is not null && EquipmentOrder.SerialNumberId != null)
         {
-            EquipmentOrder.SerialNumber.IsAssigned = true;
-
-            await SerialNumberService.Update(EquipmentOrder.SerialNumber);
+            await SerialNumberService.Assign(EquipmentOrder.SerialNumberId);
         }
     }
 

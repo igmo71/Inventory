@@ -7,44 +7,64 @@
 
 @attribute [Authorize]
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Создать</PageTitle>
 
-<h1>Create</h1>
+<h1>Создать</h1>
 
-<h2>Location</h2>
+<h2>Локацию</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <EditForm method="post" Model="Location" OnValidSubmit="AddLocation" FormName="create" Enhance>
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
+            <ValidationSummary class="text-danger" role="alert" />
             <div class="mb-3">
-                <label for="name" class="form-label">Name:</label> 
-                <InputText id="name" @bind-Value="Location.Name" class="form-control" /> 
-                <ValidationMessage For="() => Location.Name" class="text-danger" /> 
-            </div>        
+                <label for="name" class="form-label">Наименование:</label>
+                <InputText id="name" @bind-Value="Location.Name" class="form-control" />
+                <ValidationMessage For="() => Location.Name" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="isfolder" class="form-label">IsFolder:</label> 
-                <InputCheckbox id="isfolder" @bind-Value="Location.IsFolder" class="form-check-input" /> 
-                <ValidationMessage For="() => Location.IsFolder" class="text-danger" /> 
-            </div>        
+                <label for="isfolder" class="form-label">Это Папка:</label>
+                <InputCheckbox id="isfolder" @bind-Value="Location.IsFolder" class="form-check-input" />
+                <ValidationMessage For="() => Location.IsFolder" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="parentid" class="form-label">ParentId:</label> 
-                <InputText id="parentid" @bind-Value="Location.ParentId" class="form-control" /> 
-                <ValidationMessage For="() => Location.ParentId" class="text-danger" /> 
-            </div>        
-            <button type="submit" class="btn btn-primary">Create</button>
+                <label for="parentid" class="form-label">Родительская Локация:</label>
+                <InputSelect id="parentid" @bind-Value="Location.ParentId" class="form-control">
+                    <option value="">- Выберите -</option>
+                    @foreach (var location in locations)
+                    {
+                        <option value="@location.Id">@location.Name </option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Location.ParentId" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Создать</button>
         </EditForm>
     </div>
 </div>
 
 <div>
-    <a href="/locations">Back to List</a>
+    <a href="/locations">Назад к Списку</a>
 </div>
 
 @code {
     [SupplyParameterFromForm]
     private Location Location { get; set; } = new();
+
+    private List<Location> locations = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetLocations();
+    }
+
+    private async Task GetLocations()
+    {
+        var locationsResult = await Service.GetList();
+        if (locationsResult.IsSuccess)
+            locations = locationsResult.Value;
+    }
 
     private async Task AddLocation()
     {

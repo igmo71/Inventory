@@ -7,41 +7,41 @@
 
 @attribute [Authorize]
 
-<PageTitle>Details</PageTitle>
+<PageTitle>Детали</PageTitle>
 
-<h1>Details</h1>
+<h1>Детали</h1>
 
 <div>
-    <h2>EquipmentOrder</h2>
+    <h2>Ордера на Оборудование</h2>
     <hr />
     @if (equipmentOrder is null)
     {
-        <p><em>Loading...</em></p>
+        <p><em>Загрузка...</em></p>
     }
     else {
         <dl class="row">
-            <dt class="col-sm-2">EquipmentId</dt>
-            <dd class="col-sm-10">@equipmentOrder.EquipmentId</dd>
-            <dt class="col-sm-2">SerialNumberId</dt>
-            <dd class="col-sm-10">@equipmentOrder.SerialNumberId</dd>
-            <dt class="col-sm-2">DateTime</dt>
-            <dd class="col-sm-10">@equipmentOrder.DateTime</dd>
-            <dt class="col-sm-2">Number</dt>
+            <dt class="col-sm-2">Автор</dt>
+            <dd class="col-sm-10">@equipmentOrder.Author?.Name</dd>
+            <dt class="col-sm-2">Номер</dt>
             <dd class="col-sm-10">@equipmentOrder.Number</dd>
-            <dt class="col-sm-2">AuthorId</dt>
-            <dd class="col-sm-10">@equipmentOrder.AuthorId</dd>
-            <dt class="col-sm-2">AssigneeId</dt>
-            <dd class="col-sm-10">@equipmentOrder.AssigneeId</dd>
-            <dt class="col-sm-2">LocationId</dt>
-            <dd class="col-sm-10">@equipmentOrder.LocationId</dd>
+            <dt class="col-sm-2">Дата</dt>
+            <dd class="col-sm-10">@equipmentOrder.DateTime</dd>
+            <dt class="col-sm-2">Оборудование</dt>
+            <dd class="col-sm-10">@equipmentOrder.Equipment?.Name</dd>
+            <dt class="col-sm-2">Серийный Номер</dt>
+            <dd class="col-sm-10">@equipmentOrder.SerialNumber?.Number</dd>
+            <dt class="col-sm-2">Ответственный</dt>
+            <dd class="col-sm-10">@equipmentOrder.Assignee?.Name</dd>
+            <dt class="col-sm-2">Локация</dt>
+            <dd class="col-sm-10">@equipmentOrder.Location?.Name</dd>
             <dt class="col-sm-2">Дата выдачи</dt>
             <dd class="col-sm-10">@equipmentOrder.ReceiptDate</dd>
             <dt class="col-sm-2">Дата возврата</dt>
             <dd class="col-sm-10">@equipmentOrder.ReturnDate</dd>
         </dl>
         <div>
-            <a href="@($"/equipmentorders/edit?id={equipmentOrder.Id}")">Edit</a> |
-            <a href="@($"/equipmentorders")">Back to List</a>
+            <a href="@($"/equipmentorders/edit?id={equipmentOrder.Id}")">Изменить</a> |
+            <a href="@($"/equipmentorders")">Назад к Списку</a>
         </div>
     }
 </div>
@@ -55,7 +55,12 @@
     protected override async Task OnInitializedAsync()
     {
         if (Id is not null) 
-            equipmentOrder = await Service.Get(Id);
+            equipmentOrder = await Service.Get(Id, 
+                isIncludeEquipment: true, 
+                isIncludeSerialNumber: true, 
+                isIncludeAuthor: true, 
+                isIncludeAssignee: true,
+                isIncludeLocation: true);
 
         if (equipmentOrder is null)
             NavigationManager.NavigateTo("notfound");

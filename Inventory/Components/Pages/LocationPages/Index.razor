@@ -7,22 +7,28 @@
 
 @attribute [Authorize]
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Локации</PageTitle>
 
-<h1>Index</h1>
+<h1>Локации</h1>
 
 <p>
-    <a href="locations/create">Create New</a>
+    <a href="locations/create">Создать Новую</a>
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
-    <PropertyColumn Property="location => location.Id" />
-    <PropertyColumn Property="location => location.Name" />
-    <PropertyColumn Property="location => location.IsFolder" />
-    <PropertyColumn Property="location => location.ParentId" />
-    <TemplateColumn Context="location">
+    @* <PropertyColumn Property="location => location.Id" /> *@
+    <PropertyColumn Property="location => location.Name">
+        <HeaderTemplate><th>Локация</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="location => location.IsFolder">
+        <HeaderTemplate><th>Это Папка</th></HeaderTemplate>
+    </PropertyColumn>
+    <PropertyColumn Property="location => location.Parent != null ? location.Parent.Name : string.Empty">
+        <HeaderTemplate><th>Родительская Локация</th></HeaderTemplate>
+    </PropertyColumn>
+    @* <TemplateColumn Context="location">
         <span>@location.Parent?.Name</span>
-    </TemplateColumn>
+    </TemplateColumn> *@
 
     <TemplateColumn Context="location">
         <a href="@($"locations/edit?id={location.Id}")">Edit</a> |
@@ -38,7 +44,7 @@
     {
         itemsProvider = async request =>
         {
-            var result = await Service.GetList(request.StartIndex, request.Count);
+            var result = await Service.GetList(request.StartIndex, request.Count, isIncludeParent: true);
 
             if (!result.IsSuccess || result.Value is null)
                 return default;

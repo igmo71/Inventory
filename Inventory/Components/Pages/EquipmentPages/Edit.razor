@@ -78,7 +78,13 @@ else
 
     private async Task UpdateEquipment()
     {
-        await Service.Update(Equipment!);
+        if (Equipment is null)
+            return;
+
+        if (string.IsNullOrEmpty(Equipment.ParentId))
+            Equipment.ParentId = null;
+
+        await Service.Update(Equipment);
 
         NavigationManager.NavigateTo("/equipment/t");
     }

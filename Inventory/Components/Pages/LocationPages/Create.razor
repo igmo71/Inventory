@@ -1,7 +1,9 @@
 ﻿@page "/locations/create"
-@using Inventory.Application
+
+@using Inventory.Application.LocationServices
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
+
 @inject NavigationManager NavigationManager
 @inject ILocationService Service
 
@@ -50,7 +52,7 @@
 
 @code {
     [SupplyParameterFromForm]
-    private Location Location { get; set; } = new();
+    private Location Location { get; set; } = new() { Id = Guid.CreateVersion7().ToString() };
 
     private List<Location> locations = new();
 

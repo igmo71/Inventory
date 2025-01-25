@@ -1,0 +1,57 @@
+﻿@page "/locations/tree"
+
+@using Inventory.Application.LocationServices
+@using Inventory.Components.ComponentTreeView
+@using Inventory.Components.ComponentTreeViewBase
+@using Inventory.Domain
+
+@inject ILocationService Service
+
+<h3>IndexTree</h3>
+
+<TreeViewBase Nodes="treeItems" OnSelect="HandleSelect" />
+
+<div>
+    @selectedItem?.Value
+</div>
+
+@code {
+    private List<TreeItem>? treeItems;
+    private TreeItem? selectedItem;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetItems();
+    }
+
+    private async Task GetItems(TreeItem? treeItem = null)
+    {
+        var listResult = await Service.GetList(isIncludeParent: true);
+
+        if (!listResult.IsSuccess)
+            return;
+
+        var locations = listResult.Value;
+
+        treeItems = From(locations);
+    }
+
+    private List<TreeItem> From(List<Location> locations)
+    {
+        var list = locations.Select(e => new TreeItem
+            {
+                Id = e.Id,
+                Value = e.Name,
+                IsFolder = e.IsFolder,
+                ParentId = e.ParentId
+            }).ToList();
+
+        var tree = TreeBuilder.Build(list);
+
+        return tree;
+    }
+
+    private void HandleSelect(TreeItem treeItem){
+        selectedItem = treeItem;
+    }
+}

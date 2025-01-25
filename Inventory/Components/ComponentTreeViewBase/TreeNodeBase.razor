@@ -1,0 +1,56 @@
+﻿@using Inventory.Components.ComponentTreeView
+@using Inventory.Components.Icons
+
+<li class="list-group-item pt-0 pb-0 border-0">
+    @if (Node != null)
+    {
+        <div>
+            <div class="btn" @onclick="ToggleExpand">
+                <TreeIcons TreeItem="Node" />
+            </div>
+            <span class="btn btn-outline-secondary text-start border-0 @(Node.Id == SelectedNodeId ? "active" : "")" @onclick="SelectNode">@Node.Value </span>
+        </div>
+        @if (Node.IsExpanded && Node.Children != null && Node.Children.Any())
+        {
+            <ul class="list-group p-0">
+                @foreach (var child in Node.Children)
+                {
+                    if (child != null)
+                    {
+                        <TreeNodeBase Node="child" OnSelect="OnSelect" />
+                    }
+                }
+            </ul>
+        }
+    }
+</li>
+
+@code {
+    [Parameter]
+    public TreeItem? Node { get; set; }
+
+    [Parameter]
+    public EventCallback<TreeItem> OnSelect { get; set; }
+
+    [CascadingParameter]
+    public string? SelectedNodeId { get; set; }
+
+    private async Task SelectNode()
+    {
+        if (Node == null)
+            return;
+
+        SelectedNodeId = Node.Id;
+
+        if (OnSelect.HasDelegate)
+            await OnSelect.InvokeAsync(Node);
+    }
+
+    private void ToggleExpand()
+    {
+        if (Node == null)
+            return;
+
+        Node.IsExpanded = !Node.IsExpanded;
+    }
+}

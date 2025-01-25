@@ -1,0 +1,25 @@
+﻿@using Inventory.Components.ComponentTreeView
+
+<div>
+    @if (Nodes != null && Nodes.Any())
+    {
+        <ul class="list-group p-0">
+            @foreach (var node in Nodes)
+            {
+                <CascadingValue Value="selectedNodeId">
+                    <TreeNodeBase Node="node" OnSelect="OnSelect" />
+                </CascadingValue>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<TreeItem>? Nodes { get; set; }
+
+    [Parameter]
+    public EventCallback<TreeItem> OnSelect { get; set; }
+
+    private string selectedNodeId = string.Empty;
+}

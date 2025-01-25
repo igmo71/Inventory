@@ -8,7 +8,18 @@ namespace Inventory.Components.ComponentTreeViewBase
         {
             var rootNodes = new List<TreeItem>();
 
-            var lookup = items.ToDictionary(k => k.Id!, v => v);
+            var lookup = items.ToDictionary(e => e.Id, e => e);
+
+            foreach (var item in items)
+            {
+                if (item.ParentId is null)
+                    rootNodes.Add(lookup[item.Id]);
+                else if (lookup.TryGetValue(item.ParentId, out var parentNode))
+                {
+                    parentNode.Children ??= [];
+                    parentNode.Children.Add(item);
+                }
+            }
 
             return rootNodes;
         }

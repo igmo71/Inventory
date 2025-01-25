@@ -1,7 +1,9 @@
 ﻿@page "/locations/edit"
-@using Inventory.Application
+
+@using Inventory.Application.LocationServices
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
+
 @inject NavigationManager NavigationManager
 @inject ILocationService Service
 
@@ -34,7 +36,7 @@ else
                     <label for="isfolder" class="form-label">Это Папка:</label>
                     <InputCheckbox id="isfolder" @bind-Value="Location.IsFolder" class="form-check-input" />
                     <ValidationMessage For="() => Location.IsFolder" class="text-danger" />
-                </div>                
+                </div>
                 <div class="mb-3">
                     <label for="parentid" class="form-label">Родительская Локация:</label>
                     <InputSelect id="parentid" @bind-Value="Location.ParentId" class="form-control">
@@ -79,13 +81,20 @@ else
     private async Task GetLocations()
     {
         var locationsResult = await Service.GetList();
+
         if (locationsResult.IsSuccess)
             locations = locationsResult.Value;
     }
 
     private async Task UpdateLocation()
     {
-        await Service.Update(Location!);
+        if (Location is null)
+            return;
+
+        if (string.IsNullOrEmpty(Location.ParentId))
+            Location.ParentId = null;
+
+        await Service.Update(Location);
 
         NavigationManager.NavigateTo("/locations");
     }

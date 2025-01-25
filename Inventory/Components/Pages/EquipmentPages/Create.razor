@@ -1,7 +1,9 @@
 ﻿@page "/equipment/create"
+
 @using Inventory.Application
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
+
 @inject NavigationManager NavigationManager
 @inject IEquipmentService Service
 
@@ -49,10 +51,10 @@
 
 @code {
     [SupplyParameterFromQuery]
-    private string? Id { get; set; }
+    private string? ParentId { get; set; }
 
     [SupplyParameterFromForm]
-    private Equipment Equipment { get; set; } = new();
+    private Equipment Equipment { get; set; } = new() { Id = Guid.CreateVersion7().ToString() };
 
     private List<Equipment> equipmentFolders = new();
 
@@ -60,8 +62,8 @@
     {
         equipmentFolders = await Service.GetFolders();
 
-        if (Id != null)
-            Equipment.ParentId = Id;
+        if (ParentId != null)
+            Equipment.ParentId = ParentId;
     }
 
     private async Task AddEquipment()

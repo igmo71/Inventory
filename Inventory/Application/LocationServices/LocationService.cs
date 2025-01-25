@@ -56,7 +56,6 @@ namespace Inventory.Application.LocationServices
         public async Task<string> Create(Location location)
         {
             using var context = _dbFactory.CreateDbContext();
-            //location.Id = Guid.CreateVersion7().ToString();
             context.Locations.Add(location);
             await context.SaveChangesAsync();
             return location.Id;

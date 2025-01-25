@@ -1,8 +1,10 @@
 ﻿@page "/locations"
-@using Inventory.Application
+
+@using Inventory.Application.LocationServices
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.QuickGrid
+
 @inject ILocationService Service
 
 @attribute [Authorize]

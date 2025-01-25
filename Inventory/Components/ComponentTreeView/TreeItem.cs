@@ -6,6 +6,7 @@
 
         public string? Value { get; set; }
 
+        public string? ParentId { get; set; }
         public TreeItem? Parent { get; set; }
 
         public List<TreeItem>? Children { get; set; }

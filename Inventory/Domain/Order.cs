@@ -4,7 +4,7 @@ namespace Inventory.Domain
 {
     public class Order
     {
-        public string? Id { get; set; }
+        public required string Id { get; set; }
 
         public DateTime DateTime { get; set; }
 

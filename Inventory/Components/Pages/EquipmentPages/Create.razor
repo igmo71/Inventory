@@ -34,7 +34,8 @@
                 <label for="parentid" class="form-label">В Папке:</label>
                 <InputSelect id="parentid" @bind-Value="Equipment.ParentId" class="form-control">
                     <option value="">- Выберите -</option>
-                    @foreach (var folder in equipmentFolders){
+                    @foreach (var folder in equipmentFolders)
+                    {
                         <option value="@folder.Id">@folder.Name</option>
                     }
                 </InputSelect>
@@ -46,7 +47,7 @@
 </div>
 
 <div>
-    <a href="/equipment/t">Назад к Списку</a>
+    <a href="/equipment">Назад к Списку</a>
 </div>
 
 @code {
@@ -70,6 +71,6 @@
     {
         string id = await Service.Create(Equipment);
 
-        NavigationManager.NavigateTo("/equipment/t");
+        NavigationManager.NavigateTo("/equipment");
     }
 }

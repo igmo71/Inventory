@@ -51,7 +51,7 @@
 
 @code {
     [SupplyParameterFromForm]
-    private MaterialOrder MaterialOrder { get; set; } = new();
+    private MaterialOrder MaterialOrder { get; set; } = new() { Id = Guid.CreateVersion7().ToString() };
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddMaterialOrder()

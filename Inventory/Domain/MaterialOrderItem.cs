@@ -2,7 +2,7 @@
 {
     public class MaterialOrderItem
     {
-        public string? Id { get; set; }
+        public required string Id { get; set; }
 
         public MaterialOrder? Order { get; set; }
         public string? OrderId { get; set; }

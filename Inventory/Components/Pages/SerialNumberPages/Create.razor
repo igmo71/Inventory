@@ -48,7 +48,7 @@
 
 @code {
     [SupplyParameterFromForm]
-    private SerialNumber SerialNumber { get; set; } = new();
+    private SerialNumber SerialNumber { get; set; } = new() { Id = Guid.CreateVersion7().ToString() };
 
     private List<Equipment> equipment = new();
 

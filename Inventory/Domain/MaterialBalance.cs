@@ -4,7 +4,7 @@ namespace Inventory.Domain
 {
     public class MaterialBalance
     {
-        public string? Id { get; set; }
+        public required string Id { get; set; }
 
         public ApplicationUser? Assignee { get; set; }
         public string? AssigneeId { get; set; }

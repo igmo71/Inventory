@@ -1,386 +1,60 @@
 ﻿@page "/equipment"
-
 @using Inventory.Application
-@using Inventory.Components.ComponentModalDialog
-@using Inventory.Components.ComponentTreeView
-@using Inventory.Components.Icons
 @using Inventory.Domain
-
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.QuickGrid
 @inject IEquipmentService Service
-@inject ISerialNumberService SerialNumberService
 
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
-@using System.Text.Json
-@using System.Text.Json.Serialization
-@inject ProtectedSessionStorage ProtectedSessionStore
+@attribute [Authorize]
 
 <PageTitle>Оборудование</PageTitle>
 
 <h1>Оборудование</h1>
 
 <p>
-    <a href="equipment/t">Таблица</a>
+    <a href="equipment/tree">Дерево</a>
 </p>
 
-<div class="row">
-    <div class="col-md-7">
-        <div class="d-flex flex-row mb-1">
-            <div class="d-inline-flex ms-auto">
-                <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
-                        @onclick="() => OpenCreateDialog()">
-                    <PlusLgIcon /><span> Создать </span>
-                </button>
-            </div>
-        </div>
-        <TreeView TreeItems="treeItems">
-            <TreeItemTemplate Context="treeItem">
-                <div class="d-flex flex-row @(treeItem == selectedTreeItem ? "bg-body-secondary" : string.Empty)">
-                    <div class="btn" @onclick="() => ExpandItem(treeItem)">
-                        <TreeIcons TreeItem="treeItem" />
-                    </div>
-                    <div class="btn text-start" @onclick="() => SelectItem(treeItem)">
-                        @treeItem.Value
-                    </div>
-                    <div class="ms-auto">
-                        <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
-                                @onclick="() => OpenCreateDialog(treeItem)">
-                            <PlusLgIcon />
-                        </button>
-                        <div class="btn-group">
-                            <button class="btn btn-outline-success" @onclick="() => OpenEditDialog(treeItem)" title="Изменить"><PencilIcon /></button>
-                            <button class="btn btn-outline-danger" @onclick="() => OpenDeleteDialog(treeItem)" title="Удалить"><Trash3Icon /></button>
-                        </div>
-                    </div>
-                </div>
-            </TreeItemTemplate>
-        </TreeView>
-    </div>
-    <div class="col-md-5">
-        @if (selectedTreeItem is not null)
-        {
-            <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
-                <div class="card-body">
-                    <div><b>@selectedTreeItem?.Value</b></div>
-                    <div>
-                        @if (serialNumbers is not null && serialNumbers.Count > 0)
-                        {
-                            <table class="table table-hover table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Серийный Номер</th>
-                                        <th>Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var serialNumber in serialNumbers)
-                                    {
-                                        <tr>
-                                            <td>@serialNumber.Number</td>
-                                            <td>
-                                                @if (serialNumber.IsAssigned)
-                                                {
-                                                    <a href="equipmentorders?equipmentId=@(selectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
-                                                        <Check2CircleIcon />
-                                                        <span> Выдано </span>
-                                                    </a>
+<p>
+    <a href="equipment/create">Создать</a>
+</p>
 
-                                                }
-                                                else
-                                                {
-                                                    <a href="equipmentorders/create?equipmentId=@(selectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
-                                                        <ReplyIcon />
-                                                        <span> Выдать </span>
-                                                    </a>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-</div>
-
-<ModalDialog @ref="@createDialog" Title="Создать Оборудование">
-    <ModalBody>
-        <CreateEuipmentForm ParentEquipment="parentEquipment" OnCreate="OnCreate" />
-    </ModalBody>
-</ModalDialog>
-
-<ModalDialog @ref="@editDialog" Title="Удалить Оборудование">
-    <ModalBody>
-        <EditEquipmentForm Equipment="editEquipment" Folders="folders" OnUpdate="OnEdit" />
-    </ModalBody>
-</ModalDialog>
-
-<ModalDialog @ref="@deleteDialog" Title="Удалить Оборудование">
-    <ModalBody>
-        <DeleteEquipmentForm Equipment="deleteEquipment" OnDelete="OnDelete" />
-    </ModalBody>
-</ModalDialog>
-
-<ModalDialog @ref="@errorDialog" Title="Ошибка">
-    <ModalBody>
-        <div class="alert alert-danger">
-            @errorMessage
-        </div>
-    </ModalBody>
-</ModalDialog>
+<QuickGrid Class="table" ItemsProvider="itemsProvider">
+    <PropertyColumn Property="equipment => equipment.Name" Title="Наименование" />
+    <PropertyColumn Property="equipment => equipment.IsFolder" Title="Это Папка" />
+    <TemplateColumn Context="equipment" Title="Родительская Папка!">
+        <HeaderTemplate>
+            <th>Родительская Папка</th>
+        </HeaderTemplate>
+        <ChildContent>
+            <span> @equipment.Parent?.Name</span>
+        </ChildContent>
+    </TemplateColumn>
+    <TemplateColumn Context="equipment">
+        <a href="@($"equipment/edit?id={equipment.Id}")">Изменить</a> |
+        <a href="@($"equipment/details?id={equipment.Id}")">Детали</a> |
+        <a href="@($"equipment/delete?id={equipment.Id}")">Удалить</a>
+    </TemplateColumn>
+</QuickGrid>
 
 @code {
-    private List<TreeItem>? treeItems;
-    private List<Equipment>? folders;
-    private List<SerialNumber>? serialNumbers;
+    GridItemsProvider<Equipment>? itemsProvider;
 
-    private TreeItem? selectedTreeItem;
-    private TreeItem? parentTreeItem;
-    private Equipment? parentEquipment;
-    private Equipment? editEquipment;
-    private Equipment? deleteEquipment;
-
-    private ModalDialog? createDialog;
-    private ModalDialog? editDialog;
-    private ModalDialog? deleteDialog;
-    private ModalDialog? errorDialog;
-    private string? errorMessage;
-
-    private JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+    protected override void OnInitialized()
+    {
+        itemsProvider = async request =>
         {
-            ReferenceHandler = ReferenceHandler.Preserve,
-            MaxDepth = 16
+            var result = await Service.GetList(request.StartIndex, request.Count, isIncludeParent: true);
+
+            if (!result.IsSuccess || result.Value is null)
+                return default;
+
+            var response = GridItemsProviderResult.From(
+                items: result.Value,
+                totalItemCount: result.Total
+            );
+
+            return response;
         };
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            var browserTreeItems = await ProtectedSessionStore.GetAsync<string>(nameof(treeItems));
-            if (browserTreeItems.Success)
-            {
-                if (browserTreeItems.Value is not null)
-                {
-                    string treeItemsString = browserTreeItems.Value;
-                    treeItems = JsonSerializer.Deserialize<List<TreeItem>?>(treeItemsString, jsonOptions);
-                }
-            }
-            else
-                await GetItems();
-
-            var browserSelectedTreeItem = await ProtectedSessionStore.GetAsync<string>(nameof(selectedTreeItem));
-            if (browserSelectedTreeItem.Success)
-            {
-                if (browserSelectedTreeItem.Value is not null)
-                {
-                    string selectedTreeItemString = browserSelectedTreeItem.Value;
-                    selectedTreeItem = JsonSerializer.Deserialize<TreeItem?>(selectedTreeItemString, jsonOptions);
-                    if (selectedTreeItem is not null)
-                    {
-                        var listResult = await SerialNumberService.GetList(equipmentId: selectedTreeItem.Id);
-                        serialNumbers = listResult.Value;
-                    }
-                }
-            }
-        }
-        catch (Exception)
-        {
-            await GetItems();
-        }
-
-        await GetFolders();
-    }
-
-    private async Task GetItems(TreeItem? treeItem = null)
-    {
-        List<Equipment>? equipment;
-
-        if (treeItem is null)
-        {
-            equipment = await Service.GetListWithoutParents();
-
-            treeItems = From(equipment);
-        }
-        else if (treeItem.IsExpanded)
-        {
-            var listResult = await Service.GetList(isIncludeParent: true, parentId: treeItem.Id);
-
-            if (!listResult.IsSuccess)
-                return;
-
-            equipment = listResult.Value;
-
-            treeItem.Children = From(equipment);
-
-            foreach (var child in treeItem.Children)
-                child.Parent = treeItem;
-        }
-        else
-        {
-            treeItem.Children = null;
-        }
-
-        if (treeItems is not null)
-        {
-            try
-            {
-                string treeItemsString = JsonSerializer.Serialize(treeItems, jsonOptions);
-                await ProtectedSessionStore.SetAsync(nameof(treeItems), treeItemsString);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-    }
-
-    private List<TreeItem> From(List<Equipment> equipment)
-    {
-        return equipment.Select(e => new TreeItem
-            {
-                Id = e.Id,
-                Value = e.Name,
-                IsFolder = e.IsFolder
-            })
-        .ToList();
-    }
-
-    private async Task GetFolders()
-    {
-        folders = await Service.GetFolders();
-    }
-
-    private async Task ExpandItem(TreeItem treeItem)
-    {
-        treeItem.IsExpanded = !treeItem.IsExpanded;
-
-        await GetItems(treeItem);
-    }
-
-    private async Task SelectItem(TreeItem treeItem)
-    {
-        selectedTreeItem = treeItem;
-
-        var listResult = await SerialNumberService.GetList(equipmentId: treeItem.Id);
-
-        serialNumbers = listResult.Value;
-
-        try
-        {
-            string selectedTreeItemString = JsonSerializer.Serialize(selectedTreeItem, jsonOptions);
-            await ProtectedSessionStore.SetAsync(nameof(selectedTreeItem), selectedTreeItemString);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
-
-    private void OpenCreateDialog(TreeItem? treeItem = null)
-    {
-        parentTreeItem = treeItem;
-
-        parentEquipment = treeItem is null ? null : new Equipment
-            {
-                Id = treeItem.Id,
-                Name = treeItem.Value,
-                IsFolder = treeItem.IsFolder
-            };
-
-        createDialog?.Open();
-    }
-
-    private async Task OnCreate(Equipment equipment)
-    {
-        var id = await Service.Create(equipment);
-
-        if (parentTreeItem is null)
-        {
-            await GetItems();
-
-            if (treeItems is not null)
-                selectedTreeItem = treeItems.FirstOrDefault(e => e.Id == id);
-        }
-        else
-        {
-            parentTreeItem.IsExpanded = true;
-
-            await GetItems(parentTreeItem);
-
-            if (parentTreeItem.Children is not null)
-                selectedTreeItem = parentTreeItem.Children.FirstOrDefault(e => e.Id == id);
-        }
-
-        createDialog?.Close();
-    }
-
-    private async Task OpenEditDialog(TreeItem? treeItem)
-    {
-        if (treeItem is null)
-            return;
-
-        selectedTreeItem = treeItem;
-        parentTreeItem = treeItem.Parent;
-
-        if (parentTreeItem is not null)
-            parentTreeItem.IsExpanded = true;
-
-        editEquipment = await Service.Get(treeItem.Id!, isIncludeParent: false);
-
-        editDialog?.Open();
-    }
-
-    private async Task OnEdit(Equipment equipment)
-    {
-        await Service.Update(equipment);
-
-        await GetItems(parentTreeItem);
-
-        editDialog?.Close();
-    }
-
-    private async Task OpenDeleteDialog(TreeItem? treeItem)
-    {
-        if (treeItem is null)
-            return;
-
-        parentTreeItem = treeItem.Parent;
-
-        if (parentTreeItem is not null)
-            parentTreeItem.IsExpanded = true;
-
-        deleteEquipment = await Service.Get(treeItem.Id!, isIncludeParent: true);
-
-        if (deleteEquipment is null)
-            return;
-
-        treeItem = null;
-
-        deleteDialog?.Open();
-    }
-
-    private async Task OnDelete(Equipment equipment)
-    {
-        try
-        {
-            await Service.Delete(equipment);
-
-            await GetItems(parentTreeItem);
-
-            selectedTreeItem = parentTreeItem;
-        }
-        catch (Exception ex)
-        {
-            errorMessage = ex.Message;
-            if (ex.InnerException is not null)
-                errorMessage = ex.InnerException.Message;
-            errorDialog?.Open();
-        }
-        finally
-        {
-            deleteDialog?.Close();
-        }
     }
 }

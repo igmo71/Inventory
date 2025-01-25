@@ -2,7 +2,7 @@
 {
     public class SerialNumber
     {
-        public string? Id { get; set; }
+        public required string Id { get; set; }
 
         public Equipment? Equipment { get; set; }
         public string? EquipmentId { get; set; }

@@ -75,7 +75,6 @@ namespace Inventory.Application
         public async Task<string> Create(SerialNumber serialNumber)
         {
             using var context = _dbFactory.CreateDbContext();
-            serialNumber.Id = Guid.CreateVersion7().ToString();
             context.SerialNumbers.Add(serialNumber);
             await context.SaveChangesAsync();
             return serialNumber.Id;

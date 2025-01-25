@@ -115,7 +115,7 @@
     public string? SerialNumberId { get; set; }
 
     [SupplyParameterFromForm]
-    private EquipmentOrder EquipmentOrder { get; set; } = new();
+    private EquipmentOrder EquipmentOrder { get; set; } = new() { Id = Guid.CreateVersion7().ToString() };
 
     private List<Equipment> equipment = new();
     private List<SerialNumber> serialNumbers = new();

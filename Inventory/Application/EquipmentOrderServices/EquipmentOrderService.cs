@@ -87,7 +87,6 @@ namespace Inventory.Application.EquipmentOrderServices
         public async Task<string> Create(EquipmentOrder equipmentOrder)
         {
             using var context = _dbFactory.CreateDbContext();
-            equipmentOrder.Id = Guid.CreateVersion7().ToString();
             context.EquipmentOrders.Add(equipmentOrder);
             await context.SaveChangesAsync();
             return equipmentOrder.Id;

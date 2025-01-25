@@ -115,7 +115,6 @@ namespace Inventory.Application
         public async Task<string> Create(Equipment equipment)
         {
             using var context = _dbFactory.CreateDbContext();
-            equipment.Id = Guid.CreateVersion7().ToString();
             context.Equipment.Add(equipment);
             await context.SaveChangesAsync();
             return equipment.Id;

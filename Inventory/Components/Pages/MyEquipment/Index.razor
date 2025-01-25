@@ -107,6 +107,6 @@
     {
         var authstate = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         applicationUser = await UserManager.GetUserAsync(authstate.User);
-        filterParameters.assignee = applicationUser?.Id;
+        filterParameters.assigneeId = applicationUser?.Id;
     }
 }

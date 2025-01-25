@@ -3,9 +3,8 @@ using Inventory.Common.Results;
 using Inventory.Data;
 using Inventory.Domain;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace Inventory.Application
+namespace Inventory.Application.LocationServices
 {
     public interface ILocationService
     {
@@ -57,7 +56,7 @@ namespace Inventory.Application
         public async Task<string> Create(Location location)
         {
             using var context = _dbFactory.CreateDbContext();
-            location.Id = Guid.CreateVersion7().ToString();
+            //location.Id = Guid.CreateVersion7().ToString();
             context.Locations.Add(location);
             await context.SaveChangesAsync();
             return location.Id;

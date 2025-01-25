@@ -23,9 +23,9 @@
     <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" Format="dd.MM.yyyy" Title="Дата">
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty" Title="Оборудование">
-        <ColumnOptions >
+        <ColumnOptions>
             <div class="search-box">
-                <input class="form-control" type="search" autofocus value="@filterParameters.equipment" @oninput="OnInputEquipmentFilter" placeholder="Оборудование..." />
+                <input class="form-control" type="search" autofocus value="@filterParameters.equipmentName" @oninput="OnInputEquipmentFilter" placeholder="Оборудование..." />
             </div>
         </ColumnOptions>
     </PropertyColumn>
@@ -39,14 +39,14 @@
     <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" Title="Ответственный">
         <ColumnOptions>
             <div class="search-box">
-                <input class="form-control" type="search" autofocus value="@filterParameters.assignee" @oninput="OnInputAssigneeFilter" placeholder="Ответственный..." />
+                <input class="form-control" type="search" autofocus value="@filterParameters.assigneeName" @oninput="OnInputAssigneeFilter" placeholder="Ответственный..." />
             </div>
         </ColumnOptions>
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" Title="Локация">
         <ColumnOptions>
             <div class="search-box">
-                <input class="form-control" type="search" autofocus value="@filterParameters.location" @oninput="OnInputLocationFilter" placeholder="Локация..." />
+                <input class="form-control" type="search" autofocus value="@filterParameters.locationName" @oninput="OnInputLocationFilter" placeholder="Локация..." />
             </div>
         </ColumnOptions>
     </PropertyColumn>
@@ -64,16 +64,28 @@
 </QuickGrid>
 
 @code {
+    [SupplyParameterFromQuery]
+    public string? EquipmentId { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? SerialNumberId { get; set; }
+
     GridItemsProvider<EquipmentOrder>? itemsProvider;
 
     QuickGrid<EquipmentOrder>? grid;
-    
+
     int numResults;
 
     EquipmentOrderFilterParameters filterParameters;
 
     protected override void OnInitialized()
     {
+        if (EquipmentId != null)
+            filterParameters.equipmentId = EquipmentId;
+
+        if (SerialNumberId != null)
+            filterParameters.serialNumberId = SerialNumberId;
+
         itemsProvider = async request =>
          {
              var result = await Service.GetList(request,
@@ -104,7 +116,7 @@
 
     void OnInputEquipmentFilter(ChangeEventArgs e)
     {
-        filterParameters.equipment = e.Value?.ToString() ?? string.Empty;
+        filterParameters.equipmentName = e.Value?.ToString() ?? string.Empty;
         grid!.RefreshDataAsync();
     }
 
@@ -116,13 +128,13 @@
 
     void OnInputAssigneeFilter(ChangeEventArgs e)
     {
-        filterParameters.assignee = e.Value?.ToString() ?? string.Empty;
+        filterParameters.assigneeName = e.Value?.ToString() ?? string.Empty;
         grid!.RefreshDataAsync();
     }
 
     void OnInputLocationFilter(ChangeEventArgs e)
     {
-        filterParameters.location = e.Value?.ToString() ?? string.Empty;
+        filterParameters.locationName = e.Value?.ToString() ?? string.Empty;
         grid!.RefreshDataAsync();
     }
 }

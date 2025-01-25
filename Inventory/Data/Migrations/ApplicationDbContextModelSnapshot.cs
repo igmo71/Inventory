@@ -112,7 +112,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Equipment");
+                    b.ToTable("Equipment", (string)null);
                 });
 
             modelBuilder.Entity("Inventory.Domain.Location", b =>
@@ -136,7 +136,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("Inventory.Domain.Material", b =>
@@ -160,7 +160,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Materials");
+                    b.ToTable("Materials", (string)null);
                 });
 
             modelBuilder.Entity("Inventory.Domain.MaterialBalance", b =>
@@ -192,7 +192,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("MaterialId");
 
-                    b.ToTable("MaterialBalances");
+                    b.ToTable("MaterialBalances", (string)null);
                 });
 
             modelBuilder.Entity("Inventory.Domain.MaterialOrderItem", b =>
@@ -218,7 +218,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("MaterialOrderItems");
+                    b.ToTable("MaterialOrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Inventory.Domain.MaterialTurnover", b =>
@@ -268,7 +268,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("MaterialTurnovers");
+                    b.ToTable("MaterialTurnovers", (string)null);
                 });
 
             modelBuilder.Entity("Inventory.Domain.Order", b =>
@@ -312,7 +312,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
 
                     b.HasDiscriminator().HasValue("Order");
 
@@ -340,7 +340,7 @@ namespace Inventory.Migrations
 
                     b.HasIndex("EquipmentId");
 
-                    b.ToTable("SerialNumbers");
+                    b.ToTable("SerialNumbers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

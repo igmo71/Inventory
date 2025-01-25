@@ -2,9 +2,13 @@
 {
     public struct EquipmentOrderFilterParameters
     {
-        public string? equipment;
+        public string? equipmentId;
+        public string? equipmentName;
+        public string? serialNumberId;
         public string? serialNumber;
-        public string? assignee;
-        public string? location;
+        public string? assigneeId;
+        public string? assigneeName;
+        public string? locationId;
+        public string? locationName;
     }
 }

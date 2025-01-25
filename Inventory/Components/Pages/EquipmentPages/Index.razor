@@ -23,7 +23,7 @@
 </p>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-7">
         <div class="d-flex flex-row mb-1">
             <div class="d-inline-flex ms-auto">
                 <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
@@ -55,7 +55,7 @@
             </TreeItemTemplate>
         </TreeView>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-5">
         @if (selectedTreeItem is not null)
         {
             <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
@@ -79,11 +79,18 @@
                                             <td>
                                                 @if (serialNumber.IsAssigned)
                                                 {
-                                                    <span>Выдано</span>
+                                                    <a href="equipmentorders?equipmentId=@(selectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
+                                                        <Check2CircleIcon />
+                                                        <span> Выдано </span>
+                                                    </a>
+
                                                 }
                                                 else
                                                 {
-                                                    <a href="equipmentorders/create?equipmentId=@(selectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">Выдать</a>
+                                                    <a href="equipmentorders/create?equipmentId=@(selectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
+                                                        <ReplyIcon />
+                                                        <span> Выдать </span>
+                                                    </a>
                                                 }
                                             </td>
                                         </tr>
@@ -170,7 +177,8 @@
                 {
                     string selectedTreeItemString = browserSelectedTreeItem.Value;
                     selectedTreeItem = JsonSerializer.Deserialize<TreeItem?>(selectedTreeItemString, jsonOptions);
-                    if (selectedTreeItem is not null){
+                    if (selectedTreeItem is not null)
+                    {
                         var listResult = await SerialNumberService.GetList(equipmentId: selectedTreeItem.Id);
                         serialNumbers = listResult.Value;
                     }

@@ -27,11 +27,23 @@ namespace Inventory.Application.EquipmentOrderServices
 
         public static IQueryable<EquipmentOrder> PerformFilter(this IQueryable<EquipmentOrder> query, EquipmentOrderFilterParameters filterParameters)
         {
-            if (filterParameters.equipment is not null)
+            if (filterParameters.equipmentId is not null)
+                query = query.Where(e =>
+                    e.Equipment != null &&
+                    e.Equipment.Id != null &&
+                    e.Equipment.Id == filterParameters.equipmentId);
+
+            if (filterParameters.equipmentName is not null)
                 query = query.Where(e =>
                     e.Equipment != null &&
                     e.Equipment.Name != null &&
-                    e.Equipment.Name.Contains(filterParameters.equipment));
+                    e.Equipment.Name.Contains(filterParameters.equipmentName));
+
+            if (filterParameters.serialNumberId is not null)
+                query = query.Where(e =>
+                    e.SerialNumber != null &&
+                    e.SerialNumber.Id != null &&
+                    e.SerialNumber.Id == filterParameters.serialNumberId);
 
             if (filterParameters.serialNumber is not null)
                 query = query.Where(e =>
@@ -39,17 +51,30 @@ namespace Inventory.Application.EquipmentOrderServices
                     e.SerialNumber.Number != null &&
                     e.SerialNumber.Number.Contains(filterParameters.serialNumber));
 
-            if (filterParameters.assignee is not null)
+            if (filterParameters.assigneeId is not null)
+                query = query.Where(e =>
+                    e.Assignee != null &&
+                    e.Assignee.Id != null &&
+                    e.Assignee.Id == filterParameters.assigneeId);
+
+            if (filterParameters.assigneeName is not null)
                 query = query.Where(e =>
                     e.Assignee != null &&
                     e.Assignee.Name != null &&
-                    (e.Assignee.Name.Contains(filterParameters.assignee) || e.Assignee.Id == filterParameters.assignee));
+                    (e.Assignee.Name.Contains(filterParameters.assigneeName) || e.Assignee.Id == filterParameters.assigneeName));
 
-            if (filterParameters.location is not null)
+
+            if (filterParameters.locationId is not null)
+                query = query.Where(e =>
+                    e.Location != null &&
+                    e.Location.Id != null &&
+                    e.Location.Id == filterParameters.locationId);
+
+            if (filterParameters.locationName is not null)
                 query = query.Where(e =>
                     e.Location != null &&
                     e.Location.Name != null &&
-                    e.Location.Name.Contains(filterParameters.location));
+                    e.Location.Name.Contains(filterParameters.locationName));
 
             return query;
         }

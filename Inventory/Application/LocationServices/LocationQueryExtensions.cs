@@ -7,10 +7,11 @@ namespace Inventory.Application.LocationServices
     {
         public static IQueryable<Location> HandleRequest(this IQueryable<Location> query, GridItemsProviderRequest<Location> request)
         {
+
             if (request.StartIndex > 0)
                 query = query.Skip(request.StartIndex);
 
-            if (request.Count is not null)
+            if (request.Count != null)
                 query = query.Take((int)request.Count);
 
             return query;

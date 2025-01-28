@@ -177,9 +177,7 @@
 
     private async Task GetLocations()
     {
-        var locationsResult = await LocationService.GetList(0, null);
-        if (locationsResult.IsSuccess)
-            locations = locationsResult.Value;
+        var locations = await LocationService.GetList();
     }
 
     private async Task GetApplicationUser(){

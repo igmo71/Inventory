@@ -1,4 +1,5 @@
-﻿using Inventory.Common;
+﻿using Azure.Core;
+using Inventory.Common;
 using Inventory.Common.Results;
 using Inventory.Data;
 using Inventory.Domain;
@@ -10,6 +11,7 @@ namespace Inventory.Application.LocationServices
     public interface ILocationService
     {
         Task<ListResult<Location>> GetList(GridItemsProviderRequest<Location> request, bool isIncludeParent = false);
+        Task<List<Location>> GetList(bool isIncludeParent = false);
         Task<Location?> Get(string id, bool isIncludeParent = false);
         Task<string> Create(Location location);
         Task<Result> Update(Location location);
@@ -24,8 +26,9 @@ namespace Inventory.Application.LocationServices
         public async Task<ListResult<Location>> GetList(GridItemsProviderRequest<Location> request, bool isIncludeParent = false)
         {
             using var context = _dbFactory.CreateDbContext();
-            var query = context.Locations.AsNoTracking()
-                .HandleRequest(request);           
+            var query = context.Locations.AsNoTracking();
+
+            query = query.HandleRequest(request);
 
             if (isIncludeParent)
                 query = query.Include(e => e.Parent);
@@ -34,6 +37,19 @@ namespace Inventory.Application.LocationServices
             var total = context.Locations.Count();
 
             return ListResult<Location>.Success(result, total);
+        }
+
+        public async Task<List<Location>> GetList(bool isIncludeParent = false)
+        {
+            using var context = _dbFactory.CreateDbContext();
+            var query = context.Locations.AsNoTracking();
+
+            if (isIncludeParent)
+                query = query.Include(e => e.Parent);
+
+            var result = await query.ToListAsync();
+
+            return result;
         }
 
         public async Task<Location?> Get(string id, bool isIncludeParent = false)

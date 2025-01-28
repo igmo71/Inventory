@@ -3,9 +3,12 @@
 @using Inventory.Application.LocationServices
 @using Inventory.Components.ComponentTreeView
 @using Inventory.Components.ComponentTreeViewBase
+@using Inventory.Components.Icons
 @using Inventory.Domain
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
 @inject ILocationService Service
+@inject ProtectedSessionStorage ProtectedSessionStorage
 
 <h1>Локации</h1>
 
@@ -13,31 +16,85 @@
     <a href="locations">Таблица</a>
 </p>
 
-<TreeViewBase Nodes="treeItems" OnSelect="HandleSelect" />
-
-<div>
-    @selectedItem?.Value
-</div>
+@if (isConnected)
+{
+    <div class="row">
+        <div class="col">
+            <TreeViewBase TreeItems="treeItems" OnSelect="HandleSelect" @ref="treeView">
+                <TreeItemTemplate Context="treeItem">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-success" @onclick="() => OpenEditDialog(treeItem)" title="Изменить"><PencilIcon /></button>
+                        <button class="btn btn-outline-danger" @onclick="() => OpenDeleteDialog(treeItem)" title="Удалить"><Trash3Icon /></button>
+                    </div>
+                </TreeItemTemplate>
+            </TreeViewBase>
+        </div>
+        <div class="col"></div>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
 
 @code {
+    private List<Location>? locations;
+    private List<TreeItem>? itemsList;
     private List<TreeItem>? treeItems;
-    private TreeItem? selectedItem;
+    private TreeViewBase? treeView;
+    private bool isConnected;
+
+    public string? selectedTreeItemId;
+    public List<string>? expandedTreeItems;
 
     protected override async Task OnInitializedAsync()
     {
-        await GetItems();
+        await GetLocations();
+        GetItemsList();
     }
 
-    private async Task GetItems(TreeItem? treeItem = null)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var listResult = await Service.GetList(isIncludeParent: true);
+        if (firstRender)
+        {
+            isConnected = true;
+            await LoadTreeStateAsync();
 
-        if (!listResult.IsSuccess)
-            return;
+            if (ExpandedTreeItems != null)
+            {
+                List<TreeItem>? expandedItems = itemsList?
+                    .Where(e => ExpandedTreeItems.Contains(e.Id))
+                    .ToList();
 
-        var locations = listResult.Value;
+                if (expandedItems != null)
+                    foreach (var item in expandedItems)
+                        item.IsExpanded = true;
+            }
+            if (itemsList != null)
+                treeItems = TreeBuilder.Build(itemsList);
 
-        treeItems = From(locations);
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadTreeStateAsync()
+    {
+        var expandedTreeItemsResult = await ProtectedSessionStorage.GetAsync<List<string>?>(nameof(ExpandedTreeItems));
+
+        if (expandedTreeItemsResult.Success)
+            ExpandedTreeItems = expandedTreeItemsResult.Value;
+    }
+
+    private async Task GetLocations()
+    {
+        locations = await Service.GetList(isIncludeParent: true);
+    }
+
+    private void GetItemsList()
+    {
+        if (locations != null)
+            itemsList = From(locations);
     }
 
     private List<TreeItem> From(List<Location> locations)
@@ -50,12 +107,25 @@
                 ParentId = e.ParentId
             }).ToList();
 
-        var tree = TreeBuilder.Build(list);
+        //var tree = TreeBuilder.Build(list);
 
-        return tree;
+        return list;
     }
 
-    private void HandleSelect(TreeItem treeItem){
-        selectedItem = treeItem;
+    private void HandleSelect(TreeItem treeItem)
+    {
+        //selectedItem = treeItem;
+    }
+
+    private async Task OpenEditDialog(TreeItem? treeItem)
+    {
+        //selectedItem = treeItem;
+        //treeView?.SelectTreeItem(selectedItem);
+    }
+
+    private async Task OpenDeleteDialog(TreeItem? treeItem)
+    {
+        //selectedItem = treeItem;
+        //treeView?.SelectTreeItem(selectedItem);
     }
 }

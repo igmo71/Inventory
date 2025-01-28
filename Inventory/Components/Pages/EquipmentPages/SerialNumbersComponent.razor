@@ -1,0 +1,63 @@
+﻿@using Inventory.Components.ComponentTreeView
+@using Inventory.Components.Icons
+@using Inventory.Domain
+@inject NavigationManager NavigationManager
+@if (SelectedTreeItem is not null)
+{
+    <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
+        <div class="card-body">
+            <div><b>@SelectedTreeItem.Value</b></div>
+            <div>
+                @if (SerialNumbers is not null && SerialNumbers.Count > 0)
+                {
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <span> Серийный Номер </span>
+                                    <a href="/serialnumbers/create?returnUrl=@(NavigationManager.Uri)&equipmentId=@(SelectedTreeItem.Id)" class="btn btn-outline-primary" title="Добавить Серийный Номер">
+                                        <PlusLgIcon />
+                                    </a>
+                                </th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var serialNumber in SerialNumbers)
+                            {
+                                <tr>
+                                    <td>@serialNumber.Number</td>
+                                    <td>
+                                        @if (serialNumber.IsAssigned)
+                                        {
+                                            <a href="equipmentorders?equipmentId=@(SelectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
+                                                <Check2CircleIcon />
+                                                <span> Выдано </span>
+                                            </a>
+
+                                        }
+                                        else
+                                        {
+                                            <a href="equipmentorders/create?equipmentId=@(SelectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
+                                                <ReplyIcon />
+                                                <span> Выдать </span>
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<SerialNumber>? SerialNumbers { get; set; }
+
+    [Parameter]
+    public TreeItem? SelectedTreeItem { get; set; }
+}

@@ -1,23 +1,32 @@
 ﻿@using Inventory.Components.ComponentTreeView
 @using Inventory.Components.Icons
 
-<li class="list-group-item pt-0 pb-0 border-0">
-    @if (Node != null)
+<li class="list-group-item border-0 pe-0 pb-0">
+    @if (TreeItem != null)
     {
-        <div>
-            <div class="btn" @onclick="ToggleExpand">
-                <TreeIcons TreeItem="Node" />
+        <div @onmouseover="SetBgColor" @onmouseout="ResetBgColor">
+            <div class="@bgColor">
+                <div class="d-flex flex-row @(TreeView?.SelectedTreeItemId == TreeItem.Id ? "bg-body-secondary" : string.Empty)">
+                    <div class="btn" @onclick="ToggleExpand">
+                        <TreeIcons TreeItem="TreeItem" />
+                    </div>
+                    <div class="btn text-start" @onclick="SelectNode">
+                        @TreeItem.Value
+                    </div>
+                    <div class="ms-auto">
+                        @TreeItemTemplate(TreeItem)
+                    </div>
+                </div>
             </div>
-            <span class="btn btn-outline-secondary text-start border-0 @(Node.Id == SelectedNodeId ? "active" : "")" @onclick="SelectNode">@Node.Value </span>
         </div>
-        @if (Node.IsExpanded && Node.Children != null && Node.Children.Any())
+        @if (TreeItem.IsExpanded && TreeItem.Children != null && TreeItem.Children.Any())
         {
             <ul class="list-group p-0">
-                @foreach (var child in Node.Children)
+                @foreach (var child in TreeItem.Children)
                 {
                     if (child != null)
                     {
-                        <TreeNodeBase Node="child" OnSelect="OnSelect" />
+                        <TreeNodeBase TreeItem="child" OnSelect="OnSelect" TreeItemTemplate="TreeItemTemplate" />
                     }
                 }
             </ul>
@@ -27,30 +36,41 @@
 
 @code {
     [Parameter]
-    public TreeItem? Node { get; set; }
+    public TreeItem? TreeItem { get; set; }
+
+    [Parameter]
+    public RenderFragment<TreeItem> TreeItemTemplate { get; set; } = default!;
 
     [Parameter]
     public EventCallback<TreeItem> OnSelect { get; set; }
 
     [CascadingParameter]
-    public string? SelectedNodeId { get; set; }
+    public TreeViewBase? TreeView { get; set; }
+
+    private string bgColor = string.Empty;
 
     private async Task SelectNode()
     {
-        if (Node == null)
+        if (TreeItem is null)
             return;
 
-        SelectedNodeId = Node.Id;
+        TreeView?.SelectTreeItem(TreeItem.Id);
 
         if (OnSelect.HasDelegate)
-            await OnSelect.InvokeAsync(Node);
+            await OnSelect.InvokeAsync(TreeItem);
     }
 
     private void ToggleExpand()
     {
-        if (Node == null)
+        if (TreeItem == null)
             return;
 
-        Node.IsExpanded = !Node.IsExpanded;
+        TreeItem.IsExpanded = !TreeItem.IsExpanded;
+
+        TreeView?.UpdateExpandedItems(TreeItem);
     }
+
+    private void SetBgColor() => bgColor = "bg-body-tertiary";
+
+    private void ResetBgColor() => bgColor = string.Empty;
 }

@@ -40,7 +40,7 @@
     {
         itemsProvider = async request =>
         {
-            var result = await Service.GetList(request.StartIndex, request.Count, isIncludeParent: true);
+            var result = await Service.GetList(request, isIncludeParent: true);
 
             if (!result.IsSuccess || result.Value is null)
                 return default;

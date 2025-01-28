@@ -1,25 +1,65 @@
 ﻿@using Inventory.Components.ComponentTreeView
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject ProtectedSessionStorage ProtectedSessionStorage
 
 <div>
-    @if (Nodes != null && Nodes.Any())
+    @if (TreeItems != null && TreeItems.Any())
     {
         <ul class="list-group p-0">
-            @foreach (var node in Nodes)
+            @foreach (var treeItem in TreeItems)
             {
-                <CascadingValue Value="selectedNodeId">
-                    <TreeNodeBase Node="node" OnSelect="OnSelect" />
+                <CascadingValue Value="this">
+                    <TreeNodeBase TreeItem="treeItem" OnSelect="OnSelect" TreeItemTemplate="TreeItemTemplate" />
                 </CascadingValue>
             }
         </ul>
     }
 </div>
+<div>
+    @if (ExpandedTreeItems != null)
+    {
+        foreach (var item in ExpandedTreeItems)
+        {
+            <div>@item?.Value</div>
+        }
+    }
+</div>
 
 @code {
     [Parameter]
-    public List<TreeItem>? Nodes { get; set; }
+    public List<TreeItem>? TreeItems { get; set; }
+
+    [Parameter]
+    public RenderFragment<TreeItem> TreeItemTemplate { get; set; } = default!;
 
     [Parameter]
     public EventCallback<TreeItem> OnSelect { get; set; }
 
-    private string selectedNodeId = string.Empty;
+    public TreeItem? SelectedTreeItem { get; private set; }
+    public List<TreeItem>? ExpandedTreeItems { get; private set; }
+
+    public async Task SelectTreeItem(TreeItem treeItem)
+    {
+        if (SelectedTreeItem != treeItem)
+        {
+            SelectedTreeItem = treeItem;
+
+            //await ProtectedSessionStorage.SetAsync(nameof(SelectedTreeItemId), SelectedTreeItemId);
+        }
+    }
+
+    public async Task UpdateExpandedItems(TreeItem treeItem)
+    {
+        ExpandedTreeItems ??= [];
+
+        if (treeItem.IsExpanded)
+            ExpandedTreeItems.Add(treeItem);
+        if (!treeItem.IsExpanded)
+            ExpandedTreeItems.Remove(treeItem);
+
+        await ProtectedSessionStorage.SetAsync(nameof(ExpandedTreeItems), ExpandedTreeItems.Select(e => e.Id));
+
+        StateHasChanged();
+    }
 }

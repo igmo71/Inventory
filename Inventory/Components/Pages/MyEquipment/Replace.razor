@@ -5,6 +5,7 @@
 @using Inventory.Application.EquipmentOrderServices
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.AspNetCore.Identity
 
 @inject NavigationManager NavigationManager
@@ -104,7 +105,7 @@ else
 
     private async Task GetLocations()
     {
-        var locationsResult = await LocationService.GetList(0, null);
+        var locationsResult = await LocationService.GetList(new GridItemsProviderRequest<Location>());
         if (locationsResult.IsSuccess)
             locations = locationsResult.Value;
     }

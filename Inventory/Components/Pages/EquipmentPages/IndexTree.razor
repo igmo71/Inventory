@@ -27,7 +27,7 @@
         <div class="d-flex flex-row mb-1">
             <div class="d-inline-flex ms-auto">
                 <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
-                @onclick="() => OpenCreateDialog()">
+                        @onclick="() => OpenCreateDialog()">
                     <PlusLgIcon /><span> Создать </span>
                 </button>
             </div>
@@ -43,7 +43,7 @@
                     </div>
                     <div class="ms-auto">
                         <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
-                        @onclick="() => OpenCreateDialog(treeItem)">
+                                @onclick="() => OpenCreateDialog(treeItem)">
                             <PlusLgIcon />
                         </button>
                         <div class="btn-group">
@@ -56,57 +56,7 @@
         </TreeView>
     </div>
     <div class="col-md-5">
-        @if (selectedTreeItem is not null)
-        {
-            <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
-                <div class="card-body">
-                    <div><b>@selectedTreeItem.Value</b></div>
-                    <div>
-                        @if (serialNumbers is not null && serialNumbers.Count > 0)
-                        {
-                            <table class="table table-hover table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <span> Серийный Номер </span>
-                                            <a href="/serialnumbers/create?returnUrl=@(NavigationManager.Uri)&equipmentId=@(selectedTreeItem.Id)" class="btn btn-outline-primary" title="Добавить Серийный Номер">
-                                                <PlusLgIcon />
-                                            </a>
-                                        </th>
-                                        <th>Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var serialNumber in serialNumbers)
-                                    {
-                                        <tr>
-                                            <td>@serialNumber.Number</td>
-                                            <td>
-                                                @if (serialNumber.IsAssigned)
-                                                {
-                                                    <a href="equipmentorders?equipmentId=@(selectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
-                                                        <Check2CircleIcon />
-                                                        <span> Выдано </span>
-                                                    </a>
-
-                                                }
-                                                else
-                                                {
-                                                    <a href="equipmentorders/create?equipmentId=@(selectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
-                                                        <ReplyIcon />
-                                                        <span> Выдать </span>
-                                                    </a>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                    </div>
-                </div>
-            </div>
-        }
+        <SerialNumbersComponent SerialNumbers="serialNumbers" SelectedTreeItem="selectedTreeItem" />       
     </div>
 </div>
 

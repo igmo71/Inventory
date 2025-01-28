@@ -63,9 +63,7 @@
 
     private async Task GetLocations()
     {
-        var locationsResult = await Service.GetList();
-        if (locationsResult.IsSuccess)
-            locations = locationsResult.Value;
+        locations = await Service.GetList();
     }
 
     private async Task AddLocation()

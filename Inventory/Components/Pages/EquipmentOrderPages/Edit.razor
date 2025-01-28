@@ -140,13 +140,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+       
         if (Id is not null)
-            EquipmentOrder ??= await Service.Get(Id, 
-                isIncludeEquipment: true, 
-                isIncludeSerialNumber: true, 
-                isIncludeAuthor: true, 
-                isIncludeAssignee: false, 
-                isIncludeLocation: false);
+            EquipmentOrder ??= await Service.Get(Id, new EquipmentOrderIncludeParameters
+                {
+                    isIncludeAssignee = false,
+                    isIncludeAuthor = true,
+                    isIncludeEquipment = true,
+                    isIncludeLocation = false,
+                    isIncludeSerialNumber = true
+                });
 
         if (EquipmentOrder is null)
             NavigationManager.NavigateTo("notfound");

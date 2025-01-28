@@ -14,12 +14,10 @@ namespace Inventory.Application.EquipmentOrderServices
             EquipmentOrderIncludeParameters includeParameters,
             EquipmentOrderFilterParameters filterParameters);
 
-        Task<EquipmentOrder?> Get(string id,
-            bool isIncludeEquipment = false,
-            bool isIncludeSerialNumber = false,
-            bool isIncludeAuthor = false,
-            bool isIncludeAssignee = false,
-            bool isIncludeLocation = false);
+        Task<EquipmentOrder?> Get(
+            string id, 
+            EquipmentOrderIncludeParameters includeParameters);
+
         Task<string> Create(EquipmentOrder equipmentOrder);
         Task<Result> Update(EquipmentOrder equipmentOrder);
         Task Delete(EquipmentOrder equipmentOrder);
@@ -36,15 +34,10 @@ namespace Inventory.Application.EquipmentOrderServices
             EquipmentOrderFilterParameters filterParameters)
         {
             using var context = _dbFactory.CreateDbContext();
-            var query = context.EquipmentOrders.AsNoTracking();
 
-            if (request.StartIndex > 0)
-                query = query.Skip(request.StartIndex);
-
-            if (request.Count is not null)
-                query = query.Take((int)request.Count);
-
-            var result = await query
+            var result = await context.EquipmentOrders
+                .AsNoTracking()
+                .HandleRequest(request)
                 .PerformInclude(includeParameters)
                 .PerformFilter(filterParameters)
                 .OrderBy(e => e.DateTime)
@@ -54,33 +47,16 @@ namespace Inventory.Application.EquipmentOrderServices
             return ListResult<EquipmentOrder>.Success(result, total);
         }
 
-        public async Task<EquipmentOrder?> Get(string id,
-            bool isIncludeEquipment = false,
-            bool isIncludeSerialNumber = false,
-            bool isIncludeAuthor = false,
-            bool isIncludeAssignee = false,
-            bool isIncludeLocation = false)
+        public async Task<EquipmentOrder?> Get(
+            string id, 
+            EquipmentOrderIncludeParameters includeParameters)
         {
-            using var context = _dbFactory.CreateDbContext();
+            using var context = _dbFactory.CreateDbContext();         
 
-            var query = context.EquipmentOrders.AsNoTracking();
-
-            if (isIncludeEquipment)
-                query = query.Include(e => e.Equipment);
-
-            if (isIncludeSerialNumber)
-                query = query.Include(e => e.SerialNumber);
-
-            if (isIncludeAuthor)
-                query = query.Include(e => e.Author);
-
-            if (isIncludeAssignee)
-                query = query.Include(e => e.Assignee);
-
-            if (isIncludeLocation)
-                query = query.Include(e => e.Location);
-
-            var equipmentOrder = await query.FirstOrDefaultAsync(m => m.Id == id);
+            var equipmentOrder = await context.EquipmentOrders
+                .AsNoTracking()
+                .PerformInclude(includeParameters)
+                .FirstOrDefaultAsync(m => m.Id == id);
             return equipmentOrder;
         }
 

@@ -1,10 +1,22 @@
 ﻿using Inventory.Domain;
+using Microsoft.AspNetCore.Components.QuickGrid;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Application.EquipmentOrderServices
 {
     public static class EquipmentOrderQueryExtensions
     {
+        public static IQueryable<EquipmentOrder> HandleRequest(this IQueryable<EquipmentOrder> query, GridItemsProviderRequest<EquipmentOrder> request)
+        {
+            if (request.StartIndex > 0)
+                query = query.Skip(request.StartIndex);
+
+            if (request.Count is not null)
+                query = query.Take((int)request.Count);
+
+            return query;
+        }
+
         public static IQueryable<EquipmentOrder> PerformInclude(this IQueryable<EquipmentOrder> query, EquipmentOrderIncludeParameters includeParameters)
         {
             if (includeParameters.isIncludeEquipment)

@@ -10,7 +10,6 @@ namespace Inventory.Application
     {
         Task<ListResult<Equipment>> GetList(int? skip = null, int? take = null,
             bool isIncludeParent = false,
-            bool isIncludeChildren = false,
             string? parentId = null);
         Task<List<Equipment>> GetListWithoutFolders();
         Task<List<Equipment>> GetFolders();
@@ -29,7 +28,6 @@ namespace Inventory.Application
 
         public async Task<ListResult<Equipment>> GetList(int? skip = null, int? take = null,
             bool isIncludeParent = false,
-            bool isIncludeChildren = false,
             string? parentId = null)
         {
             using var context = _dbFactory.CreateDbContext();
@@ -43,9 +41,6 @@ namespace Inventory.Application
 
             if (isIncludeParent)
                 query = query.Include(e => e.Parent);
-
-            if (isIncludeChildren)
-                query = query.Include(e => e.Children);
 
             if (parentId != null)
                 query = query.Where(e => e.ParentId == parentId);

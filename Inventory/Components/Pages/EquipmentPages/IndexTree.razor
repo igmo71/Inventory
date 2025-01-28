@@ -332,7 +332,7 @@
         if (parentTreeItem is not null)
             parentTreeItem.IsExpanded = true;
 
-        editEquipment = await Service.Get(treeItem.Id!, isIncludeParent: false);
+        editEquipment = await Service.Get(treeItem.Id, isIncludeParent: false);
 
         editDialog?.Open();
     }
@@ -356,7 +356,7 @@
         if (parentTreeItem is not null)
             parentTreeItem.IsExpanded = true;
 
-        deleteEquipment = await Service.Get(treeItem.Id!, isIncludeParent: true);
+        deleteEquipment = await Service.Get(treeItem.Id, isIncludeParent: true);
 
         if (deleteEquipment is null)
             return;

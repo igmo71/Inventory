@@ -2,13 +2,14 @@
 using Inventory.Common.Results;
 using Inventory.Data;
 using Inventory.Domain;
+using Microsoft.AspNetCore.Components.QuickGrid;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Application.LocationServices
 {
     public interface ILocationService
     {
-        Task<ListResult<Location>> GetList(int? skip = null, int? take = null, bool isIncludeParent = false);
+        Task<ListResult<Location>> GetList(GridItemsProviderRequest<Location> request, bool isIncludeParent = false);
         Task<Location?> Get(string id, bool isIncludeParent = false);
         Task<string> Create(Location location);
         Task<Result> Update(Location location);
@@ -20,16 +21,11 @@ namespace Inventory.Application.LocationServices
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
 
-        public async Task<ListResult<Location>> GetList(int? skip = null, int? take = null, bool isIncludeParent = false)
+        public async Task<ListResult<Location>> GetList(GridItemsProviderRequest<Location> request, bool isIncludeParent = false)
         {
             using var context = _dbFactory.CreateDbContext();
-            var query = context.Locations.AsNoTracking();
-
-            if (skip is not null)
-                query = query.Skip((int)skip);
-
-            if (take is not null)
-                query = query.Take((int)take);
+            var query = context.Locations.AsNoTracking()
+                .HandleRequest(request);           
 
             if (isIncludeParent)
                 query = query.Include(e => e.Parent);

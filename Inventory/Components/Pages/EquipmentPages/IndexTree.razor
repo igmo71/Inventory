@@ -5,14 +5,14 @@
 @using Inventory.Components.ComponentTreeView
 @using Inventory.Components.Icons
 @using Inventory.Domain
-
-@inject IEquipmentService Service
-@inject ISerialNumberService SerialNumberService
-
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using System.Text.Json
 @using System.Text.Json.Serialization
+
+@inject IEquipmentService Service
+@inject ISerialNumberService SerialNumberService
 @inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavigationManager
 
 <PageTitle>Оборудование</PageTitle>
 
@@ -27,7 +27,7 @@
         <div class="d-flex flex-row mb-1">
             <div class="d-inline-flex ms-auto">
                 <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
-                        @onclick="() => OpenCreateDialog()">
+                @onclick="() => OpenCreateDialog()">
                     <PlusLgIcon /><span> Создать </span>
                 </button>
             </div>
@@ -43,7 +43,7 @@
                     </div>
                     <div class="ms-auto">
                         <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
-                                @onclick="() => OpenCreateDialog(treeItem)">
+                        @onclick="() => OpenCreateDialog(treeItem)">
                             <PlusLgIcon />
                         </button>
                         <div class="btn-group">
@@ -60,14 +60,19 @@
         {
             <div class="card shadow-sm  overflow-auto" style="max-height: 800px;">
                 <div class="card-body">
-                    <div><b>@selectedTreeItem?.Value</b></div>
+                    <div><b>@selectedTreeItem.Value</b></div>
                     <div>
                         @if (serialNumbers is not null && serialNumbers.Count > 0)
                         {
                             <table class="table table-hover table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Серийный Номер</th>
+                                        <th>
+                                            <span> Серийный Номер </span>
+                                            <a href="/serialnumbers/create?returnUrl=@(NavigationManager.Uri)&equipmentId=@(selectedTreeItem.Id)" class="btn btn-outline-primary" title="Добавить Серийный Номер">
+                                                <PlusLgIcon />
+                                            </a>
+                                        </th>
                                         <th>Статус</th>
                                     </tr>
                                 </thead>

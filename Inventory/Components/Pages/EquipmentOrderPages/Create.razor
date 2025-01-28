@@ -135,7 +135,9 @@
 
         if (EquipmentId is not null){
             EquipmentOrder.EquipmentId = EquipmentId;
+
             await GetSerialNumbers();
+
             if (SerialNumberId is not null)
                 EquipmentOrder.SerialNumberId = SerialNumberId;
         }

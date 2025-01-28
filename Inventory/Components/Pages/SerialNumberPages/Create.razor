@@ -20,9 +20,9 @@
     <div class="col-md-4">
         <EditForm method="post" Model="SerialNumber" OnValidSubmit="AddSerialNumber" FormName="create" Enhance>
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
+            <ValidationSummary class="text-danger" role="alert" />
             <div class="mb-3">
-                <label for="equipmentid" class="form-label">Оборудование:</label> 
+                <label for="equipmentid" class="form-label">Оборудование:</label>
                 <InputSelect id="equipmentid" @bind-Value="SerialNumber.EquipmentId" class="form-control">
                     <option value="">- Выберите -</option>
                     @foreach (var equip in equipment)
@@ -30,13 +30,13 @@
                         <option value="@equip.Id">@equip.Name </option>
                     }
                 </InputSelect>
-                <ValidationMessage For="() => SerialNumber.EquipmentId" class="text-danger" /> 
-            </div>        
+                <ValidationMessage For="() => SerialNumber.EquipmentId" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="number" class="form-label">Серийный Номер:</label> 
-                <InputText id="number" @bind-Value="SerialNumber.Number" class="form-control" /> 
-                <ValidationMessage For="() => SerialNumber.Number" class="text-danger" /> 
-            </div>        
+                <label for="number" class="form-label">Серийный Номер:</label>
+                <InputText id="number" @bind-Value="SerialNumber.Number" class="form-control" />
+                <ValidationMessage For="() => SerialNumber.Number" class="text-danger" />
+            </div>
             <button type="submit" class="btn btn-primary">Создать</button>
         </EditForm>
     </div>
@@ -47,13 +47,25 @@
 </div>
 
 @code {
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? EquipmentId { get; set; }
+
     [SupplyParameterFromForm]
     private SerialNumber SerialNumber { get; set; } = new() { Id = Guid.CreateVersion7().ToString() };
 
     private List<Equipment> equipment = new();
 
-    protected override async Task OnInitializedAsync(){
+    protected override async Task OnInitializedAsync()
+    {
         await GetEquipment();
+
+        if (EquipmentId is not null)
+        {
+            SerialNumber.EquipmentId = EquipmentId;
+        }
     }
 
     private async Task GetEquipment()
@@ -65,6 +77,8 @@
     {
         string id = await Service.Create(SerialNumber);
 
-        NavigationManager.NavigateTo("/serialnumbers");
+        ReturnUrl ??= "/serialnumbers";
+
+        NavigationManager.NavigateTo(ReturnUrl);
     }
 }

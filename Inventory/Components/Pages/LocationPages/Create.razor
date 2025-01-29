@@ -79,8 +79,6 @@
     {
         string id = await Service.Create(Location);
 
-        ReturnUrl ??= "/locations";
-
-        NavigationManager.NavigateTo(ReturnUrl);
+        NavigationManager.NavigateTo(ReturnUrl ??= "/locations");
     }
 }

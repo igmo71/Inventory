@@ -15,6 +15,10 @@
     <a href="equipmentorders/create">Создать Новый</a>
 </p>
 
+<p>
+    <button class="btn btn-primary" @onclick=ClearFilter>Очистить поиск</button>
+</p>
+
 <QuickGrid Class="table" ItemsProvider="itemsProvider" Virtualize="true" @ref="grid">
     <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty" Title="Автор">
     </PropertyColumn>
@@ -135,6 +139,12 @@
     void OnInputLocationFilter(ChangeEventArgs e)
     {
         filterParameters.locationName = e.Value?.ToString() ?? string.Empty;
+        grid!.RefreshDataAsync();
+    }
+
+    void ClearFilter()
+    {
+        filterParameters = new EquipmentOrderFilterParameters();
         grid!.RefreshDataAsync();
     }
 }

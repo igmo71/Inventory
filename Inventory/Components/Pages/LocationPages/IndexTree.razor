@@ -15,6 +15,10 @@
     <a href="locations">Таблица</a>
 </p>
 
+<p>
+    <button class="btn btn-primary" @onclick="RollUpTree">Свернуть все</button>
+</p>
+
 <div class="row">
     <div class="col">
         @if (isConnected)
@@ -65,20 +69,9 @@
     {
         if (firstRender)
         {
-            await LoadTreeStateAsync();
+            await GetTreeStateAsync();
 
-            var locations = await Service.GetList(isIncludeParent: true);
-
-            var list = From(locations);
-
-            if (expandedTreeItemsId != null)
-            {
-                var itemsToExpand = list.Where(e => expandedTreeItemsId.Contains(e.Id));
-                foreach (var item in itemsToExpand)
-                    item.IsExpanded = true;
-            }
-
-            treeItems = TreeBuilder.Build(list);
+            await GetTreeItems();
 
             isConnected = true;
 
@@ -86,7 +79,7 @@
         }
     }
 
-    private async Task LoadTreeStateAsync()
+    private async Task GetTreeStateAsync()
     {
         var expandedTreeItemsResult = await ProtectedSessionStorage.GetAsync<List<string>?>(nameof(expandedTreeItemsId));
 
@@ -99,6 +92,21 @@
             selectedTreeItemId = selectedTreeItemIdResult.Value;
     }
 
+    private async Task GetTreeItems()
+    {
+        var locations = await Service.GetList(isIncludeParent: true);
+
+        var list = From(locations);
+
+        if (expandedTreeItemsId != null)
+        {
+            var itemsToExpand = list.Where(e => expandedTreeItemsId.Contains(e.Id));
+            foreach (var item in itemsToExpand)
+                item.IsExpanded = true;
+        }
+
+        treeItems = TreeBuilder.Build(list);
+    }
 
     private List<TreeItem> From(List<Location> locations)
     {
@@ -132,5 +140,15 @@
         selectedTreeItemId = treeItem.Id;
 
         await ProtectedSessionStorage.SetAsync(nameof(selectedTreeItemId), selectedTreeItemId);
+    }
+
+    private async Task RollUpTree()
+    {
+        expandedTreeItemsId = null;
+
+        await ProtectedSessionStorage.DeleteAsync(nameof(expandedTreeItemsId));
+        await ProtectedSessionStorage.DeleteAsync(nameof(selectedTreeItemId));
+
+        await GetTreeItems();
     }
 }

@@ -43,7 +43,7 @@
                 <label for="datetime" class="form-label">Дата:</label>
                 <InputDate id="datetime" @bind-Value="EquipmentOrder.DateTime" class="form-control" @bind-Value:format="dd.MM.yyyy hh:mi:ss" disabled />
                 <ValidationMessage For="() => EquipmentOrder.DateTime" class="text-danger" />
-            </div>            
+            </div>
             <div class="mb-3">
                 <label for="equipmentid" class="form-label">Оборудование:</label>
                 <InputSelect id="equipmentid" @bind-Value="EquipmentOrder.EquipmentId" @bind-Value:after="GetSerialNumbers" class="form-control">
@@ -76,7 +76,7 @@
                     }
                 </InputSelect>
                 <ValidationMessage For="() => EquipmentOrder.AssigneeId" class="text-danger" />
-            </div>            
+            </div>
             <div class="mb-3">
                 <label for="locationid" class="form-label">Локация:</label>
                 <InputSelect id="locationid" @bind-Value="EquipmentOrder.LocationId" class="form-control">
@@ -104,7 +104,7 @@
 </div>
 
 <div>
-    <a href="/equipmentorders">Назад к Списку Ордеров</a> | <a href="/equipment">Назад к Оборудованию</a>
+    <a href=@(ReturnUrl ?? "/equipmentorders")>Назад к Списку</a>
 </div>
 
 @code {
@@ -113,6 +113,10 @@
 
     [SupplyParameterFromQuery]
     public string? SerialNumberId { get; set; }
+
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
 
     [SupplyParameterFromForm]
     private EquipmentOrder EquipmentOrder { get; set; } = new() { Id = Guid.CreateVersion7().ToString() };
@@ -133,7 +137,8 @@
 
         EquipmentOrder.DateTime = DateTime.Now;
 
-        if (EquipmentId is not null){
+        if (EquipmentId is not null)
+        {
             EquipmentOrder.EquipmentId = EquipmentId;
 
             await GetSerialNumbers();
@@ -142,7 +147,7 @@
                 EquipmentOrder.SerialNumberId = SerialNumberId;
         }
 
-        GetApplicationUsers();     
+        GetApplicationUsers();
     }
 
     private async Task AddEquipmentOrder()
@@ -151,7 +156,7 @@
 
         await AssignSerialNumber();
 
-        NavigationManager.NavigateTo("/equipmentorders");
+        NavigationManager.NavigateTo(ReturnUrl ?? "/equipmentorders");
     }
 
     private async Task AssignSerialNumber()
@@ -177,10 +182,11 @@
 
     private async Task GetLocations()
     {
-        var locations = await LocationService.GetList();
+        locations = await LocationService.GetList();
     }
 
-    private async Task GetApplicationUser(){
+    private async Task GetApplicationUser()
+    {
         var authstate = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         applicationUser = await UserManager.GetUserAsync(authstate.User);
     }

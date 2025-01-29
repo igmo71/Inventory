@@ -22,12 +22,17 @@
     <a href="equipment">Таблица</a>
 </p>
 
+<p>
+    <button class="btn btn-primary" @onclick="RollUpTree">Свернуть все</button>
+</p>
+
+
 <div class="row">
     <div class="col-md-7">
         <div class="d-flex flex-row mb-1">
             <div class="d-inline-flex ms-auto">
                 <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
-                        @onclick="() => OpenCreateDialog()">
+                @onclick="() => OpenCreateDialog()">
                     <PlusLgIcon /><span> Создать </span>
                 </button>
             </div>
@@ -43,7 +48,7 @@
                     </div>
                     <div class="ms-auto">
                         <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
-                                @onclick="() => OpenCreateDialog(treeItem)">
+                        @onclick="() => OpenCreateDialog(treeItem)">
                             <PlusLgIcon />
                         </button>
                         <div class="btn-group">
@@ -56,7 +61,7 @@
         </TreeView>
     </div>
     <div class="col-md-5">
-        <SerialNumbersComponent SerialNumbers="serialNumbers" SelectedTreeItem="selectedTreeItem" />       
+        <SerialNumbersComponent SerialNumbers="serialNumbers" SelectedTreeItem="selectedTreeItem" />
     </div>
 </div>
 
@@ -102,6 +107,7 @@
     private ModalDialog? deleteDialog;
     private ModalDialog? errorDialog;
     private string? errorMessage;
+    private bool isConnected;
 
     private JsonSerializerOptions jsonOptions = new JsonSerializerOptions
         {
@@ -109,46 +115,89 @@
             MaxDepth = 16
         };
 
-    protected override async Task OnInitializedAsync()
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     try
+    //     {
+    //         var browserTreeItems = await ProtectedSessionStore.GetAsync<string>(nameof(treeItems));
+    //         if (browserTreeItems.Success)
+    //         {
+    //             if (browserTreeItems.Value is not null)
+    //             {
+    //                 string treeItemsString = browserTreeItems.Value;
+    //                 treeItems = JsonSerializer.Deserialize<List<TreeItem>?>(treeItemsString, jsonOptions);
+    //             }
+    //         }
+    //         else
+    //             await GetTreeItems();
+
+    //         var browserSelectedTreeItem = await ProtectedSessionStore.GetAsync<string>(nameof(selectedTreeItem));
+    //         if (browserSelectedTreeItem.Success)
+    //         {
+    //             if (browserSelectedTreeItem.Value is not null)
+    //             {
+    //                 string selectedTreeItemString = browserSelectedTreeItem.Value;
+    //                 selectedTreeItem = JsonSerializer.Deserialize<TreeItem?>(selectedTreeItemString, jsonOptions);
+    //                 if (selectedTreeItem is not null)
+    //                 {
+    //                     var listResult = await SerialNumberService.GetList(equipmentId: selectedTreeItem.Id);
+    //                     serialNumbers = listResult.Value;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     catch (Exception)
+    //     {
+    //         await GetTreeItems();
+    //     }
+
+    //     await GetFolders();
+    // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            var browserTreeItems = await ProtectedSessionStore.GetAsync<string>(nameof(treeItems));
-            if (browserTreeItems.Success)
-            {
-                if (browserTreeItems.Value is not null)
-                {
-                    string treeItemsString = browserTreeItems.Value;
-                    treeItems = JsonSerializer.Deserialize<List<TreeItem>?>(treeItemsString, jsonOptions);
-                }
-            }
-            else
-                await GetItems();
+            if (!await GetTreeState())
+                await GetTreeItems();
 
-            var browserSelectedTreeItem = await ProtectedSessionStore.GetAsync<string>(nameof(selectedTreeItem));
-            if (browserSelectedTreeItem.Success)
-            {
-                if (browserSelectedTreeItem.Value is not null)
-                {
-                    string selectedTreeItemString = browserSelectedTreeItem.Value;
-                    selectedTreeItem = JsonSerializer.Deserialize<TreeItem?>(selectedTreeItemString, jsonOptions);
-                    if (selectedTreeItem is not null)
-                    {
-                        var listResult = await SerialNumberService.GetList(equipmentId: selectedTreeItem.Id);
-                        serialNumbers = listResult.Value;
-                    }
-                }
-            }
-        }
-        catch (Exception)
-        {
-            await GetItems();
-        }
+            await GetSelectedState();
 
-        await GetFolders();
+            isConnected = true;
+
+            StateHasChanged();
+        }
     }
 
-    private async Task GetItems(TreeItem? treeItem = null)
+    private async Task<bool> GetTreeState()
+    {
+        var treeItemsResult = await ProtectedSessionStore.GetAsync<string>(nameof(treeItems));
+        if (treeItemsResult.Success && !string.IsNullOrEmpty(treeItemsResult.Value))
+        {
+            string treeItemsString = treeItemsResult.Value;
+            treeItems = JsonSerializer.Deserialize<List<TreeItem>?>(treeItemsString, jsonOptions);
+            return true;
+        }
+        return false;
+    }
+
+    private async Task GetSelectedState()
+    {
+        var selectedTreeItemResult = await ProtectedSessionStore.GetAsync<string>(nameof(selectedTreeItem));
+        if (selectedTreeItemResult.Success && !string.IsNullOrEmpty(selectedTreeItemResult.Value))
+        {
+            string selectedTreeItemString = selectedTreeItemResult.Value;
+            selectedTreeItem = JsonSerializer.Deserialize<TreeItem?>(selectedTreeItemString, jsonOptions);
+            if (selectedTreeItem is not null)
+            {
+                var listResult = await SerialNumberService.GetList(equipmentId: selectedTreeItem.Id);
+                serialNumbers = listResult.Value;
+            }
+
+        }
+    }
+
+    private async Task GetTreeItems(TreeItem? treeItem = null)
     {
         List<Equipment>? equipment;
 
@@ -176,19 +225,6 @@
         {
             treeItem.Children = null;
         }
-
-        if (treeItems is not null)
-        {
-            try
-            {
-                string treeItemsString = JsonSerializer.Serialize(treeItems, jsonOptions);
-                await ProtectedSessionStore.SetAsync(nameof(treeItems), treeItemsString);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
     }
 
     private List<TreeItem> From(List<Equipment> equipment)
@@ -211,7 +247,13 @@
     {
         treeItem.IsExpanded = !treeItem.IsExpanded;
 
-        await GetItems(treeItem);
+        await GetTreeItems(treeItem);
+
+        if (treeItems is not null)
+        {
+            string treeItemsString = JsonSerializer.Serialize(treeItems, jsonOptions);
+            await ProtectedSessionStore.SetAsync(nameof(treeItems), treeItemsString);
+        }
     }
 
     private async Task SelectItem(TreeItem treeItem)
@@ -225,6 +267,7 @@
         try
         {
             string selectedTreeItemString = JsonSerializer.Serialize(selectedTreeItem, jsonOptions);
+
             await ProtectedSessionStore.SetAsync(nameof(selectedTreeItem), selectedTreeItemString);
         }
         catch (Exception ex)
@@ -253,7 +296,7 @@
 
         if (parentTreeItem is null)
         {
-            await GetItems();
+            await GetTreeItems();
 
             if (treeItems is not null)
                 selectedTreeItem = treeItems.FirstOrDefault(e => e.Id == id);
@@ -262,7 +305,7 @@
         {
             parentTreeItem.IsExpanded = true;
 
-            await GetItems(parentTreeItem);
+            await GetTreeItems(parentTreeItem);
 
             if (parentTreeItem.Children is not null)
                 selectedTreeItem = parentTreeItem.Children.FirstOrDefault(e => e.Id == id);
@@ -291,7 +334,7 @@
     {
         await Service.Update(equipment);
 
-        await GetItems(parentTreeItem);
+        await GetTreeItems(parentTreeItem);
 
         editDialog?.Close();
     }
@@ -322,7 +365,7 @@
         {
             await Service.Delete(equipment);
 
-            await GetItems(parentTreeItem);
+            await GetTreeItems(parentTreeItem);
 
             selectedTreeItem = parentTreeItem;
         }
@@ -337,5 +380,15 @@
         {
             deleteDialog?.Close();
         }
+    }
+
+    private async Task RollUpTree()
+    {
+        selectedTreeItem = null;
+        serialNumbers = null;
+        await ProtectedSessionStore.DeleteAsync(nameof(treeItems));
+        await ProtectedSessionStore.DeleteAsync(nameof(selectedTreeItem));
+
+        await GetTreeItems();
     }
 }

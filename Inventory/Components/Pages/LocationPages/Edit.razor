@@ -96,8 +96,6 @@ else
 
         await Service.Update(Location);
 
-        ReturnUrl ??= "/locations";
-
-        NavigationManager.NavigateTo(ReturnUrl);
+        NavigationManager.NavigateTo(ReturnUrl ??= "/locations");
     }
 }

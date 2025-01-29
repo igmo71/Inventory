@@ -74,9 +74,7 @@
         {
             await Service.Delete(location!);
 
-            ReturnUrl ??= "/locations";
-
-            NavigationManager.NavigateTo(ReturnUrl);
+            NavigationManager.NavigateTo(ReturnUrl ??= "/locations");
         }
         catch (Exception ex)
         {

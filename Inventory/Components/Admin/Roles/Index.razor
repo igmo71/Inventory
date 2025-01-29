@@ -17,14 +17,14 @@
 </p>
 
 <QuickGrid Class="table" Items="RoleManager.Roles">
-    <PropertyColumn Property="role => role.Id" />
+    @* <PropertyColumn Property="role => role.Id" /> *@
     <PropertyColumn Property="role => role.Name" />
 
-    <TemplateColumn Context="role">
+    @* <TemplateColumn Context="role">
         <a href="@($"roles/edit?id={role.Id}")">Изменить</a> |
         <a href="@($"roles/details?id={role.Id}")">Детали</a> |
         <a href="@($"roles/delete?id={role.Id}")">Удалить</a>
-    </TemplateColumn>
+    </TemplateColumn> *@
 </QuickGrid>
 
 @code {

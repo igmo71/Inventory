@@ -15,7 +15,7 @@
                             <tr>
                                 <th>
                                     <span> Серийный Номер </span>
-                                    <a href="/serialnumbers/create?returnUrl=@(NavigationManager.Uri)&equipmentId=@(SelectedTreeItem.Id)" class="btn btn-outline-primary" title="Добавить Серийный Номер">
+                                    <a href="/serialnumbers/create?equipmentId=@(SelectedTreeItem.Id)&returnUrl=@(NavigationManager.Uri)" class="btn btn-outline-primary" title="Добавить Серийный Номер">
                                         <PlusLgIcon />
                                     </a>
                                 </th>
@@ -30,7 +30,7 @@
                                     <td>
                                         @if (serialNumber.IsAssigned)
                                         {
-                                            <a href="equipmentorders?equipmentId=@(SelectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
+                                            <a href="equipmentorders?equipmentId=@(SelectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)&returnUrl=@(NavigationManager.Uri)">
                                                 <Check2CircleIcon />
                                                 <span> Выдано </span>
                                             </a>
@@ -38,7 +38,7 @@
                                         }
                                         else
                                         {
-                                            <a href="equipmentorders/create?equipmentId=@(SelectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)">
+                                            <a href="equipmentorders/create?equipmentId=@(SelectedTreeItem?.Id)&serialNumberId=@(serialNumber.Id)&returnUrl=@(NavigationManager.Uri)">
                                                 <ReplyIcon />
                                                 <span> Выдать </span>
                                             </a>

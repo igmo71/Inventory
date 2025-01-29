@@ -24,9 +24,9 @@
 </p>
 
 <QuickGrid Class="table" ItemsProvider="@itemsProvider">
-    <PropertyColumn Property="@(userModel => userModel.User != null ? userModel.User.Id : string.Empty)" >
+    @* <PropertyColumn Property="@(userModel => userModel.User != null ? userModel.User.Id : string.Empty)" >
         <HeaderTemplate><th>Id</th></HeaderTemplate>
-    </PropertyColumn>
+    </PropertyColumn> *@
     <PropertyColumn Property="@(userModel => userModel.User != null ? userModel.User.Name : string.Empty)" >
         <HeaderTemplate><th>Имя</th></HeaderTemplate>
     </PropertyColumn>

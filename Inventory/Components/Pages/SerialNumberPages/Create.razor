@@ -43,15 +43,15 @@
 </div>
 
 <div>
-    <a href="/serialnumbers">Назад к Списку</a>
+    <a href=@(ReturnUrl ??= "/serialnumbers")>Назад к Списку</a>
 </div>
 
 @code {
     [SupplyParameterFromQuery]
-    private string? ReturnUrl { get; set; }
+    public string? EquipmentId { get; set; }
 
     [SupplyParameterFromQuery]
-    public string? EquipmentId { get; set; }
+    private string? ReturnUrl { get; set; }
 
     [SupplyParameterFromForm]
     private SerialNumber SerialNumber { get; set; } = new() { Id = Guid.CreateVersion7().ToString() };
@@ -77,8 +77,6 @@
     {
         string id = await Service.Create(SerialNumber);
 
-        ReturnUrl ??= "/serialnumbers";
-
-        NavigationManager.NavigateTo(ReturnUrl);
+        NavigationManager.NavigateTo(ReturnUrl ??= "/serialnumbers");
     }
 }

@@ -32,7 +32,7 @@
         <div class="d-flex flex-row mb-1">
             <div class="d-inline-flex ms-auto">
                 <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
-                @onclick="() => OpenCreateDialog()">
+                        @onclick="() => OpenCreateDialog()">
                     <PlusLgIcon /><span> Создать </span>
                 </button>
             </div>
@@ -48,7 +48,7 @@
                     </div>
                     <div class="ms-auto">
                         <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
-                        @onclick="() => OpenCreateDialog(treeItem)">
+                                @onclick="() => OpenCreateDialog(treeItem)">
                             <PlusLgIcon />
                         </button>
                         <div class="btn-group">
@@ -114,45 +114,6 @@
             ReferenceHandler = ReferenceHandler.Preserve,
             MaxDepth = 16
         };
-
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     try
-    //     {
-    //         var browserTreeItems = await ProtectedSessionStore.GetAsync<string>(nameof(treeItems));
-    //         if (browserTreeItems.Success)
-    //         {
-    //             if (browserTreeItems.Value is not null)
-    //             {
-    //                 string treeItemsString = browserTreeItems.Value;
-    //                 treeItems = JsonSerializer.Deserialize<List<TreeItem>?>(treeItemsString, jsonOptions);
-    //             }
-    //         }
-    //         else
-    //             await GetTreeItems();
-
-    //         var browserSelectedTreeItem = await ProtectedSessionStore.GetAsync<string>(nameof(selectedTreeItem));
-    //         if (browserSelectedTreeItem.Success)
-    //         {
-    //             if (browserSelectedTreeItem.Value is not null)
-    //             {
-    //                 string selectedTreeItemString = browserSelectedTreeItem.Value;
-    //                 selectedTreeItem = JsonSerializer.Deserialize<TreeItem?>(selectedTreeItemString, jsonOptions);
-    //                 if (selectedTreeItem is not null)
-    //                 {
-    //                     var listResult = await SerialNumberService.GetList(equipmentId: selectedTreeItem.Id);
-    //                     serialNumbers = listResult.Value;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     catch (Exception)
-    //     {
-    //         await GetTreeItems();
-    //     }
-
-    //     await GetFolders();
-    // }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

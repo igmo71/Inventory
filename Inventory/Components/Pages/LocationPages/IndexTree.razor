@@ -1,14 +1,13 @@
 ﻿@page "/locations/tree"
-
 @using Inventory.Application.LocationServices
 @using Inventory.Components.ComponentTreeView
-@using Inventory.Components.ComponentTreeViewBase
 @using Inventory.Components.Icons
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
 @inject ILocationService Service
 @inject ProtectedSessionStorage ProtectedSessionStorage
+@inject NavigationManager NavigationManager
 
 <h1>Локации</h1>
 
@@ -16,63 +15,72 @@
     <a href="locations">Таблица</a>
 </p>
 
-@if (isConnected)
-{
-    <div class="row">
-        <div class="col">
-            <TreeViewBase TreeItems="treeItems" OnSelect="HandleSelect" @ref="treeView">
+<div class="row">
+    <div class="col">
+        @if (isConnected)
+        {
+            <TreeView TreeItems="treeItems">
                 <TreeItemTemplate Context="treeItem">
-                    <div class="btn-group">
-                        <button class="btn btn-outline-success" @onclick="() => OpenEditDialog(treeItem)" title="Изменить"><PencilIcon /></button>
-                        <button class="btn btn-outline-danger" @onclick="() => OpenDeleteDialog(treeItem)" title="Удалить"><Trash3Icon /></button>
+                    <div class="d-flex flex-row @(treeItem.Id == selectedTreeItemId ? "bg-body-secondary" : string.Empty)">
+                        <div class="btn" @onclick="() => ExpandItem(treeItem)">
+                            <TreeIcons TreeItem="treeItem" />
+                        </div>
+                        <div class="btn text-start" @onclick="() => SelectItem(treeItem)">
+                            @treeItem.Value
+                        </div>
+                        <div class="ms-auto">
+                            <a href="locations/create?parentId=@(treeItem.Id)&returnUrl=@(NavigationManager.Uri)"
+                            class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке">
+                                <PlusLgIcon />
+                            </a>
+                            <div class="btn-group">
+                                <a href="locations/edit?id=@(treeItem.Id)&returnUrl=@(NavigationManager.Uri)" class="btn btn-outline-success" title="Изменить">
+                                    <PencilIcon />
+                                </a>
+                                <a href="locations/delete?id=@(treeItem.Id)&returnUrl=@(NavigationManager.Uri)" class="btn btn-outline-danger" title="Удалить">
+                                    <Trash3Icon />
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </TreeItemTemplate>
-            </TreeViewBase>
-        </div>
-        <div class="col"></div>
+            </TreeView>
+        }
+        else
+        {
+            <p>Загрузка...</p>
+        }
     </div>
-}
-else
-{
-    <p>Loading...</p>
-}
+    <div class="col"></div>
+</div>
 
 @code {
-    private List<Location>? locations;
-    private List<TreeItem>? itemsList;
     private List<TreeItem>? treeItems;
-    private TreeViewBase? treeView;
     private bool isConnected;
 
     public string? selectedTreeItemId;
-    public List<string>? expandedTreeItems;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await GetLocations();
-        GetItemsList();
-    }
+    public List<string>? expandedTreeItemsId;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            isConnected = true;
             await LoadTreeStateAsync();
 
-            if (ExpandedTreeItems != null)
+            var locations = await Service.GetList(isIncludeParent: true);
+
+            var list = From(locations);
+
+            if (expandedTreeItemsId != null)
             {
-                List<TreeItem>? expandedItems = itemsList?
-                    .Where(e => ExpandedTreeItems.Contains(e.Id))
-                    .ToList();
-
-                if (expandedItems != null)
-                    foreach (var item in expandedItems)
-                        item.IsExpanded = true;
+                var itemsToExpand = list.Where(e => expandedTreeItemsId.Contains(e.Id));
+                foreach (var item in itemsToExpand)
+                    item.IsExpanded = true;
             }
-            if (itemsList != null)
-                treeItems = TreeBuilder.Build(itemsList);
 
+            treeItems = TreeBuilder.Build(list);
+
+            isConnected = true;
 
             StateHasChanged();
         }
@@ -80,22 +88,17 @@ else
 
     private async Task LoadTreeStateAsync()
     {
-        var expandedTreeItemsResult = await ProtectedSessionStorage.GetAsync<List<string>?>(nameof(ExpandedTreeItems));
+        var expandedTreeItemsResult = await ProtectedSessionStorage.GetAsync<List<string>?>(nameof(expandedTreeItemsId));
 
         if (expandedTreeItemsResult.Success)
-            ExpandedTreeItems = expandedTreeItemsResult.Value;
+            expandedTreeItemsId = expandedTreeItemsResult.Value;
+
+        var selectedTreeItemIdResult = await ProtectedSessionStorage.GetAsync<string?>(nameof(selectedTreeItemId));
+
+        if (selectedTreeItemIdResult.Success)
+            selectedTreeItemId = selectedTreeItemIdResult.Value;
     }
 
-    private async Task GetLocations()
-    {
-        locations = await Service.GetList(isIncludeParent: true);
-    }
-
-    private void GetItemsList()
-    {
-        if (locations != null)
-            itemsList = From(locations);
-    }
 
     private List<TreeItem> From(List<Location> locations)
     {
@@ -107,25 +110,27 @@ else
                 ParentId = e.ParentId
             }).ToList();
 
-        //var tree = TreeBuilder.Build(list);
-
         return list;
     }
 
-    private void HandleSelect(TreeItem treeItem)
+    private async Task ExpandItem(TreeItem treeItem)
     {
-        //selectedItem = treeItem;
+        treeItem.IsExpanded = !treeItem.IsExpanded;
+
+        expandedTreeItemsId ??= [];
+
+        if (treeItem.IsExpanded)
+            expandedTreeItemsId.Add(treeItem.Id);
+        if (!treeItem.IsExpanded)
+            expandedTreeItemsId.Remove(treeItem.Id);
+
+        await ProtectedSessionStorage.SetAsync(nameof(expandedTreeItemsId), expandedTreeItemsId);
     }
 
-    private async Task OpenEditDialog(TreeItem? treeItem)
+    private async Task SelectItem(TreeItem treeItem)
     {
-        //selectedItem = treeItem;
-        //treeView?.SelectTreeItem(selectedItem);
-    }
+        selectedTreeItemId = treeItem.Id;
 
-    private async Task OpenDeleteDialog(TreeItem? treeItem)
-    {
-        //selectedItem = treeItem;
-        //treeView?.SelectTreeItem(selectedItem);
+        await ProtectedSessionStorage.SetAsync(nameof(selectedTreeItemId), selectedTreeItemId);
     }
 }

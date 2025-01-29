@@ -47,10 +47,16 @@
 </div>
 
 <div>
-    <a href="/locations">Назад к Списку</a>
+    <a href=@(ReturnUrl ?? "/locations")>Назад к Списку</a>
 </div>
 
 @code {
+    [SupplyParameterFromQuery]
+    public string? ParentId { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
     [SupplyParameterFromForm]
     private Location Location { get; set; } = new() { Id = Guid.CreateVersion7().ToString() };
 
@@ -58,6 +64,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (ParentId != null)
+            Location.ParentId = ParentId;
+
         await GetLocations();
     }
 
@@ -70,6 +79,8 @@
     {
         string id = await Service.Create(Location);
 
-        NavigationManager.NavigateTo("/locations");
+        ReturnUrl ??= "/locations";
+
+        NavigationManager.NavigateTo(ReturnUrl);
     }
 }

@@ -13,10 +13,17 @@
 
 <h1>Удалить</h1>
 
-<p>Вы уверены, что хотите удалить?</p>    
+<p>Вы уверены, что хотите удалить?</p>
 <div>
     <h2>Локацию</h2>
     <hr />
+
+    @if(errorMessage != null){
+        <div class="alert alert-danger">
+            @errorMessage
+        </div>
+    }
+
     @if (location is null)
     {
         <p><em>Загрузка...</em></p>
@@ -37,16 +44,20 @@
         </dl>
         <EditForm method="post" Model="location" OnValidSubmit="DeleteLocation" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(location is null)">Удалить</button> |
-            <a href="/locations">Назад к Списку</a>
+            <a href=@(ReturnUrl ?? "/locations")>Назад к Списку</a>
         </EditForm>
     }
 </div>
 
 @code {
-    private Location? location;
-
     [SupplyParameterFromQuery]
     private string? Id { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private Location? location;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,8 +70,19 @@
 
     private async Task DeleteLocation()
     {
-        await Service.Delete(location!);
+        try
+        {
+            await Service.Delete(location!);
 
-        NavigationManager.NavigateTo("/locations");
+            ReturnUrl ??= "/locations";
+
+            NavigationManager.NavigateTo(ReturnUrl);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{ex.Message} {ex.InnerException?.Message}";
+            if (errorMessage.Contains("SAME TABLE REFERENCE"))
+                errorMessage = "Нельзя удалить. Папка сожержит вложенные объекты.";
+        }
     }
 }

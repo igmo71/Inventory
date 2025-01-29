@@ -1,6 +1,4 @@
-﻿using Inventory.Components.ComponentTreeView;
-
-namespace Inventory.Components.ComponentTreeViewBase
+﻿namespace Inventory.Components.ComponentTreeView
 {
     public class TreeBuilder
     {

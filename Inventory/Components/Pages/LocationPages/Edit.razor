@@ -55,12 +55,15 @@ else
 }
 
 <div>
-    <a href="/locations">Назад к Списку</a>
+    <a href=@(ReturnUrl ?? "/locations")>Назад к Списку</a>
 </div>
 
 @code {
     [SupplyParameterFromQuery]
     private string? Id { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
 
     [SupplyParameterFromForm]
     private Location? Location { get; set; }
@@ -93,6 +96,8 @@ else
 
         await Service.Update(Location);
 
-        NavigationManager.NavigateTo("/locations");
+        ReturnUrl ??= "/locations";
+
+        NavigationManager.NavigateTo(ReturnUrl);
     }
 }

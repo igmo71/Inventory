@@ -32,7 +32,7 @@
         <div class="d-flex flex-row mb-1">
             <div class="d-inline-flex ms-auto">
                 <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
-                        @onclick="() => OpenCreateDialog()">
+                @onclick="() => OpenCreateDialog()">
                     <PlusLgIcon /><span> Создать </span>
                 </button>
             </div>
@@ -48,7 +48,7 @@
                     </div>
                     <div class="ms-auto">
                         <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
-                                @onclick="() => OpenCreateDialog(treeItem)">
+                        @onclick="() => OpenCreateDialog(treeItem)">
                             <PlusLgIcon />
                         </button>
                         <div class="btn-group">
@@ -71,7 +71,7 @@
     </ModalBody>
 </ModalDialog>
 
-<ModalDialog @ref="@editDialog" Title="Удалить Оборудование">
+<ModalDialog @ref="@editDialog" Title="Изменить Оборудование">
     <ModalBody>
         <EditEquipmentForm Equipment="editEquipment" Folders="folders" OnUpdate="OnEdit" />
     </ModalBody>
@@ -123,6 +123,8 @@
                 await GetTreeItems();
 
             await GetSelectedState();
+
+            await GetFolders();
 
             isConnected = true;
 
@@ -288,6 +290,8 @@
 
         editEquipment = await Service.Get(treeItem.Id, isIncludeParent: false);
 
+        await GetFolders();
+
         editDialog?.Open();
     }
 
@@ -332,9 +336,9 @@
         }
         catch (Exception ex)
         {
-            errorMessage = ex.Message;
-            if (ex.InnerException is not null)
-                errorMessage = ex.InnerException.Message;
+            errorMessage = $"{ex.Message} {ex.InnerException?.Message}";
+            if (errorMessage.Contains("SAME TABLE REFERENCE"))
+                errorMessage = "Нельзя удалить. Папка сожержит вложенные объекты.";
             errorDialog?.Open();
         }
         finally

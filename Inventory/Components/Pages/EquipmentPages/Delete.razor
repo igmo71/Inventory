@@ -15,6 +15,14 @@
 <div>
     <h2>Оборудование</h2>
     <hr />
+
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @errorMessage
+        </div>
+    }
+
     @if (equipment is null)
     {
         <p><em>Загрузка...</em></p>
@@ -46,6 +54,8 @@
     [SupplyParameterFromQuery]
     private string? Id { get; set; }
 
+    private string? errorMessage;
+
     protected override async Task OnInitializedAsync()
     {
         if (Id is not null)
@@ -57,8 +67,17 @@
 
     private async Task DeleteEquipment()
     {
-        await Service.Delete(equipment!);
+        try
+        {
+            await Service.Delete(equipment!);
 
-        NavigationManager.NavigateTo("/equipment");
+            NavigationManager.NavigateTo("/equipment");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"{ex.Message} {ex.InnerException?.Message}";
+            if (errorMessage.Contains("SAME TABLE REFERENCE"))
+                errorMessage = "Нельзя удалить. Папка сожержит вложенные объекты.";
+        }
     }
 }

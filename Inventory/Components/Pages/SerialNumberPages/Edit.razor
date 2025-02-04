@@ -44,6 +44,12 @@ else
                     <InputText id="number" @bind-Value="SerialNumber.Number" class="form-control" />
                     <ValidationMessage For="() => SerialNumber.Number" class="text-danger" />
                 </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" @bind="SerialNumber.IsAssigned" value="@SerialNumber.IsAssigned" id="isAssigned">
+                    <label class="form-check-label" for="isAssigned">
+                        Выдан
+                    </label>
+                </div>
                 <button type="submit" class="btn btn-primary">Сохранить</button>
             </EditForm>
         </div>

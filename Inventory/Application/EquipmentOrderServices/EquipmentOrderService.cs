@@ -2,6 +2,7 @@
 using Inventory.Common.Results;
 using Inventory.Data;
 using Inventory.Domain;
+using Inventory.EventBus;
 using Microsoft.AspNetCore.Components.QuickGrid;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,9 +25,15 @@ namespace Inventory.Application.EquipmentOrderServices
         bool Exists(string id);
     }
 
-    public class EquipmentOrderService(IDbContextFactory<ApplicationDbContext> dbFactory) : IEquipmentOrderService
+    public class EquipmentOrderService(
+        IDbContextFactory<ApplicationDbContext> dbFactory, 
+        IEquipmentOrderEventBus equipmentOrderEventBus,
+        IEquipmentOrderEventHandler equipmentOrderEventHandler
+        ) : IEquipmentOrderService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _dbFactory = dbFactory;
+        private readonly IEquipmentOrderEventBus _equipmentOrderEventBus = equipmentOrderEventBus;
+        private readonly IEquipmentOrderEventHandler _equipmentOrderEventHandler = equipmentOrderEventHandler;
 
         public async Task<ListResult<EquipmentOrder>> GetList(
             GridItemsProviderRequest<EquipmentOrder> request,
@@ -63,8 +70,13 @@ namespace Inventory.Application.EquipmentOrderServices
         public async Task<string> Create(EquipmentOrder equipmentOrder)
         {
             using var context = _dbFactory.CreateDbContext();
+
             context.EquipmentOrders.Add(equipmentOrder);
+
             await context.SaveChangesAsync();
+
+            await _equipmentOrderEventBus.PublishEquipmentOrderCreated(equipmentOrder);
+
             return equipmentOrder.Id;
         }
 
@@ -76,6 +88,8 @@ namespace Inventory.Application.EquipmentOrderServices
             try
             {
                 await context.SaveChangesAsync();
+
+                await _equipmentOrderEventBus.PublishEquipmentOrderUpdated(equipmentOrder);
 
                 return Result.Success();
             }
@@ -95,8 +109,12 @@ namespace Inventory.Application.EquipmentOrderServices
         public async Task Delete(EquipmentOrder equipmentOrder)
         {
             using var context = _dbFactory.CreateDbContext();
+
             context.EquipmentOrders.Remove(equipmentOrder);
+
             await context.SaveChangesAsync();
+
+            await _equipmentOrderEventBus.PublishEquipmentOrderDeleted(equipmentOrder);
         }
 
         public bool Exists(string id)

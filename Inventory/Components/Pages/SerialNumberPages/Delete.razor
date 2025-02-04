@@ -28,6 +28,10 @@
             <dt class="col-sm-2">Серийный Номер</dt>
             <dd class="col-sm-10">@serialnumber.Number</dd>
         </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Выдан</dt>
+            <dd class="col-sm-10">@serialnumber.IsAssigned</dd>
+        </dl>
         <EditForm method="post" Model="serialnumber" OnValidSubmit="DeleteSerialNumber" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(serialnumber is null)">Удалить</button> |
             <a href="/serialnumbers">Назад к Списку</a>

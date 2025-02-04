@@ -25,17 +25,17 @@
     else
     {
         <dl class="row">
-            <dt class="col-sm-2">Автор</dt>
-            <dd class="col-sm-10">@equipmentOrder.Author?.Name</dd>
-        </dl>
-        <dl class="row">
             <dt class="col-sm-2">Номер</dt>
             <dd class="col-sm-10">@equipmentOrder.Number</dd>
         </dl>
         <dl class="row">
             <dt class="col-sm-2">Дата</dt>
             <dd class="col-sm-10">@equipmentOrder.DateTime</dd>
-        </dl>        
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Автор</dt>
+            <dd class="col-sm-10">@equipmentOrder.Author?.Name</dd>
+        </dl>
         <dl class="row">
             <dt class="col-sm-2">Оборудование</dt>
             <dd class="col-sm-10">@equipmentOrder.Equipment?.Name</dd>
@@ -93,18 +93,6 @@
     {
         await Service.Delete(equipmentOrder!);
 
-        await UpdateSerialNumber();
-
         NavigationManager.NavigateTo("/equipmentorders");
-    }
-
-    private async Task UpdateSerialNumber()
-    {
-        if (equipmentOrder is not null && equipmentOrder.SerialNumber != null)
-        {
-            equipmentOrder.SerialNumber.IsAssigned = false;
-
-            await SerialNumberService.Update(equipmentOrder.SerialNumber);
-        }
     }
 }

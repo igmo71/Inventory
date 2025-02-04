@@ -48,15 +48,14 @@ else
                     </InputSelect>
                     <ValidationMessage For="() => Location.ParentId" class="text-danger" />
                 </div>
-                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button> |
+                    <a href=@(ReturnUrl ?? "/locations")>Назад к Списку</a>
+                </div>
             </EditForm>
         </div>
     </div>
 }
-
-<div>
-    <a href=@(ReturnUrl ?? "/locations")>Назад к Списку</a>
-</div>
 
 @code {
     [SupplyParameterFromQuery]

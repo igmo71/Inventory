@@ -24,6 +24,8 @@
             <dd class="col-sm-10">@serialnumber.Equipment?.Name</dd>
             <dt class="col-sm-2">Серийный Номер</dt>
             <dd class="col-sm-10">@serialnumber.Number</dd>
+            <dt class="col-sm-2">Выдан</dt>
+            <dd class="col-sm-10">@serialnumber.IsAssigned</dd>
         </dl>
         <div>
             <a href="@($"/serialnumbers/edit?id={serialnumber.Id}")">Изменить</a> |

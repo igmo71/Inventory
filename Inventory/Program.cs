@@ -4,6 +4,7 @@ using Inventory.Application.LocationServices;
 using Inventory.Components;
 using Inventory.Components.Account;
 using Inventory.Data;
+using Inventory.EventBus;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +50,12 @@ namespace Inventory
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
             builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+
             builder.Services.AddScoped<IEquipmentOrderService, EquipmentOrderService>();
+            builder.Services.AddScoped<IEquipmentOrderEventHandler, EquipmentOrderEventHandler>();
+            builder.Services.AddSingleton<IEquipmentOrderEventBus, EquipmentOrderEventBus>();
+            builder.Services.AddHostedService<EquipmentOrderEventDispatcher>();
+
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped<ISerialNumberService, SerialNumberService>();
 

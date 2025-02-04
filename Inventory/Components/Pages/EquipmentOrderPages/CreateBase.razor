@@ -1,4 +1,4 @@
-﻿@page "/equipmentorders/create"
+﻿@page "/equipmentorders/create-base"
 
 @using Inventory.Application
 @using Inventory.Application.EquipmentOrderServices
@@ -29,23 +29,24 @@
         <EditForm method="post" Model="EquipmentOrder" OnValidSubmit="AddEquipmentOrder" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert" />
-            <div class="form-floating mb-3">
-                <InputText id="number" @bind-Value="EquipmentOrder.Number" class="form-control" placeholder="АБ-123" />
+            <div class="mb-3">
                 <label for="number" class="form-label">Номер:</label>
+                <InputText id="number" @bind-Value="EquipmentOrder.Number" class="form-control" />
                 <ValidationMessage For="() => EquipmentOrder.Number" class="text-danger" />
             </div>
-            <div class="form-floating mb-3">
-                <InputDate id="datetime" @bind-Value="EquipmentOrder.DateTime" class="form-control" @bind-Value:format="dd.MM.yyyy hh:mi:ss" />
+            <div class="mb-3">
                 <label for="datetime" class="form-label">Дата:</label>
-                <ValidationMessage For="() => EquipmentOrder.DateTime" class="text-danger" />
+                <InputDate id="datetime" @bind-Value="EquipmentOrder.DateTime" class="form-control" @bind-Value:format="dd.MM.yyyy hh:mi:ss" disabled />
             </div>
-            <div class="form-floating mb-3">
-                @* <InputText id="authorid" @bind-Value="EquipmentOrder.Author.Name" class="form-control" disabled /> *@
-                <input type="text" value="@applicationUser?.Name" class="form-control" disabled />
+            <div class="mb-3">
                 <label for="authorid" class="form-label">Автор:</label>
-                @* <ValidationMessage For="() => EquipmentOrder.AuthorId" class="text-danger" /> *@
+                @if (EquipmentOrder.Author is not null)
+                {
+                    <InputText id="authorid" @bind-Value="EquipmentOrder.Author.Name" class="form-control" disabled />
+                }
             </div>
-            <div class="form-floating mb-3">
+            <div class="mb-3">
+                <label for="equipmentid" class="form-label">Оборудование:</label>
                 <InputSelect id="equipmentid" @bind-Value="EquipmentOrder.EquipmentId" @bind-Value:after="GetSerialNumbers" class="form-control">
                     <option value="">- Выберите -</option>
                     @foreach (var equip in equipment)
@@ -53,10 +54,10 @@
                         <option value="@equip.Id">@equip.Name</option>
                     }
                 </InputSelect>
-                <label for="equipmentid" class="form-label">Оборудование:</label>
                 <ValidationMessage For="() => EquipmentOrder.EquipmentId" class="text-danger" />
             </div>
-            <div class="form-floating mb-3">
+            <div class="mb-3">
+                <label for="serialnumberid" class="form-label">Серийный Номер:</label>
                 <InputSelect id="serialnumberid" @bind-Value="EquipmentOrder.SerialNumberId" class="form-control">
                     <option value="">- Выберите -</option>
                     @foreach (var serialNumber in serialNumbers)
@@ -64,10 +65,10 @@
                         <option value="@serialNumber.Id">@serialNumber.Number</option>
                     }
                 </InputSelect>
-                <label for="serialnumberid" class="form-label">Серийный Номер:</label>
                 <ValidationMessage For="() => EquipmentOrder.SerialNumberId" class="text-danger" />
             </div>
-            <div class="form-floating mb-3">
+            <div class="mb-3">
+                <label for="assigneeid" class="form-label">Ответственный:</label>
                 <InputSelect id="assigneeid" @bind-Value="EquipmentOrder.AssigneeId" class="form-control">
                     <option value="">- Выберите -</option>
                     @foreach (var user in applicationUsers)
@@ -75,10 +76,10 @@
                         <option value="@user.Id">@user.Name </option>
                     }
                 </InputSelect>
-                <label for="assigneeid" class="form-label">Ответственный:</label>
                 <ValidationMessage For="() => EquipmentOrder.AssigneeId" class="text-danger" />
             </div>
-            <div class="form-floating mb-3">
+            <div class="mb-3">
+                <label for="locationid" class="form-label">Локация:</label>
                 <InputSelect id="locationid" @bind-Value="EquipmentOrder.LocationId" class="form-control">
                     <option value="">- Выберите -</option>
                     @foreach (var location in locations)
@@ -86,25 +87,25 @@
                         <option value="@location.Id">@location.Name </option>
                     }
                 </InputSelect>
-                <label for="locationid" class="form-label">Локация:</label>
                 <ValidationMessage For="() => EquipmentOrder.LocationId" class="text-danger" />
             </div>
-            <div class="form-floating mb-3">
-                <InputDate id="ReceiptDate" @bind-Value="EquipmentOrder.ReceiptDate" class="form-control" disabled />
+            <div class="mb-3">
                 <label for="ReceiptDate" class="form-label">Дата выдачи:</label>
+                <InputDate id="ReceiptDate" @bind-Value="EquipmentOrder.ReceiptDate" class="form-control" disabled />
                 <ValidationMessage For="() => EquipmentOrder.ReceiptDate" class="text-danger" />
             </div>
-            <div class="form-floating mb-3">
-                <InputDate id="ReturnDate" @bind-Value="EquipmentOrder.ReturnDate" class="form-control" disabled />
+            <div class="mb-3">
                 <label for="ReturnDate" class="form-label">Дата возврата:</label>
+                <InputDate id="ReturnDate" @bind-Value="EquipmentOrder.ReturnDate" class="form-control" disabled />
                 <ValidationMessage For="() => EquipmentOrder.ReturnDate" class="text-danger" />
             </div>
-            <div>
-                <button type="submit" class="btn btn-primary">Создать</button> |
-                <a href=@(ReturnUrl ?? "/equipmentorders")>Назад к Списку</a>
-            </div>
+            <button type="submit" class="btn btn-primary">Создать</button>
         </EditForm>
     </div>
+</div>
+
+<div>
+    <a href=@(ReturnUrl ?? "/equipmentorders")>Назад к Списку</a>
 </div>
 
 @code {
@@ -129,7 +130,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await GetEquipment();
+        await GetLocations();
+        await GetApplicationUser();
+        GetApplicationUsers();
+
         EquipmentOrder.AuthorId = applicationUser?.Id;
+        EquipmentOrder.Author = applicationUser;
         EquipmentOrder.DateTime = DateTime.Now;
 
         if (EquipmentId is not null)
@@ -141,11 +148,6 @@
             if (SerialNumberId is not null)
                 EquipmentOrder.SerialNumberId = SerialNumberId;
         }
-
-        await GetEquipment();
-        await GetLocations();
-        await GetApplicationUser();
-        GetApplicationUsers();
     }
 
     private async Task GetEquipment()
@@ -172,7 +174,7 @@
     private async Task GetSerialNumbers()
     {
         var equipmentId = EquipmentOrder.EquipmentId;
-        var result = await SerialNumberService.GetList(isIncludeEquipment: true, equipmentId: equipmentId, isNotAssignedOnly: true);
+        var result = await SerialNumberService.GetList(0, null, isIncludeEquipment: true, equipmentId, isNotAssignedOnly: true);
         if (result.IsSuccess)
             serialNumbers = result.Value;
     }

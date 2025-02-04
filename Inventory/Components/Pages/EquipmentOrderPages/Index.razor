@@ -1,8 +1,12 @@
 ﻿@page "/equipmentorders"
+
+@using Inventory.Components.Icons
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
 @using Inventory.Application.EquipmentOrderServices
 @using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject NavigationManager NavigationManager
 @inject IEquipmentOrderService Service
 
 @attribute [Authorize]
@@ -12,19 +16,20 @@
 <h1>Ордера на Оборудование</h1>
 
 <p>
-    <a href="equipmentorders/create">Создать Новый</a>
+    <a href="equipmentorders/create"><PlusCircleIcon /><span> Создать Ордер </span></a>
+    @if (FilterAny)
+    {
+        <span> | </span>
+        <button class="btn btn-outline-secondary" @onclick=ClearFilter>Очистить поиск</button>
+    }
 </p>
 
-<p>
-    <button class="btn btn-primary" @onclick=ClearFilter>Очистить поиск</button>
-</p>
-
-<QuickGrid Class="table" ItemsProvider="itemsProvider" Virtualize="true" @ref="grid">
-    <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty" Title="Автор">
-    </PropertyColumn>
+<QuickGrid Class="table table-hover table-striped" ItemsProvider="itemsProvider" Virtualize="true" @ref="grid">
     <PropertyColumn Property="equipmentorder => equipmentorder.Number" Title="Номер">
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" Format="dd.MM.yyyy" Title="Дата">
+    </PropertyColumn>
+    <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty" Title="Автор">
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty" Title="Оборудование">
         <ColumnOptions>
@@ -59,11 +64,12 @@
     <PropertyColumn Property="equipmentorder => equipmentorder.ReturnDate" Format="dd.MM.yyyy" Title="Дата возврата">
     </PropertyColumn>
 
-
     <TemplateColumn Context="equipmentorder">
-        <a href="@($"equipmentorders/edit?id={equipmentorder.Id}")">Изменить</a> |
-        <a href="@($"equipmentorders/details?id={equipmentorder.Id}")">Детали</a> |
-        <a href="@($"equipmentorders/delete?id={equipmentorder.Id}")">Удалить</a>
+        <div class="btn-group">
+            <a class="btn btn-outline-success" href="@($"equipmentorders/edit?id={equipmentorder.Id}")" title="Изменить"><PencilIcon /></a>
+            <a class="btn btn-outline-primary" href="@($"equipmentorders/details?id={equipmentorder.Id}")" title="Детали"><InfoLgIcon /></a>
+            <a class="btn btn-outline-danger" href="@($"equipmentorders/delete?id={equipmentorder.Id}")" title="Ужалить"><Trash3Icon /></a>
+        </div>
     </TemplateColumn>
 </QuickGrid>
 
@@ -144,7 +150,16 @@
 
     void ClearFilter()
     {
+        if (EquipmentId != null || SerialNumberId != null)
+            NavigationManager.NavigateTo("/equipmentorders");
+
         filterParameters = new EquipmentOrderFilterParameters();
         grid!.RefreshDataAsync();
     }
+
+    bool FilterAny =>
+            filterParameters.assigneeId != null || filterParameters.assigneeName != null ||
+            filterParameters.equipmentId != null || filterParameters.equipmentName != null ||
+            filterParameters.serialNumberId != null || filterParameters.serialNumber != null ||
+            filterParameters.locationId != null || filterParameters.locationName != null;
 }

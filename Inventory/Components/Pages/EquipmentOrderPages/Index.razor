@@ -16,10 +16,9 @@
 <h1>Ордера на Оборудование</h1>
 
 <p>
-    <a href="equipmentorders/create"><PlusCircleIcon /><span> Создать Ордер </span></a>
+    <a href="equipmentorders/create" class="btn btn-outline-primary me-3"><PlusLgIcon /><span> Создать Ордер </span></a>
     @if (FilterAny)
     {
-        <span> | </span>
         <button class="btn btn-outline-secondary" @onclick=ClearFilter>Очистить поиск</button>
     }
 </p>

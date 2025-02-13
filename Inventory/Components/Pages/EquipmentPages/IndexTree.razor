@@ -144,22 +144,6 @@
         return false;
     }
 
-    private async Task GetSelectedState()
-    {
-        var selectedTreeItemResult = await ProtectedSessionStore.GetAsync<string>(nameof(selectedTreeItem));
-        if (selectedTreeItemResult.Success && !string.IsNullOrEmpty(selectedTreeItemResult.Value))
-        {
-            string selectedTreeItemString = selectedTreeItemResult.Value;
-            selectedTreeItem = JsonSerializer.Deserialize<TreeItem?>(selectedTreeItemString, jsonOptions);
-            if (selectedTreeItem is not null)
-            {
-                var listResult = await SerialNumberService.GetList(equipmentId: selectedTreeItem.Id);
-                serialNumbers = listResult.Value;
-            }
-
-        }
-    }
-
     private async Task GetTreeItems(TreeItem? treeItem = null)
     {
         List<Equipment>? equipment;
@@ -187,6 +171,22 @@
         else
         {
             treeItem.Children = null;
+        }
+    }
+
+    private async Task GetSelectedState()
+    {
+        var selectedTreeItemResult = await ProtectedSessionStore.GetAsync<string>(nameof(selectedTreeItem));
+        if (selectedTreeItemResult.Success && !string.IsNullOrEmpty(selectedTreeItemResult.Value))
+        {
+            string selectedTreeItemString = selectedTreeItemResult.Value;
+            selectedTreeItem = JsonSerializer.Deserialize<TreeItem?>(selectedTreeItemString, jsonOptions);
+            if (selectedTreeItem is not null)
+            {
+                var listResult = await SerialNumberService.GetList(equipmentId: selectedTreeItem.Id);
+                serialNumbers = listResult.Value;
+            }
+
         }
     }
 

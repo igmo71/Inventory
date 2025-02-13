@@ -31,7 +31,7 @@ namespace Inventory.Data
             builder.Entity<Equipment>().Property(e => e.Name).HasMaxLength(AppSettings.NAME_LENGTH);
 
             
-            //builder.Entity<EquipmentOrder>().Property<byte[]>("Version").IsRowVersion();
+            builder.Entity<EquipmentOrder>().Property(e => e.RowVersion).IsRowVersion();
             builder.Entity<EquipmentOrder>().HasOne(e => e.Equipment).WithMany().HasForeignKey(e => e.EquipmentId).HasPrincipalKey(e => e.Id);
             builder.Entity<EquipmentOrder>().HasOne(e => e.SerialNumber).WithMany().HasForeignKey(e => e.SerialNumberId).HasPrincipalKey(e => e.Id);
             builder.Entity<EquipmentOrder>().Property(e => e.EquipmentId).HasMaxLength(AppSettings.GUID_LENGTH);

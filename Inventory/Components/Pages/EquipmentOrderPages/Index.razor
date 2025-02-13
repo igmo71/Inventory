@@ -23,18 +23,19 @@
     }
 </p>
 
-<QuickGrid Class="table table-hover table-striped" ItemsProvider="itemsProvider" Virtualize="true" @ref="grid">
+<QuickGrid Class="table table-hover table-striped" ItemsProvider="itemsProvider" Virtualize="true" @ref="grid" ItemKey="@(x => x.Id)">
     <PropertyColumn Property="equipmentorder => equipmentorder.Number" Title="Номер">
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.DateTime" Format="dd.MM.yyyy" Title="Дата">
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.Author != null ? equipmentorder.Author.Name : string.Empty" Title="Автор">
     </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty" Title="Оборудование">
+    <PropertyColumn Sortable=true Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty" Title="Оборудование">
         <ColumnOptions>
             <div class="search-box">
                 <input class="form-control" type="search" autofocus value="@filterParameters.equipmentName" @oninput="OnInputEquipmentFilter" placeholder="Оборудование..." />
             </div>
+            <div>Hello? World!</div>
         </ColumnOptions>
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty" Title="Серийный номер">

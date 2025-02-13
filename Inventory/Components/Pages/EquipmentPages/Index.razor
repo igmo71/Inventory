@@ -20,9 +20,9 @@
 </p>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
-    <PropertyColumn Property="equipment => equipment.Name" Title="Наименование" />
-    <PropertyColumn Property="equipment => equipment.IsFolder" Title="Это Папка" />
-    <TemplateColumn Context="equipment" Title="Родительская Папка!">
+    <PropertyColumn Property="equipment => equipment.Name" Title="Наименование" Sortable="true" />
+    <PropertyColumn Property="equipment => equipment.IsFolder" Title="Это Папка" Sortable="true" />
+    <TemplateColumn Context="equipment" Title="Родительская Папка!" Sortable="true">
         <HeaderTemplate>
             <th>Родительская Папка</th>
         </HeaderTemplate>

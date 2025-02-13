@@ -14,7 +14,7 @@ public static class EquipmentEndpoints
         {
             var result = await db.Equipment
             //.AsNoTracking()
-            .Select(e => new { e.Id, e.Name, e.IsFolder, e.ParentId })
+            //.Select(e => new { e.Id, e.Name, e.IsFolder, e.ParentId })
             .ToListAsync();
 
             var entries = db.ChangeTracker.Entries();

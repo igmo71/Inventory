@@ -32,7 +32,7 @@
         <div class="d-flex flex-row mb-1">
             <div class="d-inline-flex ms-auto">
                 <button class="btn btn-outline-primary" title="Создать  на верхнем уровне"
-                @onclick="() => OpenCreateDialog()">
+                        @onclick="() => OpenCreateDialog()">
                     <PlusLgIcon /><span> Создать </span>
                 </button>
             </div>
@@ -46,9 +46,23 @@
                     <div class="btn text-start" @onclick="() => SelectItem(treeItem)">
                         @treeItem.Value
                     </div>
+                    <div class="btn-group dropend">
+                        <div class="btn dropdown-toggle dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="visually-hidden">Toggle Dropdown</span>
+                        </div>
+                        <ul class="dropdown-menu">
+                            @if (treeItem.IsFolder)
+                            {
+                                <li><a class="dropdown-item" href="/equipment/create?parentId=@treeItem.Id"><PlusLgIcon /> Создать в этой папке</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                            }
+                            <li><a class="dropdown-item" href="/equipment/edit?id=@treeItem.Id"><PencilIcon /> Изменить</a></li>
+                            <li><a class="dropdown-item" href="/equipment/delete?id=@treeItem.Id"><Trash3Icon /> Удалить</a></li>
+                        </ul>
+                    </div>
                     <div class="ms-auto">
                         <button class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке"
-                        @onclick="() => OpenCreateDialog(treeItem)">
+                                @onclick="() => OpenCreateDialog(treeItem)">
                             <PlusLgIcon />
                         </button>
                         <div class="btn-group">

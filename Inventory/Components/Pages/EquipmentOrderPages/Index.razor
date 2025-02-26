@@ -32,10 +32,10 @@
     </PropertyColumn>
     <PropertyColumn Sortable=true Property="equipmentorder => equipmentorder.Equipment != null ? equipmentorder.Equipment.Name : string.Empty" Title="Оборудование">
         <ColumnOptions>
+            <div class="mb-2">Поиск по наименованию:</div>
             <div class="search-box">
                 <input class="form-control" type="search" autofocus value="@filterParameters.equipmentName" @oninput="OnInputEquipmentFilter" placeholder="Оборудование..." />
             </div>
-            <div>Hello? World!</div>
         </ColumnOptions>
     </PropertyColumn>
     <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty" Title="Серийный номер">

@@ -80,7 +80,7 @@ namespace Inventory
 
             app.MapStaticAssets();
             app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode();
+                .AddInteractiveServerRenderMode(options => options.DisableWebSocketCompression = true);
 
             // Add additional endpoints required by the Identity /Account Razor components.
             app.MapAdditionalIdentityEndpoints();

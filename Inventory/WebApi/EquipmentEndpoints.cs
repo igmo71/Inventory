@@ -6,18 +6,17 @@ namespace Inventory.WebApi;
 
 public static class EquipmentEndpoints
 {
-    public static void MapEquipmentEndpoints (this IEndpointRouteBuilder routes)
+    public static void MapEquipmentEndpoints(this IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("/api/Equipment").WithTags(nameof(Equipment));
 
         group.MapGet("/", async (ApplicationDbContext db) =>
         {
-            var result = await db.Equipment
-            //.AsNoTracking()
-            //.Select(e => new { e.Id, e.Name, e.IsFolder, e.ParentId })
+            var result = await db.Equipment//.AsNoTracking()
+            .Select(e => new { e.Id, e.Name, e.IsFolder, e.ParentId })
             .ToListAsync();
 
-            var entries = db.ChangeTracker.Entries();
+            //var entries = db.ChangeTracker.Entries();
 
             return result;
         })
@@ -26,11 +25,12 @@ public static class EquipmentEndpoints
 
         group.MapGet("/{id}", async Task<Results<Ok<Equipment>, NotFound>> (string id, ApplicationDbContext db) =>
         {
-            return await db.Equipment.AsNoTracking()
-                .FirstOrDefaultAsync(model => model.Id == id)
-                is Equipment model
-                    ? TypedResults.Ok(model)
-                    : TypedResults.NotFound();
+            var result = await db.Equipment//.AsNoTracking()
+                .FirstOrDefaultAsync(model => model.Id == id);
+
+            return result is Equipment model 
+                ? TypedResults.Ok(model) 
+                : TypedResults.NotFound();
         })
         .WithName("GetEquipmentById")
         .WithOpenApi();
@@ -54,7 +54,7 @@ public static class EquipmentEndpoints
         {
             db.Equipment.Add(equipment);
             await db.SaveChangesAsync();
-            return TypedResults.Created($"/api/Equipment/{equipment.Id}",equipment);
+            return TypedResults.Created($"/api/Equipment/{equipment.Id}", equipment);
         })
         .WithName("CreateEquipment")
         .WithOpenApi();

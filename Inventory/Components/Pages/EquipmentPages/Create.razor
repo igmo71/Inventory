@@ -41,13 +41,13 @@
                 </InputSelect>
                 <ValidationMessage For="() => Equipment.ParentId" class="text-danger" />
             </div>
-            <button type="submit" class="btn btn-primary">Создать</button>
+            <div>
+                <button type="submit" class="btn btn-primary">Создать</button> |
+                <a href="/equipment/tree">Назад к Списку</a>
+            </div>
+            
         </EditForm>
     </div>
-</div>
-
-<div>
-    <a href="/equipment">Назад к Списку</a>
 </div>
 
 @code {
@@ -71,6 +71,6 @@
     {
         string id = await Service.Create(Equipment);
 
-        NavigationManager.NavigateTo("/equipment");
+        NavigationManager.NavigateTo("/equipment/tree");
     }
 }

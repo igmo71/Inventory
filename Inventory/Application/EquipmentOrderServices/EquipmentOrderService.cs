@@ -36,7 +36,7 @@ namespace Inventory.Application.EquipmentOrderServices
         private readonly IEquipmentOrderEventHandler _equipmentOrderEventHandler = equipmentOrderEventHandler;
 
         public async Task<ListResult<EquipmentOrder>> GetList(
-            GridItemsProviderRequest<EquipmentOrder> request,
+            GridItemsProviderRequest<EquipmentOrder> gridRequest,
             EquipmentOrderIncludeParameters includeParameters,
             EquipmentOrderFilterParameters filterParameters)
         {
@@ -44,7 +44,7 @@ namespace Inventory.Application.EquipmentOrderServices
 
             var result = await context.EquipmentOrders
                 .AsNoTracking()
-                .HandleRequest(request)
+                .HandleRequest(gridRequest)
                 .PerformInclude(includeParameters)
                 .PerformFilter(filterParameters)
                 .OrderBy(e => e.DateTime)

@@ -31,6 +31,7 @@ namespace Inventory.Application
             string? parentId = null)
         {
             using var context = _dbFactory.CreateDbContext();
+
             var query = context.Equipment.AsNoTracking();
 
             if (skip is not null)
@@ -64,6 +65,8 @@ namespace Inventory.Application
         public async Task<List<Equipment>> GetFolders()
         {
             using var context = _dbFactory.CreateDbContext();
+
+            var vvv = await context.Equipment.AsNoTracking().Include(e => e.Parent).ToListAsync();
 
             var result = await context.Equipment.AsNoTracking()
                 .Where(e => e.IsFolder)

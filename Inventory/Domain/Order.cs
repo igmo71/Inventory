@@ -6,6 +6,8 @@ namespace Inventory.Domain
     {
         public required string Id { get; set; }
 
+        public byte[]? RowVersion { get; set; }
+
         public DateTime DateTime { get; set; }
 
         public string? Number { get; set; }

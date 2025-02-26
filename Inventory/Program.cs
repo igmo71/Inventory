@@ -8,6 +8,7 @@ using Inventory.EventBus;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Inventory.WebApi;
 
 namespace Inventory
 {
@@ -33,9 +34,9 @@ namespace Inventory
                 })
                 .AddIdentityCookies();
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            builder.Services.AddDbContextFactory<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
             builder.Services.AddQuickGridEntityFrameworkAdapter();
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -59,6 +60,10 @@ namespace Inventory
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped<ISerialNumberService, SerialNumberService>();
 
+            builder.Services.AddEndpointsApiExplorer();
+
+            builder.Services.AddSwaggerGen();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -74,6 +79,13 @@ namespace Inventory
                 app.UseMigrationsEndPoint();
             }
 
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+            ;
+
             app.UseHttpsRedirection();
 
             app.UseAntiforgery();
@@ -84,6 +96,8 @@ namespace Inventory
 
             // Add additional endpoints required by the Identity /Account Razor components.
             app.MapAdditionalIdentityEndpoints();
+
+            app.MapEquipmentEndpoints();
 
             app.Run();
         }

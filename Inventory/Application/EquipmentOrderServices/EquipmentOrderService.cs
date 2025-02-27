@@ -47,7 +47,6 @@ namespace Inventory.Application.EquipmentOrderServices
                 .HandleRequest(gridRequest)
                 .PerformInclude(includeParameters)
                 .PerformFilter(filterParameters)
-                .OrderBy(e => e.DateTime)
                 .ToListAsync();
             var total = result.Count;
 

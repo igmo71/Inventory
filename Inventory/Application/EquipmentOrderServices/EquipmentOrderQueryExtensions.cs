@@ -14,7 +14,24 @@ namespace Inventory.Application.EquipmentOrderServices
             if (request.Count is not null)
                 query = query.Take((int)request.Count);
 
-            return query;
+            if (request.SortByColumn != null)
+            {
+                var sortExpression = ((PropertyColumn<EquipmentOrder, string>)request.SortByColumn)?.Property;
+                if (sortExpression != null)
+                {
+                    if (request.SortByAscending)
+                        query = query.OrderBy(sortExpression);
+                    else
+                        query = query.OrderByDescending(sortExpression);
+                }
+            }
+            else
+            {
+
+                query = query.OrderBy(e => e.DateTime);
+            }
+
+                return query;
         }
 
         public static IQueryable<EquipmentOrder> PerformInclude(this IQueryable<EquipmentOrder> query, EquipmentOrderIncludeParameters includeParameters)

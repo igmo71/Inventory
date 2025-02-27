@@ -38,21 +38,21 @@
             </div>
         </ColumnOptions>
     </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty" Title="Серийный номер">
+    <PropertyColumn Sortable=true Property="equipmentorder => equipmentorder.SerialNumber != null ? equipmentorder.SerialNumber.Number : string.Empty" Title="Серийный номер">
         <ColumnOptions>
             <div class="search-box">
                 <input class="form-control" type="search" autofocus value="@filterParameters.serialNumber" @oninput="OnInputSerialNumberFilter" placeholder="Серийный Номер..." />
             </div>
         </ColumnOptions>
     </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" Title="Ответственный">
+    <PropertyColumn Sortable=true Property="equipmentorder => equipmentorder.Assignee != null ? equipmentorder.Assignee.Name : string.Empty" Title="Ответственный">
         <ColumnOptions>
             <div class="search-box">
                 <input class="form-control" type="search" autofocus value="@filterParameters.assigneeName" @oninput="OnInputAssigneeFilter" placeholder="Ответственный..." />
             </div>
         </ColumnOptions>
     </PropertyColumn>
-    <PropertyColumn Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" Title="Локация">
+    <PropertyColumn Sortable=true Property="equipmentorder => equipmentorder.Location != null ? equipmentorder.Location.Name : string.Empty" Title="Локация">
         <ColumnOptions>
             <div class="search-box">
                 <input class="form-control" type="search" autofocus value="@filterParameters.locationName" @oninput="OnInputLocationFilter" placeholder="Локация..." />

@@ -5,7 +5,7 @@
 @inject NavigationManager NavigationManager
 @inject IEquipmentService Service
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Manager")]
 
 <PageTitle>Удалить</PageTitle>
 

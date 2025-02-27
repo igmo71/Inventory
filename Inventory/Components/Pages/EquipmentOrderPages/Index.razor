@@ -9,7 +9,7 @@
 @inject NavigationManager NavigationManager
 @inject IEquipmentOrderService Service
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Manager")]
 
 <PageTitle>Ордера на Оборудование</PageTitle>
 

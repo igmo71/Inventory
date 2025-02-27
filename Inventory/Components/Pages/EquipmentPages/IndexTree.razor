@@ -5,6 +5,7 @@
 @using Inventory.Components.ComponentTreeView
 @using Inventory.Components.Icons
 @using Inventory.Domain
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using System.Text.Json
 @using System.Text.Json.Serialization
@@ -13,6 +14,8 @@
 @inject ISerialNumberService SerialNumberService
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavigationManager
+
+@attribute [Authorize(Roles = "Manager")]
 
 <PageTitle>Оборудование</PageTitle>
 

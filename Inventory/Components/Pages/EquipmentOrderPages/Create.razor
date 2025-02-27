@@ -16,7 +16,7 @@
 @inject ISerialNumberService SerialNumberService
 @inject ILocationService LocationService
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Manager")]
 
 <PageTitle>Создать</PageTitle>
 

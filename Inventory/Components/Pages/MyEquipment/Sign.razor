@@ -16,7 +16,7 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "User")]
 
 <PageTitle>Подписать</PageTitle>
 

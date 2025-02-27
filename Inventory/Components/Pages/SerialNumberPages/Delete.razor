@@ -5,7 +5,7 @@
 @inject NavigationManager NavigationManager
 @inject ISerialNumberService Service
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Manager")]
 
 <PageTitle>Удалить</PageTitle>
 

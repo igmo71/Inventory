@@ -3,11 +3,14 @@
 @using Inventory.Components.ComponentTreeView
 @using Inventory.Components.Icons
 @using Inventory.Domain
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
 @inject ILocationService Service
 @inject ProtectedSessionStorage ProtectedSessionStorage
 @inject NavigationManager NavigationManager
+
+@attribute [Authorize(Roles = "Manager")]
 
 <h1>Локации</h1>
 

@@ -1,0 +1,72 @@
+﻿@using Inventory.Domain
+@using Microsoft.EntityFrameworkCore
+
+@inject IWebHostEnvironment WebHostEnvironment
+@inject ILogger<ComponentInputFile> Logger
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+
+
+<div class="mb-3 me-3">
+    <label for="formFileMultiple" class="form-label">Выберите или перетащите сюда файлы</label>
+    <InputFile OnChange="LoadFiles" multiple class="form-control" id="formFileMultiple" />
+</div>
+@if (isLoading)
+{
+    <div class="spinner-border mb-3" role="status">
+        <span class="visually-hidden">Загрузка...</span>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    private List<IBrowserFile> loadedFiles = [];
+    private long maxFileSize = 1024 * 150;
+    private int maxAllowedFiles = 3;
+    private bool isLoading;
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        loadedFiles.Clear();
+
+        using var context = DbFactory.CreateDbContext();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                if (Id is null)
+                    return;
+
+                var trustedFileName = Path.GetRandomFileName();
+                var path = Path.Combine(WebHostEnvironment.ContentRootPath, "wwwroot\\images", $"{Id}_{trustedFileName}");
+
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+                loadedFiles.Add(file);
+
+
+                context.EquipmentOrderFiles.Add(new EquipmentOrderFile
+                    {
+                        EquipmentOrderId = Id,
+                        TrustedFileName = trustedFileName,
+                        FileName = file.Name
+                    });
+
+                Logger.LogInformation("Unsafe Filename: {UnsafeFilename} File saved: {Filename}", file.Name, trustedFileName);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("File: {Filename} Error: {Error}", file.Name, ex.Message);
+            }
+        }
+        context.SaveChanges();
+
+        isLoading = false;
+    }
+}

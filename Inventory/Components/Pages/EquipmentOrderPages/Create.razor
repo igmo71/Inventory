@@ -3,6 +3,7 @@
 @using Inventory.Application
 @using Inventory.Application.EquipmentOrderServices
 @using Inventory.Application.LocationServices
+@using Inventory.Components.ComponentInputFile
 @using Inventory.Data
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
@@ -99,6 +100,9 @@
                 <label for="ReturnDate" class="form-label">Дата возврата:</label>
                 <ValidationMessage For="() => EquipmentOrder.ReturnDate" class="text-danger" />
             </div>
+
+            <ComponentInputFile Id="@EquipmentOrder.Id" />
+
             <div>
                 <button type="submit" class="btn btn-primary">Создать</button> |
                 <a href=@(ReturnUrl ?? "/equipmentorders")>Назад к Списку</a>

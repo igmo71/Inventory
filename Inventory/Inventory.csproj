@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EventBus\NewFolder\**" />
+    <Content Remove="EventBus\NewFolder\**" />
+    <EmbeddedResource Remove="EventBus\NewFolder\**" />
+    <None Remove="EventBus\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
@@ -21,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="EventBus\NewFolder\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

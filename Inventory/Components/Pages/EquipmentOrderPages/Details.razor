@@ -1,9 +1,12 @@
 ﻿@page "/equipmentorders/details"
 @using Inventory.Application.EquipmentOrderServices
+@using Inventory.Components.ComponentInputFile
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
+
 @inject NavigationManager NavigationManager
 @inject IEquipmentOrderService Service
+@inject IWebHostEnvironment WebHostEnvironment
 
 @attribute [Authorize(Roles = "Manager")]
 
@@ -18,7 +21,8 @@
     {
         <p><em>Загрузка...</em></p>
     }
-    else {
+    else
+    {
         <dl class="row">
             <dt class="col-sm-2">Номер</dt>
             <dd class="col-sm-10">@equipmentOrder.Number</dd>
@@ -39,6 +43,9 @@
             <dt class="col-sm-2">Дата возврата</dt>
             <dd class="col-sm-10">@equipmentOrder.ReturnDate</dd>
         </dl>
+        
+        <ComponentGetImages Id="@equipmentOrder.Id" />
+
         <div>
             <a href="@($"/equipmentorders/edit?id={equipmentOrder.Id}")">Изменить</a> |
             <a href="@($"/equipmentorders")">Назад к Списку</a>
@@ -54,7 +61,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (Id is not null) 
+        if (Id is not null)
             equipmentOrder = await Service.Get(Id, new EquipmentOrderIncludeParameters
                 {
                     isIncludeAssignee = true,

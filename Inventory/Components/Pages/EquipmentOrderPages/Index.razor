@@ -1,5 +1,6 @@
 ﻿@page "/equipmentorders"
 
+@using Inventory.Components.ComponentInputFile
 @using Inventory.Components.Icons
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
@@ -8,6 +9,7 @@
 
 @inject NavigationManager NavigationManager
 @inject IEquipmentOrderService Service
+
 
 @attribute [Authorize(Roles = "Manager")]
 
@@ -66,7 +68,7 @@
 
     <TemplateColumn Context="equipmentorder">
         <div class="btn-group">
-            <a class="btn btn-outline-success" href="@($"equipmentorders/edit-base?id={equipmentorder.Id}")" title="Изменить"><PencilIcon /></a>
+            <a class="btn btn-outline-success" href="@($"equipmentorders/edit?id={equipmentorder.Id}")" title="Изменить"><PencilIcon /></a>
             <a class="btn btn-outline-primary" href="@($"equipmentorders/details?id={equipmentorder.Id}")" title="Детали"><InfoLgIcon /></a>
             <a class="btn btn-outline-danger" href="@($"equipmentorders/delete?id={equipmentorder.Id}")" title="Ужалить"><Trash3Icon /></a>
         </div>
@@ -86,7 +88,7 @@
 
     int numResults;
 
-    EquipmentOrderFilterParameters filterParameters;
+    EquipmentOrderFilterParameters filterParameters;    
 
     protected override void OnInitialized()
     {
@@ -162,4 +164,6 @@
             filterParameters.equipmentId != null || filterParameters.equipmentName != null ||
             filterParameters.serialNumberId != null || filterParameters.serialNumber != null ||
             filterParameters.locationId != null || filterParameters.locationName != null;
+
+    
 }

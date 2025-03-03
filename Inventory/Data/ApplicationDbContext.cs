@@ -9,6 +9,8 @@ namespace Inventory.Data
     {
         public DbSet<Equipment> Equipment { get; set; }
         public DbSet<EquipmentOrder> EquipmentOrders { get; set; }
+        public DbSet<EquipmentOrderFile> EquipmentOrderFiles { get; set; }
+
         public DbSet<Location> Locations { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<MaterialBalance> MaterialBalances { get; set; }
@@ -36,6 +38,12 @@ namespace Inventory.Data
             builder.Entity<EquipmentOrder>().HasOne(e => e.SerialNumber).WithMany().HasForeignKey(e => e.SerialNumberId).HasPrincipalKey(e => e.Id);
             builder.Entity<EquipmentOrder>().Property(e => e.EquipmentId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<EquipmentOrder>().Property(e => e.SerialNumberId).HasMaxLength(AppSettings.GUID_LENGTH);
+
+            builder.Entity<EquipmentOrderFile>().HasKey(e => new { e.EquipmentOrderId, e.TrustedFileName });
+            builder.Entity<EquipmentOrderFile>().HasOne(e => e.EquipmentOrder).WithMany(e => e.Files).HasForeignKey(e => e.EquipmentOrderId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<EquipmentOrderFile>().Property(e => e.EquipmentOrderId).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<EquipmentOrderFile>().Property(e => e.TrustedFileName).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<EquipmentOrderFile>().Property(e => e.FileName).HasMaxLength(AppSettings.GUID_LENGTH);
 
             builder.Entity<Location>().HasKey(e => e.Id);
             builder.Entity<Location>().HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).HasPrincipalKey(e => e.Id);

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250228152954_CreateEquipmentOrderFile")]
-    partial class CreateEquipmentOrderFile
+    [Migration("20250314145203_CreateAppFiles")]
+    partial class CreateAppFiles
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,6 +94,34 @@ namespace Inventory.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Inventory.Domain.AppFile", b =>
+                {
+                    b.Property<string>("TrustedFileName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
+
+                    b.HasKey("TrustedFileName");
+
+                    b.ToTable("AppFiles");
+
+                    b.HasDiscriminator().HasValue("AppFile");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("Inventory.Domain.Equipment", b =>
                 {
                     b.Property<string>("Id")
@@ -116,25 +144,6 @@ namespace Inventory.Migrations
                     b.HasIndex("ParentId");
 
                     b.ToTable("Equipment");
-                });
-
-            modelBuilder.Entity("Inventory.Domain.EquipmentOrderFile", b =>
-                {
-                    b.Property<string>("EquipmentOrderId")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<string>("TrustedFileName")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<string>("FileName")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.HasKey("EquipmentOrderId", "TrustedFileName");
-
-                    b.ToTable("EquipmentOrderFiles");
                 });
 
             modelBuilder.Entity("Inventory.Domain.Location", b =>
@@ -503,6 +512,13 @@ namespace Inventory.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Inventory.Domain.EquipmentOrderFile", b =>
+                {
+                    b.HasBaseType("Inventory.Domain.AppFile");
+
+                    b.HasDiscriminator().HasValue("EquipmentOrderFile");
+                });
+
             modelBuilder.Entity("Inventory.Domain.EquipmentOrder", b =>
                 {
                     b.HasBaseType("Inventory.Domain.Order");
@@ -539,17 +555,6 @@ namespace Inventory.Migrations
                         .HasForeignKey("ParentId");
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("Inventory.Domain.EquipmentOrderFile", b =>
-                {
-                    b.HasOne("Inventory.Domain.EquipmentOrder", "EquipmentOrder")
-                        .WithMany("Files")
-                        .HasForeignKey("EquipmentOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EquipmentOrder");
                 });
 
             modelBuilder.Entity("Inventory.Domain.Location", b =>
@@ -751,11 +756,6 @@ namespace Inventory.Migrations
             modelBuilder.Entity("Inventory.Domain.Material", b =>
                 {
                     b.Navigation("Children");
-                });
-
-            modelBuilder.Entity("Inventory.Domain.EquipmentOrder", b =>
-                {
-                    b.Navigation("Files");
                 });
 
             modelBuilder.Entity("Inventory.Domain.MaterialOrder", b =>

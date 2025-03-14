@@ -3,7 +3,7 @@
 @using Inventory.Application
 @using Inventory.Application.EquipmentOrderServices
 @using Inventory.Application.LocationServices
-@using Inventory.Components.ComponentInputFile
+@using Inventory.Components.ComponentAppFile
 @using Inventory.Data
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
@@ -121,11 +121,11 @@ else
                     <ValidationMessage For="() => EquipmentOrder.ReturnDate" class="text-danger" />
                 </div>
 
-
-                <ComponentInputFile Id="@EquipmentOrder.Id" />
+                <AppInputFile Id="@EquipmentOrder.Id" />
                 
-                <div>
+                <div class="mb-3">
                     <button type="submit" class="btn btn-primary">Сохранить</button> |
+                    <a href="@($"equipmentorders/details?id={Id}")" title="Детали">Посмотреть</a> |
                     <a href="/equipmentorders">Назад к Списку</a>
                 </div>
             </EditForm>

@@ -9,7 +9,5 @@
         public string? SerialNumberId { get; set; }
 
         public DateTime? ReturnDate { get; set; }
-
-        public List<EquipmentOrderFile>? Files { get; set; }
     }
 }

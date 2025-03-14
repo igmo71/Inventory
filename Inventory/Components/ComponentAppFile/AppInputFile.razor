@@ -2,7 +2,7 @@
 @using Microsoft.EntityFrameworkCore
 
 @inject IWebHostEnvironment WebHostEnvironment
-@inject ILogger<ComponentInputFile> Logger
+@inject ILogger<AppInputFile> Logger
 @inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
 
 
@@ -17,16 +17,42 @@
     </div>
 }
 
+@if (files is not null)
+{
+    <table class="table table-hover  table-striped">
+        @foreach (var file in files)
+        {
+            <tr>
+                <td>@file.FileName</td>
+                <td>
+                    <button type="button" class="btn-close btn-sm text-danger"  title="Удалить"></button>
+                </td>
+            </tr>
+        }
+    </table>
+}
+
 
 
 @code {
     [Parameter]
     public string? Id { get; set; }
 
+    [Parameter]
+    public EventCallback OnLoad { get; set; }
+
     private List<IBrowserFile> loadedFiles = [];
-    private long maxFileSize = 1024 * 150;
+    private long maxFileSize = 1024 * 100;
     private int maxAllowedFiles = 3;
     private bool isLoading;
+    private bool isSuccesss;
+
+    private List<AppFile>? files;
+
+    protected override void OnInitialized()
+    {
+        GetFiles();
+    }
 
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
@@ -42,21 +68,22 @@
                 if (Id is null)
                     return;
 
-                var trustedFileName = Path.GetRandomFileName();
-                var path = Path.Combine(WebHostEnvironment.ContentRootPath, "wwwroot\\images", $"{Id}_{trustedFileName}");
+                var trustedFileName = $"{Id}_{Path.ChangeExtension(Path.GetRandomFileName(), Path.GetExtension(file.Name))}";
+                var path = Path.Combine(WebHostEnvironment.ContentRootPath, "wwwroot\\images", trustedFileName);
 
                 await using FileStream fs = new(path, FileMode.Create);
                 await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
 
                 loadedFiles.Add(file);
 
-
-                context.EquipmentOrderFiles.Add(new EquipmentOrderFile
+                var equipmentOrderFile = new EquipmentOrderFile
                     {
-                        EquipmentOrderId = Id,
+                        Id = Id,
                         TrustedFileName = trustedFileName,
                         FileName = file.Name
-                    });
+                    };
+
+                context.EquipmentOrderFiles.Add(equipmentOrderFile);
 
                 Logger.LogInformation("Unsafe Filename: {UnsafeFilename} File saved: {Filename}", file.Name, trustedFileName);
             }
@@ -65,8 +92,23 @@
                 Logger.LogError("File: {Filename} Error: {Error}", file.Name, ex.Message);
             }
         }
+
         context.SaveChanges();
 
         isLoading = false;
+
+        GetFiles();
+
+        if (OnLoad.HasDelegate)
+            await OnLoad.InvokeAsync();
+    }
+
+    private void GetFiles()
+    {
+        using var context = DbFactory.CreateDbContext();
+        files = context.AppFiles
+            .Where(e => e.Id == Id)
+            .OrderBy(e => e.FileName)
+            .ToList();
     }
 }

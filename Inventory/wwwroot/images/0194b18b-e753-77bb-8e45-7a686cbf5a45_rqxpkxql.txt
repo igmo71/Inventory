@@ -1,0 +1,6 @@
+MigrationId,ProductVersion
+00000000000000_CreateIdentitySchema,9.0.0
+20241230103514_Initialize,9.0.0
+20241230150935_ApplicationUserName,9.0.0
+20250120110133_AddReceiptDateAndReturnDate,9.0.0
+20250213101606_AddRowVersion,9.0.0

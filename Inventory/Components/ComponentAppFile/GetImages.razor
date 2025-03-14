@@ -12,26 +12,28 @@ else
 {
     foreach (var image in images)
     {
-        <div>
-            <div>@image.FileName</div>
-            <img src="@($"/images/{image.EquipmentOrderId}_{image.TrustedFileName}.jpg")" />
+        <div class="card mb-3 w-50">
+            <div class="card-header">
+                @image.FileName
+            </div>
+            <img src="@($"images/{image.TrustedFileName}")" class="card-img-bottom img-fluid" />
         </div>
     }
 }
-<img src="/images/1.jpg" />
 
 
 @code {
     [Parameter]
     public string? Id { get; set; }
 
-    private List<EquipmentOrderFile>? images;
+    private List<AppFile>? images;
 
     protected override void OnInitialized()
     {
         using var context = DbFactory.CreateDbContext();
-        images = context.EquipmentOrderFiles
-            .Where(e => e.EquipmentOrderId == Id)
+        images = context.AppFiles
+            .Where(e => e.Id == Id)
+            .OrderBy(e => e.FileName)
             .ToList();
     }
 }

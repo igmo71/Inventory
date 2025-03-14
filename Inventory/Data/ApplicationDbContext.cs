@@ -7,6 +7,8 @@ namespace Inventory.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
+        public DbSet<AppFile> AppFiles { get; set; }
+
         public DbSet<Equipment> Equipment { get; set; }
         public DbSet<EquipmentOrder> EquipmentOrders { get; set; }
         public DbSet<EquipmentOrderFile> EquipmentOrderFiles { get; set; }
@@ -24,6 +26,11 @@ namespace Inventory.Data
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<AppFile>().HasKey(e => e.TrustedFileName);
+            builder.Entity<EquipmentOrderFile>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);
+            builder.Entity<EquipmentOrderFile>().Property(e => e.TrustedFileName).HasMaxLength(AppSettings.NAME_LENGTH);
+            builder.Entity<EquipmentOrderFile>().Property(e => e.FileName).HasMaxLength(AppSettings.NAME_LENGTH);
+
             builder.Entity<ApplicationUser>().Property(e => e.Name).HasMaxLength(AppSettings.NAME_LENGTH);
 
             builder.Entity<Equipment>().HasKey(e => e.Id);
@@ -31,19 +38,11 @@ namespace Inventory.Data
             builder.Entity<Equipment>().Property(e => e.Id).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<Equipment>().Property(e => e.ParentId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<Equipment>().Property(e => e.Name).HasMaxLength(AppSettings.NAME_LENGTH);
-
             
-            builder.Entity<EquipmentOrder>().Property(e => e.RowVersion).IsRowVersion();
             builder.Entity<EquipmentOrder>().HasOne(e => e.Equipment).WithMany().HasForeignKey(e => e.EquipmentId).HasPrincipalKey(e => e.Id);
             builder.Entity<EquipmentOrder>().HasOne(e => e.SerialNumber).WithMany().HasForeignKey(e => e.SerialNumberId).HasPrincipalKey(e => e.Id);
             builder.Entity<EquipmentOrder>().Property(e => e.EquipmentId).HasMaxLength(AppSettings.GUID_LENGTH);
             builder.Entity<EquipmentOrder>().Property(e => e.SerialNumberId).HasMaxLength(AppSettings.GUID_LENGTH);
-
-            builder.Entity<EquipmentOrderFile>().HasKey(e => new { e.EquipmentOrderId, e.TrustedFileName });
-            builder.Entity<EquipmentOrderFile>().HasOne(e => e.EquipmentOrder).WithMany(e => e.Files).HasForeignKey(e => e.EquipmentOrderId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<EquipmentOrderFile>().Property(e => e.EquipmentOrderId).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<EquipmentOrderFile>().Property(e => e.TrustedFileName).HasMaxLength(AppSettings.GUID_LENGTH);
-            builder.Entity<EquipmentOrderFile>().Property(e => e.FileName).HasMaxLength(AppSettings.GUID_LENGTH);
 
             builder.Entity<Location>().HasKey(e => e.Id);
             builder.Entity<Location>().HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).HasPrincipalKey(e => e.Id);
@@ -87,6 +86,7 @@ namespace Inventory.Data
             builder.Entity<MaterialTurnover>().Property(e => e.OrderId).HasMaxLength(AppSettings.GUID_LENGTH);
 
             builder.Entity<Order>().HasKey(e => e.Id);
+            builder.Entity<Order>().Property(e => e.RowVersion).IsRowVersion();
             builder.Entity<Order>().HasOne(e => e.Author).WithMany().HasForeignKey(e => e.AuthorId).HasPrincipalKey(e => e.Id);
             builder.Entity<Order>().HasOne(e => e.Assignee).WithMany().HasForeignKey(e => e.AssigneeId).HasPrincipalKey(e => e.Id);
             builder.Entity<Order>().HasOne(e => e.Location).WithMany().HasForeignKey(e => e.LocationId).HasPrincipalKey(e => e.Id);

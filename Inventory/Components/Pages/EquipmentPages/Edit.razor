@@ -1,5 +1,6 @@
 ﻿@page "/equipment/edit"
 @using Inventory.Application
+@using Inventory.Components.ComponentAppFile
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
@@ -46,8 +47,12 @@ else
                     </InputSelect>
                     <ValidationMessage For="() => Equipment.ParentId" class="text-danger" />
                 </div>
+
+                <AppInputFile Id="@Equipment.Id" />
+
                 <div>
                     <button type="submit" class="btn btn-primary">Сохранить</button> |
+                    <a href="@($"equipment/details?id={Id}")" title="Детали">Посмотреть</a> |
                     <a href="/equipment/tree">Назад к Списку</a>
                 </div>
             </EditForm>

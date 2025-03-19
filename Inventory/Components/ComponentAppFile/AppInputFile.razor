@@ -1,4 +1,5 @@
-﻿@using Inventory.Domain
+﻿@using Inventory.Components.Icons
+@using Inventory.Domain
 @using Microsoft.EntityFrameworkCore
 
 @inject IWebHostEnvironment WebHostEnvironment
@@ -19,13 +20,20 @@
 
 @if (files is not null)
 {
-    <table class="table table-hover  table-striped">
+    <table class="table">
         @foreach (var file in files)
         {
-            <tr>
-                <td>@file.FileName</td>
-                <td>
-                    <button type="button" class="btn-close btn-sm text-danger"  title="Удалить"></button>
+            <tr class="row">
+                <td class="col-2">
+                    <div class="card">
+                        <img src="@($"images/{file.TrustedFileName}")" class="card-img-bottom img-fluid" />
+                    </div>
+                </td>
+                <td class="col-8">@file.FileName</td>
+                <td class="col-2">
+                    <div>
+                        <button type="button" class="btn btn-outline-danger border-0 rounded-circle" @onclick="() => DeleteFile(file)" title="Удалить"><Trash3Icon /></button>
+                    </div>
                 </td>
             </tr>
         }
@@ -38,11 +46,8 @@
     [Parameter]
     public string? Id { get; set; }
 
-    [Parameter]
-    public EventCallback OnLoad { get; set; }
-
     private List<IBrowserFile> loadedFiles = [];
-    private long maxFileSize = 1024 * 100;
+    private long maxFileSize = 1024 * 1000 * 5;
     private int maxAllowedFiles = 3;
     private bool isLoading;
     private bool isSuccesss;
@@ -98,9 +103,18 @@
         isLoading = false;
 
         GetFiles();
+    }
 
-        if (OnLoad.HasDelegate)
-            await OnLoad.InvokeAsync();
+    private void DeleteFile(AppFile appFile)
+    {
+        var path = Path.Combine(WebHostEnvironment.ContentRootPath, "wwwroot\\images", appFile.TrustedFileName);
+        File.Delete(path);
+
+        using var context = DbFactory.CreateDbContext();
+        context.AppFiles.Remove(appFile);
+        context.SaveChanges();
+
+        GetFiles();
     }
 
     private void GetFiles()

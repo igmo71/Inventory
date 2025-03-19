@@ -1,5 +1,6 @@
 ﻿@page "/equipment/details"
 @using Inventory.Application
+@using Inventory.Components.ComponentAppFile
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
 @inject NavigationManager NavigationManager
@@ -21,16 +22,21 @@
     else
     {
         <dl class="row">
-            <dt class="col-sm-2">Наименование</dt>
-            <dd class="col-sm-10">@equipment.Name</dd>
-            <dt class="col-sm-2">Это Папка</dt>
-            <dd class="col-sm-10">@equipment.IsFolder</dd>
-            <dt class="col-sm-2">В Папке</dt>
-            <dd class="col-sm-10">@equipment.Parent?.Name</dd>
+            <dt class="col-md-2">Наименование</dt>
+            <dd class="col-md-10">@equipment.Name</dd>
+            <dt class="col-md-2">Это Папка</dt>
+            <dd class="col-md-10">@equipment.IsFolder</dd>
+            <dt class="col-md-2">В Папке</dt>
+            <dd class="col-md-10">@equipment.Parent?.Name</dd>
         </dl>
+        <div class="row">
+            <div class="col-md-4">
+                <GetImages Id="@equipment.Id" />
+            </div>
+        </div>
         <div>
             <a href="@($"/equipment/edit?id={equipment.Id}")">Изменить</a> |
-            <a href="@($"/equipment")">Назад к Списку</a>
+            <a href="@($"/equipment/tree")">Назад к Списку</a>
         </div>
     }
 </div>

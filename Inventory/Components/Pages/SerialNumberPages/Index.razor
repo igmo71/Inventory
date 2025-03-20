@@ -1,9 +1,13 @@
 ﻿@page "/serialnumbers"
+
 @using Inventory.Application
+@using Inventory.Components.Icons
 @using Inventory.Domain
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.QuickGrid
+
 @inject ISerialNumberService Service
+@inject NavigationManager NavigationManager
 
 @attribute [Authorize(Roles = "Manager")]
 
@@ -21,10 +25,19 @@
     <PropertyColumn Property="serialnumber => serialnumber.Number" Title="Серийный Номер" />
     <PropertyColumn Property="serialnumber => serialnumber.IsAssigned" Title="Выдан" />
 
-    <TemplateColumn Context="serialnumber">
-        <a href="@($"serialnumbers/edit?id={serialnumber.Id}")">Изменить</a> |
-        <a href="@($"serialnumbers/details?id={serialnumber.Id}")">Детали</a> |
-        <a href="@($"serialnumbers/delete?id={serialnumber.Id}")">Удалить</a>
+    <TemplateColumn Context="serialnumber">       
+        <div class="btn-group rounded-pill">
+            <a href="@($"serialnumbers/details?id={serialnumber.Id}")" class="btn btn-outline-primary border-0 rounded-circle" title="Детали">
+                <InfoLgIcon />
+            </a>
+            <a href="@($"serialnumbers/edit?id={serialnumber.Id}")" class="btn btn-outline-success border-0 rounded-circle" title="Изменить">
+                <PencilIcon />
+            </a>
+            <a href="@($"serialnumbers/delete?id={serialnumber.Id}")" class="btn btn-outline-danger border-0 rounded-circle" title="Удалить">
+                <Trash3Icon />
+            </a>
+        </div>
+
     </TemplateColumn>
 </QuickGrid>
 

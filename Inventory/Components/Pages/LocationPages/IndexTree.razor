@@ -1,4 +1,5 @@
 ﻿@page "/locations/tree"
+
 @using Inventory.Application.LocationServices
 @using Inventory.Components.ComponentTreeView
 @using Inventory.Components.Icons
@@ -26,6 +27,14 @@
     <div class="col">
         @if (isConnected)
         {
+            <div class="d-flex flex-row mb-1">
+                <div class="d-inline-flex ms-auto">
+                    <a href="locations/create?returnUrl=@(NavigationManager.Uri)"
+                       class="btn btn-outline-primary" title="Создать на верхнем уровне">
+                        <PlusLgIcon /><span> Создать </span>
+                    </a>
+                </div>
+            </div>
             <TreeView TreeItems="treeItems">
                 <TreeItemTemplate Context="treeItem">
                     <div class="d-flex flex-row @(treeItem.Id == selectedTreeItemId ? "bg-body-secondary" : string.Empty)">
@@ -37,7 +46,7 @@
                         </div>
                         <div class="ms-auto">
                             <a href="locations/create?parentId=@(treeItem.Id)&returnUrl=@(NavigationManager.Uri)"
-                            class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке">
+                               class="btn btn-outline-primary @(treeItem.IsFolder ? string.Empty : "invisible")" title="Создать в этой папке">
                                 <PlusLgIcon />
                             </a>
                             <div class="btn-group">
@@ -114,12 +123,12 @@
     private List<TreeItem> From(List<Location> locations)
     {
         var list = locations.Select(e => new TreeItem
-            {
-                Id = e.Id,
-                Value = e.Name,
-                IsFolder = e.IsFolder,
-                ParentId = e.ParentId
-            }).ToList();
+        {
+            Id = e.Id,
+            Value = e.Name,
+            IsFolder = e.IsFolder,
+            ParentId = e.ParentId
+        }).ToList();
 
         return list;
     }

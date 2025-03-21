@@ -74,7 +74,7 @@
                     return;
 
                 var trustedFileName = $"{Id}_{Path.ChangeExtension(Path.GetRandomFileName(), Path.GetExtension(file.Name))}";
-                var path = Path.Combine(WebHostEnvironment.ContentRootPath, "wwwroot\\images", trustedFileName);
+                var path = Path.Combine(WebHostEnvironment.ContentRootPath, "wwwroot/images", trustedFileName);
 
                 await using FileStream fs = new(path, FileMode.Create);
                 await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
@@ -107,7 +107,7 @@
 
     private void DeleteFile(AppFile appFile)
     {
-        var path = Path.Combine(WebHostEnvironment.ContentRootPath, "wwwroot\\images", appFile.TrustedFileName);
+        var path = Path.Combine(WebHostEnvironment.ContentRootPath, "wwwroot/images", appFile.TrustedFileName);
         File.Delete(path);
 
         using var context = DbFactory.CreateDbContext();

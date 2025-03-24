@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-//using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace Inventory
 {
@@ -56,9 +56,10 @@ namespace Inventory
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
-            //builder.Services.AddDataProtection()
-            //    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\DataProtectionKeys"))
-            //    .SetApplicationName("MyBlazorApp");
+            builder.Services.AddDataProtection()
+                //.PersistKeysToFileSystem(new DirectoryInfo(@"C:\DataProtectionKeys"))
+                .PersistKeysToFileSystem(new DirectoryInfo(@"/app/DataProtectionKeys"))
+                .SetApplicationName("MyBlazorApp");
 
 
             builder.Services.AddScoped<IEquipmentService, EquipmentService>();

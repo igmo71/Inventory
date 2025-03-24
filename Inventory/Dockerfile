@@ -16,6 +16,8 @@ COPY ["Inventory/Inventory.csproj", "Inventory/"]
 RUN dotnet restore "./Inventory/Inventory.csproj"
 COPY . .
 WORKDIR "/src/Inventory"
+RUN mkdir -p /app/wwwroot/appfiles && chmod -R 777 /app/wwwroot/appfiles
+RUN mkdir -p /app/DataProtectionKeys && chmod -R 777 /app/DataProtectionKeys
 RUN dotnet build "./Inventory.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
@@ -27,5 +29,4 @@ RUN dotnet publish "./Inventory.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN mkdir -p /app/wwwroot/appfiles && chmod -R 777 /app/wwwroot/appfiles
 ENTRYPOINT ["dotnet", "Inventory.dll"]

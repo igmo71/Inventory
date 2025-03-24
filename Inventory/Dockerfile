@@ -27,4 +27,5 @@ RUN dotnet publish "./Inventory.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+RUN mkdir -p /app/wwwroot/appfiles && chmod -R 777 /app/wwwroot/appfiles
 ENTRYPOINT ["dotnet", "Inventory.dll"]

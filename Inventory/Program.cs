@@ -5,10 +5,12 @@ using Inventory.Components;
 using Inventory.Components.Account;
 using Inventory.Data;
 using Inventory.EventBus;
+using Inventory.WebApi;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Inventory.WebApi;
+using Serilog;
+//using Microsoft.AspNetCore.DataProtection;
 
 namespace Inventory
 {
@@ -17,6 +19,10 @@ namespace Inventory
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Host.UseSerilog((ctx, lc) => lc
+                .ReadFrom.Configuration(ctx.Configuration)
+                .WriteTo.Console());
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
@@ -49,6 +55,11 @@ namespace Inventory
                 .AddDefaultTokenProviders();
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+            //builder.Services.AddDataProtection()
+            //    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\DataProtectionKeys"))
+            //    .SetApplicationName("MyBlazorApp");
+
 
             builder.Services.AddScoped<IEquipmentService, EquipmentService>();
 

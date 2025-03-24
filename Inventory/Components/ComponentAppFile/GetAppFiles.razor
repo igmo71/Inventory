@@ -1,0 +1,39 @@
+﻿@using Inventory.Domain
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<Inventory.Data.ApplicationDbContext> DbFactory
+
+@if (images is null)
+{
+    <div class="spinner-border mb-3" role="status">
+        <span class="visually-hidden">Загрузка...</span>
+    </div>
+}
+else
+{
+    foreach (var image in images)
+    {
+        <div class="card mb-3">
+            <div class="card-header">
+                @image.FileName
+            </div>
+            <img src="@($"appfiles/{image.TrustedFileName}")" class="card-img-bottom img-fluid" />
+        </div>
+    }
+}
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    private List<AppFile>? images;
+
+    protected override void OnInitialized()
+    {
+        using var context = DbFactory.CreateDbContext();
+        images = context.AppFiles
+            .Where(e => e.Id == Id)
+            .OrderBy(e => e.FileName)
+            .ToList();
+    }
+}
